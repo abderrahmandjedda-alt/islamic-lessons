@@ -232,3 +232,135 @@ footer {
   .logo h1 { font-size: 1rem; }
   .lessons-grid { grid-template-columns: 1fr; }
 }
+/* ═══════════════════════════════════════════ */
+/* 🎨 إضافات التصنيف الجديد                    */
+/* ═══════════════════════════════════════════ */
+
+/* Breadcrumb */
+.breadcrumb {
+  padding: 15px 0;
+  font-size: 0.9rem;
+  color: var(--text-light);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.crumb-link {
+  color: var(--primary);
+  cursor: pointer;
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+.crumb-link:hover { opacity: 0.7; text-decoration: underline; }
+.crumb-sep { opacity: 0.5; }
+.crumb-current { color: var(--text); font-weight: 700; }
+
+/* Back button */
+.back-btn {
+  background: var(--card);
+  border: 2px solid var(--border);
+  color: var(--text);
+  padding: 8px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  transition: all 0.2s;
+}
+.back-btn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* Years grid */
+.years-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+.year-card {
+  background: var(--card);
+  padding: 30px 20px;
+  border-radius: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 2px solid transparent;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+.year-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  transform: scaleX(0);
+  transition: transform 0.3s;
+}
+.year-card:hover::before { transform: scaleX(1); }
+.year-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--primary);
+  box-shadow: 0 12px 40px rgba(13, 148, 136, 0.2);
+}
+.year-icon { font-size: 3.5rem; display: block; margin-bottom: 15px; }
+.year-card h4 { font-size: 1.1rem; margin-bottom: 12px; color: var(--text); }
+.year-card .count {
+  display: inline-block;
+  background: var(--primary);
+  color: white;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* Specializations grid */
+.specializations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+.specialization-card {
+  background: var(--card);
+  padding: 25px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s;
+  border-right: 4px solid var(--primary);
+  box-shadow: var(--shadow);
+}
+.specialization-card:hover {
+  transform: translateX(-5px);
+  background: linear-gradient(to left, var(--card), rgba(13, 148, 136, 0.05));
+}
+.spec-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+.spec-icon { font-size: 2rem; }
+.specialization-card h4 { font-size: 1.15rem; color: var(--text); line-height: 1.4; }
+.spec-meta {
+  display: flex;
+  gap: 20px;
+  font-size: 0.9rem;
+  color: var(--text-light);
+  font-weight: 600;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+  .years-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .year-icon { font-size: 2.5rem; }
+  .year-card { padding: 20px 15px; }
+  .year-card h4 { font-size: 0.95rem; }
+  .specializations-grid { grid-template-columns: 1fr; }
+}

@@ -7,7 +7,9 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// مجلدات
+// ═══════════════════════════════════════════════
+// 📁 المجلدات
+// ═══════════════════════════════════════════════
 const UPLOAD_DIR = path.join(__dirname, 'uploads');
 const DATA_DIR = path.join(__dirname, 'data');
 const DATA_FILE = path.join(DATA_DIR, 'lessons.json');
@@ -16,15 +18,27 @@ if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR);
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR);
 if (!fs.existsSync(DATA_FILE)) fs.writeFileSync(DATA_FILE, '[]');
 
-// كلمة سر الأدمن
+// ═══════════════════════════════════════════════
+// 🔐 كلمة سر الأدمن
+// ═══════════════════════════════════════════════
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'MyStr0ng!Pass2025#Jeddah';
 
+// ═══════════════════════════════════════════════
+// ⚙️ إعدادات Express
+// ═══════════════════════════════════════════════
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(UPLOAD_DIR));
 
-// إعداد رفع الملفات
+// الصفحة الرئيسية
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// ═══════════════════════════════════════════════
+// 📤 إعداد رفع الملفات (multer)
+// ═══════════════════════════════════════════════
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, UPLOAD_DIR),
   filename: (req, file, cb) => {
@@ -36,7 +50,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 50 * 1024 * 1024 },
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50 ميغا
   fileFilter: (req, file, cb) => {
     const allowed = ['.pdf', '.doc', '.docx'];
     const ext = path.extname(file.originalname).toLowerCase();
@@ -45,27 +59,35 @@ const upload = multer({
   }
 });
 
-// قراءة/كتابة البيانات
+// ═══════════════════════════════════════════════
+// 💾 قراءة/كتابة قاعدة البيانات
+// ═══════════════════════════════════════════════
 const readData = () => JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
 const writeData = (data) => fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
 
-// التحقق من كلمة سر الأدمن
+// ═══════════════════════════════════════════════
+// 🔒 التحقق من كلمة سر الأدمن
+// ═══════════════════════════════════════════════
 const checkAdmin = (req, res, next) => {
   const pwd = req.headers['x-admin-password'];
   if (pwd === ADMIN_PASSWORD) return next();
   res.status(401).json({ error: 'كلمة السر غير صحيحة' });
 };
 
-// رفع درس جديد
+// ═══════════════════════════════════════════════
+// 📤 رفع درس جديد
+// ═══════════════════════════════════════════════
 app.post('/api/lessons', checkAdmin, upload.single('file'), (req, res) => {
   try {
-    const { title, subject, description } = req.body;
+    const { title, year, specialization, subject, description } = req.body;
     if (!req.file) return res.status(400).json({ error: 'لم يتم إرسال ملف' });
 
     const lessons = readData();
     const lesson = {
       id: Date.now().toString(),
       title: title || 'بدون عنوان',
+      year: year || 'غير محدد',
+      specialization: specialization || 'غير محدد',
       subject: subject || 'عام',
       description: description || '',
       filename: req.file.originalname,
@@ -83,12 +105,16 @@ app.post('/api/lessons', checkAdmin, upload.single('file'), (req, res) => {
   }
 });
 
-// كل الدروس
+// ═══════════════════════════════════════════════
+// 📚 كل الدروس
+// ═══════════════════════════════════════════════
 app.get('/api/lessons', (req, res) => {
   res.json(readData());
 });
 
-// حذف درس
+// ═══════════════════════════════════════════════
+// 🗑️ حذف درس
+// ═══════════════════════════════════════════════
 app.delete('/api/lessons/:id', checkAdmin, (req, res) => {
   const lessons = readData();
   const idx = lessons.findIndex(l => l.id === req.params.id);
@@ -102,12 +128,17 @@ app.delete('/api/lessons/:id', checkAdmin, (req, res) => {
   res.json({ success: true });
 });
 
-// التحقق من كلمة السر
+// ═══════════════════════════════════════════════
+// 🔐 التحقق من كلمة السر
+// ═══════════════════════════════════════════════
 app.post('/api/login', (req, res) => {
   if (req.body.password === ADMIN_PASSWORD) res.json({ success: true });
   else res.status(401).json({ error: 'كلمة السر خاطئة' });
 });
 
+// ═══════════════════════════════════════════════
+// 🚀 بدء السيرفر
+// ═══════════════════════════════════════════════
 app.listen(PORT, () => {
   console.log(`✅ الموقع يعمل على http://localhost:${PORT}`);
 });

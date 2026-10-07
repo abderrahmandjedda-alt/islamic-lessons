@@ -36,6 +36,33 @@
   <div class="upload-card">
     <h3>📤 رفع درس جديد</h3>
     <form id="uploadForm">
+  <label>السنة الدراسية</label>
+  <select name="year" id="yearSelect" required onchange="updateSpecializations()">
+    <option value="">اختر السنة</option>
+  </select>
+
+  <label>التخصص</label>
+  <select name="specialization" id="specializationSelect" required onchange="updateSubjects()">
+    <option value="">اختر السنة أولاً</option>
+  </select>
+
+  <label>المادة</label>
+  <select name="subject" id="subjectSelect" required>
+    <option value="">اختر التخصص أولاً</option>
+  </select>
+
+  <label>عنوان الدرس</label>
+  <input type="text" name="title" required placeholder="مثال: المدخل إلى الحضارة الإسلامية">
+
+  <label>وصف مختصر (اختياري)</label>
+  <textarea name="description" rows="3" placeholder="وصف موجز عن الدرس"></textarea>
+
+  <label>الملف (PDF أو Word)</label>
+  <input type="file" name="file" accept=".pdf,.doc,.docx" required>
+
+  <button type="submit" class="btn-primary">📥 رفع الدرس</button>
+  <p id="uploadStatus" class="status"></p>
+</form>
       <label>عنوان الدرس</label>
       <input type="text" name="title" required placeholder="مثال: المدخل إلى الحضارة الإسلامية">
 
