@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الدروس السنة الأولى ماستر لغة وحضارة إسلامية</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header class="navbar">
+  <div class="container nav-wrap">
+    <div class="logo">
+      <span class="logo-icon">📖</span>
+      <div>
+        <h1>الدروس الجامعية</h1>
+        <p>السنة الأولى ماستر — لغة وحضارة إسلامية</p>
+      </div>
+    </div>
+    <nav>
+      <a href="#home">🏠 الرئيسية</a>
+      <a href="#subjects">📚 المواد</a>
+      <a href="#lessons">📄 الدروس</a>
+      <a href="admin.html" class="btn-admin">👨‍🎓 لوحة التحكم</a>
+      <button id="themeToggle" class="theme-btn">🌙</button>
+    </nav>
+  </div>
+</header>
+
+<section id="home" class="hero">
+  <div class="container">
+    <h2>📖 منصة الدروس الجامعية</h2>
+    <p>كل دروسك في مكان واحد — PDF و Word — متاحة لك ولأصدقائك في أي وقت</p>
+    <p class="author">إعداد: <strong>جدة عبد الرحمن</strong></p>
+    <div class="search-hero">
+      <input type="text" id="searchInput" placeholder="🔎 ابحث عن درس، مادة، أو ملف...">
+    </div>
+  </div>
+</section>
+
+<section id="subjects" class="container section">
+  <h3 class="section-title">📚 المواد الدراسية</h3>
+  <div id="subjectsGrid" class="subjects-grid"></div>
+</section>
+
+<section id="lessons" class="container section">
+  <h3 class="section-title">📄 كل الدروس</h3>
+  <div id="lessonsGrid" class="lessons-grid"></div>
+  <div id="emptyMsg" class="empty" style="display:none;">
+    لا توجد دروس بعد. ادخل إلى <a href="admin.html">لوحة التحكم</a> لرفع أول درس.
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>© 2025 — الدروس الجامعية | جدة عبد الرحمن</p>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

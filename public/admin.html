@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة التحكم — رفع الدروس</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header class="navbar">
+  <div class="container nav-wrap">
+    <div class="logo">
+      <span class="logo-icon">👨‍🎓</span>
+      <div><h1>لوحة التحكم</h1><p>رفع وإدارة الدروس</p></div>
+    </div>
+    <nav>
+      <a href="index.html">🏠 الرئيسية</a>
+      <button id="themeToggle" class="theme-btn">🌙</button>
+    </nav>
+  </div>
+</header>
+
+<div id="loginScreen" class="container section">
+  <div class="login-box">
+    <h3>🔐 الدخول إلى لوحة التحكم</h3>
+    <p>أدخل كلمة السر الخاصة بك</p>
+    <input type="password" id="passwordInput" placeholder="كلمة السر">
+    <button id="loginBtn" class="btn-primary">دخول</button>
+    <p id="loginError" class="error"></p>
+  </div>
+</div>
+
+<div id="adminPanel" class="container section" style="display:none;">
+  <div class="upload-card">
+    <h3>📤 رفع درس جديد</h3>
+    <form id="uploadForm">
+      <label>عنوان الدرس</label>
+      <input type="text" name="title" required placeholder="مثال: المدخل إلى الحضارة الإسلامية">
+
+     <label>المادة</label>
+<select name="subject" id="subjectSelect" required>
+  <option value="حفظ القرآن">حفظ القرآن</option>
+  <option value="تاريخ المصحف">تاريخ المصحف</option>
+  <option value="أصول النحو ومذاهبه">أصول النحو ومذاهبه</option>
+  <option value="دراسات في البلاغة العربية">دراسات في البلاغة العربية</option>
+  <option value="علم الدلالة">علم الدلالة</option>
+  <option value="مصادر الاحتجاج اللغوي">مصادر الاحتجاج اللغوي</option>
+  <option value="علم الرسم والضبط 1">علم الرسم والضبط 1</option>
+  <option value="غريب القرآن">غريب القرآن</option>
+  <option value="اللغة الإنجليزية">اللغة الإنجليزية</option>
+  <option value="البرمجة والذكاء الاصطناعي">البرمجة والذكاء الاصطناعي</option>
+  <option value="نظرية النظم">نظرية النظم</option>
+  <option value="اللسانيات">اللسانيات</option>
+  <option value="عام">عام</option>
+</select>
+
+      <label>وصف مختصر (اختياري)</label>
+      <textarea name="description" rows="3" placeholder="وصف موجز عن الدرس"></textarea>
+
+      <label>الملف (PDF أو Word)</label>
+      <input type="file" name="file" accept=".pdf,.doc,.docx" required>
+
+      <button type="submit" class="btn-primary">📥 رفع الدرس</button>
+      <p id="uploadStatus" class="status"></p>
+    </form>
+  </div>
+
+  <div class="manage-card">
+    <h3>🗂️ إدارة الدروس المرفوعة</h3>
+    <div id="adminLessons"></div>
+  </div>
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>
