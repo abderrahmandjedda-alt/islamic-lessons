@@ -1146,3 +1146,51 @@ footer::before {
   background: var(--gold);
   color: white;
 }
+/* ═══════════════════════════════════════════════ */
+/* ✨ تذييل: اسم المعدّ                             */
+/* ═══════════════════════════════════════════════ */
+
+.footer-line {
+  font-size: 0.95rem;
+  opacity: 0.85;
+  margin-bottom: 8px;
+}
+
+.footer-author {
+  font-family: 'Amiri', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.5px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(212, 165, 116, 0.3);
+  display: inline-block;
+  padding-left: 30px;
+  padding-right: 30px;
+  position: relative;
+}
+
+/* نجمة قبل الاسم */
+.footer-author::before,
+.footer-author::after {
+  content: '✦';
+  color: var(--gold);
+  opacity: 0.6;
+  margin: 0 12px;
+  font-size: 0.8rem;
+  position: absolute;
+  top: 14px;
+}
+
+.footer-author::before {
+  left: 0;
+}
+
+.footer-author::after {
+  right: 0;
+}
+
+[data-theme="dark"] .footer-author {
+  color: var(--gold-light);
+}
