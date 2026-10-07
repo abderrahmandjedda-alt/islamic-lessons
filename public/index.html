@@ -5,14 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>كلية العلوم الإسلامية - الدروس الجامعية</title>
 <link rel="stylesheet" href="style.css">
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
 
 <header class="navbar">
   <div class="container nav-wrap">
     <div class="logo">
-      <span class="logo-icon">🏛️</span>
+      <span class="logo-icon">☪</span>
       <div>
         <h1>كلية العلوم الإسلامية</h1>
         <p>جامعة وهران 1 أحمد بن بلة</p>
@@ -26,56 +26,50 @@
   </div>
 </header>
 
-<!-- Hero -->
 <section class="hero">
   <div class="container">
-    <h2>📖 منصة الدروس الجامعية</h2>
+    <h2>﷽</h2>
+    <h2>منصة الدروس الجامعية</h2>
     <p>اختر السنة → التخصص → المادة → تصفّح الدروس</p>
     <div class="search-hero">
-      <input type="text" id="searchInput" placeholder="🔎 ابحث عن درس، مادة، أو ملف...">
+      <input type="text" id="searchInput" placeholder="ابحث عن درس، مادة، أو ملف...">
     </div>
   </div>
 </section>
 
-<!-- Breadcrumb -->
 <div class="container">
   <div id="breadcrumb" class="breadcrumb"></div>
 </div>
 
-<!-- شاشة اختيار السنة -->
 <section id="yearsSection" class="container section">
-  <h3 class="section-title">📅 اختر السنة الدراسية</h3>
+  <h3 class="section-title">اختر السنة الدراسية</h3>
   <div id="yearsGrid" class="years-grid"></div>
 </section>
 
-<!-- شاشة اختيار التخصص -->
 <section id="specializationsSection" class="container section" style="display:none;">
   <button class="back-btn" onclick="goHome()">← رجوع إلى السنوات</button>
-  <h3 class="section-title" id="specTitle">🎓 اختر التخصص</h3>
+  <h3 class="section-title" id="specTitle">اختر التخصص</h3>
   <div id="specializationsGrid" class="specializations-grid"></div>
 </section>
 
-<!-- شاشة اختيار المادة -->
 <section id="subjectsSection" class="container section" style="display:none;">
   <button class="back-btn" onclick="backToSpecializations()">← رجوع إلى التخصصات</button>
-  <h3 class="section-title" id="subjectTitle">📚 اختر المادة</h3>
+  <h3 class="section-title" id="subjectTitle">اختر المادة</h3>
   <div id="subjectsGrid" class="subjects-grid"></div>
 </section>
 
-<!-- شاشة عرض الدروس -->
 <section id="lessonsSection" class="container section" style="display:none;">
   <button class="back-btn" onclick="backToSubjects()">← رجوع إلى المواد</button>
-  <h3 class="section-title" id="lessonsTitle">📄 الدروس</h3>
+  <h3 class="section-title" id="lessonsTitle">الدروس</h3>
   <div id="lessonsGrid" class="lessons-grid"></div>
   <div id="emptyMsg" class="empty" style="display:none;">
     لا توجد دروس في هذه المادة بعد.
   </div>
 </section>
 
-<!-- نتائج البحث -->
 <section id="searchResultsSection" class="container section" style="display:none;">
   <button class="back-btn" onclick="goHome()">← رجوع</button>
-  <h3 class="section-title">🔎 نتائج البحث</h3>
+  <h3 class="section-title">نتائج البحث</h3>
   <div id="searchResultsGrid" class="lessons-grid"></div>
   <div id="searchEmptyMsg" class="empty" style="display:none;">
     لا توجد نتائج مطابقة لبحثك.
@@ -84,7 +78,7 @@
 
 <footer>
   <div class="container">
-    <p>© 2025 — كلية العلوم الإسلامية | جامعة وهران 1</p>
+    <p>© 2025 — كلية العلوم الإسلامية | جامعة وهران 1 أحمد بن بلة</p>
   </div>
 </footer>
 
