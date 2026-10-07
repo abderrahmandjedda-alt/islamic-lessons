@@ -1,1 +1,31 @@
-[]
+[
+  {
+    "id": "1791405177026",
+    "title": "dfgfe",
+    "year": "M1",
+    "specialization": "اللغة والدراسات القرآنية",
+    "subject": "علم الدلالة",
+    "description": "",
+    "filename": "Ø§ÙÙØ­Ø§Ø¶Ø±Ø© Ø§ÙØ£ÙÙÙ.pdf",
+    "storedName": "islamic-lessons/1791405173504-908321867.pdf",
+    "size": 213611,
+    "type": "pdf",
+    "url": "https://res.cloudinary.com/hrj01i4p/raw/upload/v1791405176/islamic-lessons/1791405173504-908321867.pdf",
+    "storage": "cloudinary",
+    "date": "2026-10-07T20:32:57.026Z"
+  },
+  {
+    "id": "1791400392514",
+    "title": "مفهوم الدلالة",
+    "year": "M1",
+    "specialization": "اللغة والدراسات القرآنية",
+    "subject": "علم الدلالة",
+    "description": "",
+    "filename": "Ø§ÙÙØ­Ø§Ø¶Ø±Ø© Ø§ÙØ£ÙÙÙ.pdf",
+    "storedName": "1791400392509-739738712.pdf",
+    "size": 213611,
+    "type": "pdf",
+    "url": "/uploads/1791400392509-739738712.pdf",
+    "date": "2026-10-07T19:13:12.514Z"
+  }
+]

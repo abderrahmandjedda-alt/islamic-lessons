@@ -3,9 +3,29 @@ const multer = require('multer');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const cloudinary = require('cloudinary').v2;
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// ═══════════════════════════════════════════════
+// ☁️ إعداد Cloudinary
+// ═══════════════════════════════════════════════
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+const useCloudinary = !!(process.env.CLOUDINARY_CLOUD_NAME && 
+                          process.env.CLOUDINARY_API_KEY && 
+                          process.env.CLOUDINARY_API_SECRET);
+
+if (useCloudinary) {
+  console.log('☁️ Cloudinary مفعّل - الملفات ستُخزّن بشكل دائم');
+} else {
+  console.log('📁 Cloudinary غير مفعّل - الملفات ستُخزّن محلياً');
+}
 
 // ═══════════════════════════════════════════════
 // 📁 المجلدات
@@ -31,22 +51,14 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(UPLOAD_DIR));
 
-// الصفحة الرئيسية
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // ═══════════════════════════════════════════════
-// 📤 إعداد رفع الملفات (multer)
+// 📤 إعداد رفع الملفات (multer - للذاكرة)
 // ═══════════════════════════════════════════════
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, UPLOAD_DIR),
-  filename: (req, file, cb) => {
-    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    const ext = path.extname(file.originalname);
-    cb(null, unique + ext);
-  }
-});
+const storage = multer.memoryStorage();
 
 const upload = multer({
   storage,
@@ -75,12 +87,56 @@ const checkAdmin = (req, res, next) => {
 };
 
 // ═══════════════════════════════════════════════
+// ☁️ دالة رفع إلى Cloudinary
+// ═══════════════════════════════════════════════
+function uploadToCloudinary(buffer, originalName) {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        resource_type: 'raw',
+        folder: 'islamic-lessons',
+        public_id: `${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(originalName)}`,
+        use_filename: false,
+        unique_filename: true
+      },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      }
+    );
+    uploadStream.end(buffer);
+  });
+}
+
+// ═══════════════════════════════════════════════
 // 📤 رفع درس جديد
 // ═══════════════════════════════════════════════
-app.post('/api/lessons', checkAdmin, upload.single('file'), (req, res) => {
+app.post('/api/lessons', checkAdmin, upload.single('file'), async (req, res) => {
   try {
     const { title, year, specialization, subject, description } = req.body;
     if (!req.file) return res.status(400).json({ error: 'لم يتم إرسال ملف' });
+
+    let fileUrl, storedName;
+
+    if (useCloudinary) {
+      try {
+        const result = await uploadToCloudinary(req.file.buffer, req.file.originalname);
+        fileUrl = result.secure_url;
+        storedName = result.public_id;
+        console.log('☁️ تم رفع الملف إلى Cloudinary:', fileUrl);
+      } catch (err) {
+        console.error('خطأ في Cloudinary:', err);
+        return res.status(500).json({ error: 'فشل الرفع إلى Cloudinary: ' + err.message });
+      }
+    } else {
+      const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      const ext = path.extname(req.file.originalname);
+      storedName = unique + ext;
+      const filePath = path.join(UPLOAD_DIR, storedName);
+      fs.writeFileSync(filePath, req.file.buffer);
+      fileUrl = `/uploads/${storedName}`;
+      console.log('📁 تم رفع الملف محلياً:', fileUrl);
+    }
 
     const lessons = readData();
     const lesson = {
@@ -91,16 +147,18 @@ app.post('/api/lessons', checkAdmin, upload.single('file'), (req, res) => {
       subject: subject || 'عام',
       description: description || '',
       filename: req.file.originalname,
-      storedName: req.file.filename,
+      storedName: storedName,
       size: req.file.size,
       type: path.extname(req.file.originalname).slice(1).toLowerCase(),
-      url: `/uploads/${req.file.filename}`,
+      url: fileUrl,
+      storage: useCloudinary ? 'cloudinary' : 'local',
       date: new Date().toISOString()
     };
     lessons.unshift(lesson);
     writeData(lessons);
     res.json({ success: true, lesson });
   } catch (err) {
+    console.error('خطأ عام:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -115,13 +173,24 @@ app.get('/api/lessons', (req, res) => {
 // ═══════════════════════════════════════════════
 // 🗑️ حذف درس
 // ═══════════════════════════════════════════════
-app.delete('/api/lessons/:id', checkAdmin, (req, res) => {
+app.delete('/api/lessons/:id', checkAdmin, async (req, res) => {
   const lessons = readData();
   const idx = lessons.findIndex(l => l.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: 'غير موجود' });
 
-  const filePath = path.join(UPLOAD_DIR, lessons[idx].storedName);
-  if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+  const lesson = lessons[idx];
+
+  if (lesson.storage === 'cloudinary' && lesson.storedName) {
+    try {
+      await cloudinary.uploader.destroy(lesson.storedName, { resource_type: 'raw' });
+      console.log('☁️ تم حذف الملف من Cloudinary');
+    } catch (err) {
+      console.error('خطأ في حذف Cloudinary:', err);
+    }
+  } else {
+    const filePath = path.join(UPLOAD_DIR, lesson.storedName);
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+  }
 
   lessons.splice(idx, 1);
   writeData(lessons);
