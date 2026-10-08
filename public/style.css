@@ -1834,3 +1834,317 @@ footer::before {
     font-size: 0.95rem;
   }
 }
+/* ═══════════════════════════════════════════════ */
+/* ⭐ زر المفضلة (تخصص + درس)                    */
+/* ═══════════════════════════════════════════════ */
+
+.fav-btn {
+  background: var(--bg-alt);
+  border: 2px solid var(--border);
+  color: var(--text);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  padding: 0;
+  margin-right: auto;
+}
+
+.fav-btn:hover {
+  transform: scale(1.15);
+  border-color: var(--gold);
+  background: rgba(212, 165, 116, 0.15);
+}
+
+.fav-btn.active {
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  border-color: var(--gold-dark);
+  color: white;
+  box-shadow: 0 4px 12px rgba(212, 165, 116, 0.4);
+  animation: heartBeat 0.5s ease;
+}
+
+.fav-btn.active:hover {
+  transform: scale(1.15) rotate(10deg);
+}
+
+/* زر مفضلة الدرس */
+.lesson-fav {
+  width: 36px;
+  height: 36px;
+  font-size: 1rem;
+}
+
+/* حاوية شارات الدرس */
+.lesson-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* في بطاقة التخصص - الزر على اليمين */
+.specialization-card .spec-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: flex-start;
+}
+
+.specialization-card .spec-meta .fav-btn {
+  margin-right: auto;
+  margin-left: 0;
+}
+
+/* تعديل header البطاقة ليكون قابلاً للنقر */
+.spec-header {
+  cursor: pointer;
+}
+
+/* دعم الوضع الليلي */
+[data-theme="dark"] .fav-btn {
+  background: var(--bg);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .fav-btn.active {
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  border-color: var(--gold-light);
+}
+
+/* ═══════════════════════════════════════════════ */
+/* ✨ حركة قلب البطاقة                            */
+/* ═══════════════════════════════════════════════ */
+@keyframes heartBeat {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.3); }
+  50% { transform: scale(1.1); }
+  75% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+
+/* ═══════════════════════════════════════════════ */
+/* 📱 الجوال                                      */
+/* ═══════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .fav-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+  
+  .lesson-fav {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .lesson-badges {
+    gap: 6px;
+  }
+}
+/* ═══════════════════════════════════════════════ */
+/* ⭐ صفحة المفضلة                                */
+/* ═══════════════════════════════════════════════ */
+
+.fav-section {
+  margin-bottom: 50px;
+}
+
+.fav-section-title {
+  font-family: 'Amiri', serif;
+  font-size: 1.6rem;
+  color: var(--emerald);
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 3px solid var(--border-gold);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+[data-theme="dark"] .fav-section-title {
+  color: var(--gold);
+}
+
+.fav-count {
+  font-size: 1rem;
+  background: var(--bg-alt);
+  color: var(--text-light);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-family: 'Tajawal', sans-serif;
+  font-weight: 700;
+}
+
+.fav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.fav-card {
+  background: var(--card);
+  padding: 20px 24px;
+  border-radius: 16px;
+  border: 2px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.3s ease;
+  flex-wrap: wrap;
+}
+
+.fav-card:hover {
+  border-color: var(--gold);
+  box-shadow: var(--shadow-lg);
+  transform: translateX(-4px);
+}
+
+.fav-card-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  min-width: 240px;
+}
+
+.fav-card-icon {
+  font-size: 2rem;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-alt);
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.fav-card-content h4 {
+  font-family: 'Amiri', serif;
+  font-size: 1.1rem;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.fav-card-content p {
+  font-size: 0.85rem;
+  color: var(--text-light);
+  font-family: 'Tajawal', sans-serif;
+}
+
+.fav-card-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.fav-go-btn {
+  background: var(--gradient-emerald);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(13, 95, 74, 0.2);
+}
+
+.fav-go-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(13, 95, 74, 0.35);
+}
+
+.fav-remove-btn {
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  color: #dc2626;
+  border: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.fav-remove-btn:hover {
+  background: #dc2626;
+  color: white;
+  transform: scale(1.1);
+}
+
+/* الحالة الفارغة */
+.fav-empty {
+  text-align: center;
+  padding: 50px 24px;
+  background: var(--card);
+  border-radius: 16px;
+  border: 2px dashed var(--border-gold);
+}
+
+.fav-empty span {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 16px;
+  opacity: 0.6;
+}
+
+.fav-empty p {
+  color: var(--text-light);
+  font-family: 'Tajawal', sans-serif;
+  margin-bottom: 16px;
+}
+
+.fav-empty a {
+  color: var(--emerald);
+  font-weight: 700;
+  text-decoration: none;
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 2px;
+}
+
+[data-theme="dark"] .fav-empty a {
+  color: var(--gold);
+}
+
+/* الجوال */
+@media (max-width: 768px) {
+  .fav-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .fav-card-actions {
+    justify-content: stretch;
+  }
+  
+  .fav-go-btn {
+    flex: 1;
+    justify-content: center;
+  }
+  
+  .fav-remove-btn {
+    flex: 0 0 42px;
+  }
+  
+  .fav-section-title {
+    font-size: 1.3rem;
+  }
+}

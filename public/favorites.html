@@ -25,13 +25,36 @@
   </div>
 </header>
 
-<section class="coming-soon">
-  <div class="coming-soon-box">
-    <span class="coming-soon-icon">⭐</span>
-    <h2>مفضلتي</h2>
-    <p>هنا ستجد تخصصاتك المفضلة والدروس التي أعجبتك.<br>هذه الميزة قادمة قريباً بإذن الله.</p>
-    <a href="index.html" class="btn-back">🏠 العودة للرئيسية</a>
+<section class="contact-hero">
+  <div class="container">
+    <span class="contact-hero-icon">⭐</span>
+    <h1>مفضلتي</h1>
+    <p>تخصصاتك المفضلة ودروسك المُعجَبة في مكان واحد</p>
   </div>
+</section>
+
+<section class="container contact-section">
+
+  <div class="fav-section">
+    <h2 class="fav-section-title">
+      🎓 التخصصات المفضلة
+      <span class="fav-count" id="specCount">(0)</span>
+    </h2>
+    <div id="favSpecsList" class="fav-list"></div>
+  </div>
+
+  <div class="fav-section">
+    <h2 class="fav-section-title">
+      ❤️ الدروس المُعجَبة
+      <span class="fav-count" id="lessonsCount">(0)</span>
+    </h2>
+    <div id="favLessonsList" class="fav-list"></div>
+  </div>
+
+  <div class="contact-back">
+    <a href="index.html" class="btn-back-large">🏠 العودة للرئيسية</a>
+  </div>
+
 </section>
 
 <footer>
@@ -41,8 +64,249 @@
   </div>
 </footer>
 
+<script src="data.js"></script>
+<script src="app.js"></script>
 <script>
+// ═══════════════════════════════════════════════
+// ⭐ عرض المفضلة - تنفيذ مباشر
+// ═══════════════════════════════════════════════
+window.onload = function() {
+  if (typeof renderFavorites === 'function') {
+    renderFavorites();
+  } else {
+    console.error('renderFavorites غير معرّفة');
+  }
+};
+
+function renderFavorites() {
+  const favs = getFavorites();
+  
+  const specsList = document.getElementById('favSpecsList');
+  document.getElementById('specCount').textContent = `(${favs.specializations.length})`;
+  
+  if (!favs.specializations.length) {
+    specsList.innerHTML = `
+      <div class="fav-empty">
+        <span>📭</span>
+        <p>لا توجد تخصصات في المفضلة بعد</p>
+        <a href="index.html">تصفح التخصصات وأضف</a>
+      </div>
+    `;
+  } else {
+    specsList.innerHTML = favs.specializations.map(fav => {
+      const yearObj = YEARS.find(y => y.id === fav.year);
+      const yearName = yearObj ? yearObj.name : fav.year;
+      
+      return `
+        <div class="fav-card">
+          <div class="fav-card-content">
+            <span class="fav-card-icon">🎓</span>
+            <div>
+              <h4>${fav.spec}</h4>
+              <p>📅 ${yearName}</p>
+            </div>
+          </div>
+          <div class="fav-card-actions">
+            <button onclick="goToSpecialization('${fav.year}', '${fav.spec.replace(/'/g, "\\'")}')" 
+                    class="fav-go-btn">
+              🚀 اذهب
+            </button>
+            <button onclick="removeSpecFavorite('${fav.year}', '${fav.spec.replace(/'/g, "\\'")}')" 
+                    class="fav-remove-btn">
+              ❌
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+  
+  const lessonsList = document.getElementById('favLessonsList');
+  document.getElementById('lessonsCount').textContent = `(${favs.lessons.length})`;
+  
+  if (!favs.lessons.length) {
+    lessonsList.innerHTML = `
+      <div class="fav-empty">
+        <span>📭</span>
+        <p>لا توجد دروس مُعجَبة بعد</p>
+        <a href="index.html">تصفح الدروس وأضف إعجاب</a>
+      </div>
+    `;
+  } else {
+    const favLessons = allLessons.filter(l => favs.lessons.includes(l.id));
+    
+    if (!favLessons.length) {
+      lessonsList.innerHTML = `
+        <div class="fav-empty">
+          <span>📭</span>
+          <p>الدروس المُعجَبة لم تعد متاحة</p>
+        </div>
+      `;
+    } else {
+      lessonsList.innerHTML = favLessons.map(l => `
+        <div class="fav-card">
+          <div class="fav-card-content">
+            <span class="fav-card-icon">📄</span>
+            <div>
+              <h4>${escapeHtml(l.title)}</h4>
+              <p>📚 ${escapeHtml(l.subject)} · 📅 ${formatDate(l.date)}</p>
+            </div>
+          </div>
+          <div class="fav-card-actions">
+            <a href="${l.url}" target="_blank" class="fav-go-btn">👁️ فتح</a>
+            <button onclick="removeLessonFavorite('${l.id}')" class="fav-remove-btn">
+              ❌
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+}
+
+function goToSpecialization(yearId, spec) {
+  sessionStorage.setItem('goto_year', yearId);
+  sessionStorage.setItem('goto_spec', spec);
+  window.location.href = 'index.html';
+}
+
+function removeSpecFavorite(yearId, spec) {
+  toggleFavoriteSpecialization(yearId, spec);
+  renderFavorites();
+}
+
+function removeLessonFavorite(lessonId) {
+  toggleFavoriteLesson(lessonId);
+  renderFavorites();
+}
+
 // الوضع الليلي
+const themeToggle = document.getElementById('themeToggle');
+const savedTheme = localStorage.getItem('theme') || 'light';
+document.documentElement.setAttribute('data-theme', savedTheme);
+themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+themeToggle.addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
+});
+</script>
+<script>
+// ═══════════════════════════════════════════════
+// ⭐ عرض المفضلة
+// ═══════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  renderFavorites();
+});
+
+function renderFavorites() {
+  const favs = getFavorites();
+  
+  const specsList = document.getElementById('favSpecsList');
+  document.getElementById('specCount').textContent = `(${favs.specializations.length})`;
+  
+  if (!favs.specializations.length) {
+    specsList.innerHTML = `
+      <div class="fav-empty">
+        <span>📭</span>
+        <p>لا توجد تخصصات في المفضلة بعد</p>
+        <a href="index.html">تصفح التخصصات وأضف</a>
+      </div>
+    `;
+  } else {
+    specsList.innerHTML = favs.specializations.map(fav => {
+      const yearObj = YEARS.find(y => y.id === fav.year);
+      const yearName = yearObj ? yearObj.name : fav.year;
+      
+      return `
+        <div class="fav-card">
+          <div class="fav-card-content">
+            <span class="fav-card-icon">🎓</span>
+            <div>
+              <h4>${fav.spec}</h4>
+              <p>📅 ${yearName}</p>
+            </div>
+          </div>
+          <div class="fav-card-actions">
+            <button onclick="goToSpecialization('${fav.year}', '${fav.spec.replace(/'/g, "\\'")}')" 
+                    class="fav-go-btn">
+              🚀 اذهب
+            </button>
+            <button onclick="removeSpecFavorite('${fav.year}', '${fav.spec.replace(/'/g, "\\'")}')" 
+                    class="fav-remove-btn">
+              ❌
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+  
+  const lessonsList = document.getElementById('favLessonsList');
+  document.getElementById('lessonsCount').textContent = `(${favs.lessons.length})`;
+  
+  if (!favs.lessons.length) {
+    lessonsList.innerHTML = `
+      <div class="fav-empty">
+        <span>📭</span>
+        <p>لا توجد دروس مُعجَبة بعد</p>
+        <a href="index.html">تصفح الدروس وأضف إعجاب</a>
+      </div>
+    `;
+  } else {
+    const favLessons = allLessons.filter(l => favs.lessons.includes(l.id));
+    
+    if (!favLessons.length) {
+      lessonsList.innerHTML = `
+        <div class="fav-empty">
+          <span>📭</span>
+          <p>الدروس المُعجَبة لم تعد متاحة</p>
+        </div>
+      `;
+    } else {
+      lessonsList.innerHTML = favLessons.map(l => `
+        <div class="fav-card">
+          <div class="fav-card-content">
+            <span class="fav-card-icon">📄</span>
+            <div>
+              <h4>${escapeHtml(l.title)}</h4>
+              <p>📚 ${escapeHtml(l.subject)} · 📅 ${formatDate(l.date)}</p>
+            </div>
+          </div>
+          <div class="fav-card-actions">
+            <a href="${l.url}" target="_blank" class="fav-go-btn">👁️ فتح</a>
+            <button onclick="removeLessonFavorite('${l.id}')" class="fav-remove-btn">
+              ❌
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+}
+
+function goToSpecialization(yearId, spec) {
+  sessionStorage.setItem('goto_year', yearId);
+  sessionStorage.setItem('goto_spec', spec);
+  window.location.href = 'index.html';
+}
+
+function removeSpecFavorite(yearId, spec) {
+  toggleFavoriteSpecialization(yearId, spec);
+  renderFavorites();
+}
+
+function removeLessonFavorite(lessonId) {
+  toggleFavoriteLesson(lessonId);
+  renderFavorites();
+}
+
+// ═══════════════════════════════════════════════
+// 🌙 الوضع الليلي
+// ═══════════════════════════════════════════════
 const themeToggle = document.getElementById('themeToggle');
 const savedTheme = localStorage.getItem('theme') || 'light';
 document.documentElement.setAttribute('data-theme', savedTheme);

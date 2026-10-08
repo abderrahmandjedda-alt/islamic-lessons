@@ -1,25 +1,100 @@
 // ═══════════════════════════════════════════════
-// ⚙️ ملاحظة: YEARS, SPECIALIZATIONS, SUBJECTS موجودة في data.js
+// ⚙️ YEARS, SPECIALIZATIONS, SUBJECTS في data.js
 // ═══════════════════════════════════════════════
 
 const API = '/api';
 let allLessons = [];
 
 // ═══════════════════════════════════════════════
-// 🌙 الوضع الليلي
+// ⭐ نظام المفضلة (localStorage)
+// ═══════════════════════════════════════════════
+const FAVORITES_KEY = 'islamic_lessons_favorites';
+
+// قراءة المفضلة
+function getFavorites() {
+  try {
+    return JSON.parse(localStorage.getItem(FAVORITES_KEY)) || {
+      specializations: [],
+      lessons: []
+    };
+  } catch (err) {
+    return { specializations: [], lessons: [] };
+  }
+}
+
+// حفظ المفضلة
+function saveFavorites(favs) {
+  try {
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify(favs));
+  } catch (err) {
+    console.error('خطأ في حفظ المفضلة:', err);
+  }
+}
+
+// إضافة/إزالة تخصص من المفضلة
+function toggleFavoriteSpecialization(yearId, spec) {
+  const favs = getFavorites();
+  const key = `${yearId}|${spec}`;
+  const index = favs.specializations.findIndex(f => `${f.year}|${f.spec}` === key);
+  
+  if (index >= 0) {
+    favs.specializations.splice(index, 1);
+    showToast('🗑️ تمت الإزالة من المفضلة');
+  } else {
+    favs.specializations.push({ year: yearId, spec });
+    showToast('⭐ تمت الإضافة للمفضلة');
+  }
+  
+  saveFavorites(favs);
+  return index < 0; // true إذا أُضيف
+}
+
+// إضافة/إزالة درس من المفضلة
+function toggleFavoriteLesson(lessonId) {
+  const favs = getFavorites();
+  const index = favs.lessons.findIndex(id => id === lessonId);
+  
+  if (index >= 0) {
+    favs.lessons.splice(index, 1);
+    showToast('🗑️ تمت الإزالة من المفضلة');
+  } else {
+    favs.lessons.push(lessonId);
+    showToast('❤️ تمت الإضافة للمفضلة');
+  }
+  
+  saveFavorites(favs);
+  return index < 0; // true إذا أُضيف
+}
+
+// هل التخصص في المفضلة؟
+function isSpecFavorite(yearId, spec) {
+  const favs = getFavorites();
+  return favs.specializations.some(f => f.year === yearId && f.spec === spec);
+}
+
+// هل الدرس في المفضلة؟
+function isLessonFavorite(lessonId) {
+  const favs = getFavorites();
+  return favs.lessons.includes(lessonId);
+}
+
+// ═══════════════════════════════════════════════
+// 🌙 الوضع الليلي (محمي)
 // ═══════════════════════════════════════════════
 const themeToggle = document.getElementById('themeToggle');
 const savedTheme = localStorage.getItem('theme') || 'light';
 document.documentElement.setAttribute('data-theme', savedTheme);
-themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
 
-themeToggle.addEventListener('click', () => {
-  const current = document.documentElement.getAttribute('data-theme');
-  const next = current === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem('theme', next);
-  themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
-});
+if (themeToggle) {
+  themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+  themeToggle.addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
+  });
+}
 
 // ═══════════════════════════════════════════════
 // 🔄 جلب الدروس
@@ -108,19 +183,39 @@ function renderSpecializations(yearId) {
       l.year === yearId && l.specialization === spec
     ).length;
     
+    const isFav = isSpecFavorite(yearId, spec);
+    const specEscaped = spec.replace(/'/g, "\\'");
+    
     return `
-      <div class="specialization-card" onclick="selectSpecialization('${spec.replace(/'/g, "\\'")}')">
-        <div class="spec-header">
+      <div class="specialization-card">
+        <div class="spec-header" onclick="selectSpecialization('${specEscaped}')">
           <span class="spec-icon">🎓</span>
           <h4>${spec}</h4>
         </div>
         <div class="spec-meta">
           <span>📚 ${subjects.length} مادة</span>
           <span>📄 ${lessonsCount} درس</span>
+          <button class="fav-btn ${isFav ? 'active' : ''}" 
+                  onclick="handleSpecFavorite(event, '${yearId}', '${specEscaped}')"
+                  title="${isFav ? 'إزالة من المفضلة' : 'أضف للمفضلة'}">
+            ${isFav ? '⭐' : '☆'}
+          </button>
         </div>
       </div>
     `;
   }).join('');
+}
+
+// معالج زر المفضلة للتخصص
+function handleSpecFavorite(event, yearId, spec) {
+  event.stopPropagation();
+  const added = toggleFavoriteSpecialization(yearId, spec);
+  
+  // تحديث الزر مباشرة
+  const btn = event.currentTarget;
+  btn.classList.toggle('active', added);
+  btn.textContent = added ? '⭐' : '☆';
+  btn.title = added ? 'إزالة من المفضلة' : 'أضف للمفضلة';
 }
 
 // ═══════════════════════════════════════════════
@@ -239,25 +334,46 @@ function renderLessons(lessons, gridId, emptyId) {
   }
   empty.style.display = 'none';
   
-  grid.innerHTML = lessons.map(l => `
-    <div class="lesson-card">
-      <div class="lesson-header">
-        <h4>${escapeHtml(l.title)}</h4>
-        <span class="file-badge ${l.type === 'pdf' ? 'pdf' : 'doc'}">
-          ${l.type.toUpperCase()}
-        </span>
+  grid.innerHTML = lessons.map(l => {
+    const isFav = isLessonFavorite(l.id);
+    return `
+      <div class="lesson-card">
+        <div class="lesson-header">
+          <h4>${escapeHtml(l.title)}</h4>
+          <div class="lesson-badges">
+            <span class="file-badge ${l.type === 'pdf' ? 'pdf' : 'doc'}">
+              ${l.type.toUpperCase()}
+            </span>
+            <button class="fav-btn lesson-fav ${isFav ? 'active' : ''}" 
+                    onclick="handleLessonFavorite(event, '${l.id}')"
+                    title="${isFav ? 'إزالة الإعجاب' : 'أعجبني'}">
+              ${isFav ? '❤️' : '🤍'}
+            </button>
+          </div>
+        </div>
+        ${l.description ? `<p class="lesson-desc">${escapeHtml(l.description)}</p>` : ''}
+        <div class="lesson-meta">
+          <span>📅 ${formatDate(l.date)}</span>
+          <span>💾 ${formatSize(l.size)}</span>
+        </div>
+        <div class="lesson-actions">
+          <a href="${l.url}" target="_blank" class="btn btn-view">👁️ فتح</a>
+          <a href="${l.url}" download="${escapeHtml(l.filename)}" class="btn btn-download">📥 تحميل</a>
+        </div>
       </div>
-      ${l.description ? `<p class="lesson-desc">${escapeHtml(l.description)}</p>` : ''}
-      <div class="lesson-meta">
-        <span>📅 ${formatDate(l.date)}</span>
-        <span>💾 ${formatSize(l.size)}</span>
-      </div>
-      <div class="lesson-actions">
-        <a href="${l.url}" target="_blank" class="btn btn-view">👁️ فتح</a>
-        <a href="${l.url}" download="${escapeHtml(l.filename)}" class="btn btn-download">📥 تحميل</a>
-      </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
+}
+
+// معالج زر الإعجاب للدرس
+function handleLessonFavorite(event, lessonId) {
+  event.stopPropagation();
+  const added = toggleFavoriteLesson(lessonId);
+  
+  const btn = event.currentTarget;
+  btn.classList.toggle('active', added);
+  btn.textContent = added ? '❤️' : '🤍';
+  btn.title = added ? 'إزالة الإعجاب' : 'أعجبني';
 }
 
 function escapeHtml(str) {
@@ -267,120 +383,70 @@ function escapeHtml(str) {
 }
 
 // ═══════════════════════════════════════════════
-// 🔎 البحث
+// 🔎 البحث (محمي - يعمل فقط في index.html)
 // ═══════════════════════════════════════════════
-document.getElementById('searchInput').addEventListener('input', (e) => {
-  const q = e.target.value.trim().toLowerCase();
-  
-  if (!q) {
-    goHome();
-    return;
-  }
-  
-  hideAllSections();
-  document.getElementById('searchResultsSection').style.display = 'block';
-  document.getElementById('breadcrumb').innerHTML = `
-    <span onclick="goHome()" class="crumb-link">🏛️ الرئيسية</span>
-    <span class="crumb-sep">›</span>
-    <span class="crumb-current">نتائج البحث</span>
-  `;
-  
-  const filtered = allLessons.filter(l =>
-    (l.title || '').toLowerCase().includes(q) ||
-    (l.subject || '').toLowerCase().includes(q) ||
-    (l.specialization || '').toLowerCase().includes(q) ||
-    (l.year || '').toLowerCase().includes(q) ||
-    (l.description || '').toLowerCase().includes(q) ||
-    (l.filename || '').toLowerCase().includes(q)
-  );
-  
-  renderLessons(filtered, 'searchResultsGrid', 'searchEmptyMsg');
-});
+const searchInput = document.getElementById('searchInput');
+if (searchInput) {
+  searchInput.addEventListener('input', (e) => {
+    const q = e.target.value.trim().toLowerCase();
+    
+    if (!q) {
+      goHome();
+      return;
+    }
+    
+    hideAllSections();
+    document.getElementById('searchResultsSection').style.display = 'block';
+    document.getElementById('breadcrumb').innerHTML = `
+      <span onclick="goHome()" class="crumb-link">🏛️ الرئيسية</span>
+      <span class="crumb-sep">›</span>
+      <span class="crumb-current">نتائج البحث</span>
+    `;
+    
+    const filtered = allLessons.filter(l =>
+      (l.title || '').toLowerCase().includes(q) ||
+      (l.subject || '').toLowerCase().includes(q) ||
+      (l.specialization || '').toLowerCase().includes(q) ||
+      (l.year || '').toLowerCase().includes(q) ||
+      (l.description || '').toLowerCase().includes(q) ||
+      (l.filename || '').toLowerCase().includes(q)
+    );
+    
+    renderLessons(filtered, 'searchResultsGrid', 'searchEmptyMsg');
+  });
+}
 
 // ═══════════════════════════════════════════════
 // 🚀 بدء التطبيق
 // ═══════════════════════════════════════════════
-document.getElementById('homeBtn').addEventListener('click', (e) => {
-  e.preventDefault();
-  document.getElementById('searchInput').value = '';
-  goHome();
-});
-
-// ═══════════════════════════════════════════════
-// 🔐 الشعار السري - إظهار زر لوحة التحكم
-// ═══════════════════════════════════════════════
-let logoClickCount = 0;
-let logoClickTimer = null;
-const logo = document.getElementById('secretLogo');
-const adminBtn = document.getElementById('adminBtn');
-
-if (logo && adminBtn) {
-  logo.addEventListener('click', () => {
-    logoClickCount++;
-    
-    logo.classList.add('pulse');
-    setTimeout(() => logo.classList.remove('pulse'), 400);
-    
-    clearTimeout(logoClickTimer);
-    logoClickTimer = setTimeout(() => {
-      logoClickCount = 0;
-    }, 3000);
-    
-    if (logoClickCount >= 5) {
-      adminBtn.classList.add('visible');
-      logoClickCount = 0;
-      showToast('✅ تم إظهار زر لوحة التحكم');
-    }
+const homeBtn = document.getElementById('homeBtn');
+if (homeBtn) {
+  homeBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    const si = document.getElementById('searchInput');
+    if (si) si.value = '';
+    goHome();
   });
 }
 
+// ═══════════════════════════════════════════════
+// 💬 إشعار Toast
+// ═══════════════════════════════════════════════
 function showToast(message) {
-  const toast = document.createElement('div');
-  toast.textContent = message;
-  toast.style.cssText = `
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: linear-gradient(135deg, #0d5f4a, #1a7d63);
-    color: white;
-    padding: 14px 28px;
-    border-radius: 30px;
-    font-family: 'Tajawal', sans-serif;
-    font-weight: 700;
-    box-shadow: 0 8px 32px rgba(13, 95, 74, 0.4);
-    z-index: 9999;
-    animation: toastIn 0.4s ease;
-  `;
+  const existing = document.querySelector('.toast-notification');
+  if (existing) existing.remove();
   
+  const toast = document.createElement('div');
+  toast.className = 'toast-notification';
+  toast.textContent = message;
   document.body.appendChild(toast);
   
   setTimeout(() => {
-    toast.style.animation = 'toastOut 0.4s ease forwards';
-    setTimeout(() => toast.remove(), 400);
-  }, 3000);
+    toast.classList.add('toast-hide');
+    setTimeout(() => toast.remove(), 300);
+  }, 2500);
 }
 
-const toastStyle = document.createElement('style');
-toastStyle.textContent = `
-  @keyframes toastIn {
-    from { opacity: 0; transform: translate(-50%, 20px); }
-    to { opacity: 1; transform: translate(-50%, 0); }
-  }
-  @keyframes toastOut {
-    from { opacity: 1; transform: translate(-50%, 0); }
-    to { opacity: 0; transform: translate(-50%, 20px); }
-  }
-`;
-document.head.appendChild(toastStyle);
-
-// ═══════════════════════════════════════════════
-// تشغيل التطبيق
-// ═══════════════════════════════════════════════
-(async () => {
-  await fetchLessons();
-  goHome();
-})();
 // ═══════════════════════════════════════════════
 // ☰ القائمة المنسدلة
 // ═══════════════════════════════════════════════
@@ -390,19 +456,16 @@ document.head.appendChild(toastStyle);
   
   if (!menuToggle || !menuDropdown) return;
   
-  // فتح/إغلاق عند الضغط على الزر
   menuToggle.addEventListener('click', (e) => {
     e.stopPropagation();
     const isOpen = menuDropdown.classList.toggle('open');
     menuToggle.classList.toggle('active', isOpen);
   });
   
-  // منع الإغلاق عند الضغط داخل القائمة
   menuDropdown.addEventListener('click', (e) => {
     e.stopPropagation();
   });
   
-  // إغلاق القائمة عند الضغط في أي مكان آخر
   document.addEventListener('click', () => {
     if (menuDropdown.classList.contains('open')) {
       menuDropdown.classList.remove('open');
@@ -410,7 +473,6 @@ document.head.appendChild(toastStyle);
     }
   });
   
-  // إغلاق القائمة عند الضغط على Escape
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && menuDropdown.classList.contains('open')) {
       menuDropdown.classList.remove('open');
@@ -418,7 +480,6 @@ document.head.appendChild(toastStyle);
     }
   });
   
-  // إغلاق تلقائي عند تغيير حجم الشاشة (من الجوال إلى الحاسوب)
   window.addEventListener('resize', () => {
     if (window.innerWidth > 768) return;
     if (menuDropdown.classList.contains('open')) {
@@ -426,4 +487,12 @@ document.head.appendChild(toastStyle);
       menuToggle.classList.remove('active');
     }
   });
+})();
+
+// ═══════════════════════════════════════════════
+// تشغيل التطبيق
+// ═══════════════════════════════════════════════
+(async () => {
+  await fetchLessons();
+  goHome();
 })();
