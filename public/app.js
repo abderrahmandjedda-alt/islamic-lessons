@@ -381,3 +381,49 @@ document.head.appendChild(toastStyle);
   await fetchLessons();
   goHome();
 })();
+// ═══════════════════════════════════════════════
+// ☰ القائمة المنسدلة
+// ═══════════════════════════════════════════════
+(function initMenu() {
+  const menuToggle = document.getElementById('menuToggle');
+  const menuDropdown = document.getElementById('menuDropdown');
+  
+  if (!menuToggle || !menuDropdown) return;
+  
+  // فتح/إغلاق عند الضغط على الزر
+  menuToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = menuDropdown.classList.toggle('open');
+    menuToggle.classList.toggle('active', isOpen);
+  });
+  
+  // منع الإغلاق عند الضغط داخل القائمة
+  menuDropdown.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+  
+  // إغلاق القائمة عند الضغط في أي مكان آخر
+  document.addEventListener('click', () => {
+    if (menuDropdown.classList.contains('open')) {
+      menuDropdown.classList.remove('open');
+      menuToggle.classList.remove('active');
+    }
+  });
+  
+  // إغلاق القائمة عند الضغط على Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menuDropdown.classList.contains('open')) {
+      menuDropdown.classList.remove('open');
+      menuToggle.classList.remove('active');
+    }
+  });
+  
+  // إغلاق تلقائي عند تغيير حجم الشاشة (من الجوال إلى الحاسوب)
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) return;
+    if (menuDropdown.classList.contains('open')) {
+      menuDropdown.classList.remove('open');
+      menuToggle.classList.remove('active');
+    }
+  });
+})();

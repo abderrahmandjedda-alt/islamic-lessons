@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بوابة التلاميذ - كلية العلوم الإسلامية</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header class="navbar">
+  <div class="container nav-wrap">
+    <div class="logo" onclick="window.location.href='index.html'">
+      <span class="logo-icon">☪</span>
+      <div>
+        <h1>كلية العلوم الإسلامية</h1>
+        <p>جامعة وهران 1 أحمد بن بلة</p>
+      </div>
+    </div>
+    <nav>
+      <a href="index.html">🏠 الرئيسية</a>
+      <button id="themeToggle" class="theme-btn">🌙</button>
+    </nav>
+  </div>
+</header>
+
+<section class="coming-soon">
+  <div class="coming-soon-box">
+    <span class="coming-soon-icon">👨‍🎓</span>
+    <h2>بوابة التلاميذ</h2>
+    <p>هنا سيتمكن التلاميذ من رفع دروسهم لمراجعة الإدارة قبل النشر.<br>هذه الميزة قادمة قريباً بإذن الله.</p>
+    <a href="index.html" class="btn-back">🏠 العودة للرئيسية</a>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p class="footer-line">© 2025 — كلية العلوم الإسلامية | جامعة وهران 1 أحمد بن بلة</p>
+    <p class="footer-author">إعداد: جدة عبد الرحمن</p>
+  </div>
+</footer>
+
+<script>
+const themeToggle = document.getElementById('themeToggle');
+const savedTheme = localStorage.getItem('theme') || 'light';
+document.documentElement.setAttribute('data-theme', savedTheme);
+themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+themeToggle.addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
+});
+</script>
+</body>
+</html>
