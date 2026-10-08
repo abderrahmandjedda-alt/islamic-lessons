@@ -2148,3 +2148,32 @@ footer::before {
     font-size: 1.3rem;
   }
 }
+/* ═══════════════════════════════════════════════ */
+/* 📱 زر تثبيت التطبيق                            */
+/* ═══════════════════════════════════════════════ */
+
+.install-btn {
+  background: linear-gradient(135deg, #d4a574, #b8935a) !important;
+  color: white !important;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 700;
+  width: 100%;
+  text-align: right;
+}
+
+.install-btn:hover {
+  background: linear-gradient(135deg, #b8935a, #a67d4a) !important;
+  transform: translateX(-4px);
+}
+
+.install-btn .menu-icon {
+  animation: pulse-icon 2s ease-in-out infinite;
+}
+
+@keyframes pulse-icon {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}

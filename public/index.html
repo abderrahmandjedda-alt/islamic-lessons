@@ -18,20 +18,25 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 🔤 الخطوط                                       -->
+<!-- ═══════════════════════════════════════════════ -->
 <link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
 
 <!-- ═══════════════════════════════════════════════ -->
 <!-- 🔍 SEO - تحسين محركات البحث                    -->
 <!-- ═══════════════════════════════════════════════ -->
+
+<!-- المعلومات الأساسية -->
 <meta name="description" content="منصة الدروس الجامعية لكلية العلوم الإسلامية - جامعة وهران 1 أحمد بن بلة. دروس PDF و Word في 40 تخصصاً و 400+ مادة للسنة الأولى والثانية ماستر وليسانس.">
-<meta name="keywords" content="كلية العلوم الإسلامية, جامعة وهران 1, دروس جامعية, ماستر, ليسانس, اللغة والدراسات القرآنية, الحديث وعلومه, العقيدة والفكر الإسلامي, الفقه وأصوله, دروس PDF, بحوث جامعية, وهران, الجزائر">
+<meta name="keywords" content="كلية العلوم الإسلامية, جامعة وهران 1, دروس جامعية, ماستر, ليسانس, اللغة والدراسات القرآنية, الحديث وعلومه, العقيدة والفكر الإسلامي, الفقه وأصوله, دروس PDF, بحوث جامعية, وهران, الجزائر, أحمد بن بلة">
 <meta name="author" content="جدة عبد الرحمن">
 <meta name="robots" content="index, follow">
 <meta name="language" content="Arabic">
 <meta http-equiv="content-language" content="ar">
 
-<!-- Open Graph -->
+<!-- Open Graph (فيسبوك، واتساب، تيليجرام) -->
 <meta property="og:title" content="منصة الدروس الجامعية - كلية العلوم الإسلامية">
 <meta property="og:description" content="دروس PDF و Word لكل تخصصات كلية العلوم الإسلامية - جامعة وهران 1">
 <meta property="og:type" content="website">
@@ -44,10 +49,10 @@
 <meta name="twitter:title" content="منصة الدروس الجامعية - كلية العلوم الإسلامية">
 <meta name="twitter:description" content="دروس PDF و Word لكل التخصصات - جامعة وهران 1">
 
-<!-- Canonical -->
+<!-- Canonical URL -->
 <link rel="canonical" href="https://islamic-lessons.onrender.com/">
 
-<!-- Schema.org -->
+<!-- Schema.org - معلومات المنظمة -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -90,6 +95,7 @@
       <button id="themeToggle" class="theme-btn">🌙</button>
       <button id="menuToggle" class="theme-btn menu-toggle" aria-label="القائمة">☰</button>
 
+      <!-- القائمة المنسدلة -->
       <div id="menuDropdown" class="menu-dropdown">
         <a href="favorites.html" class="menu-item">
           <span class="menu-icon">⭐</span>
@@ -113,6 +119,13 @@
           <span class="menu-icon">📞</span>
           <span>تواصل مع الإدارة</span>
         </a>
+
+        <!-- زر تثبيت التطبيق -->
+        <div class="menu-divider"></div>
+        <button id="installAppBtn" class="menu-item install-btn" style="display:none;">
+          <span class="menu-icon">📱</span>
+          <span>تثبيت التطبيق</span>
+        </button>
       </div>
     </nav>
   </div>
@@ -176,9 +189,10 @@
 </footer>
 
 <!-- ═══════════════════════════════════════════════ -->
-<!-- 🚀 PWA Service Worker                          -->
+<!-- 🚀 PWA Service Worker + زر التثبيت            -->
 <!-- ═══════════════════════════════════════════════ -->
 <script>
+// تسجيل Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/service-worker.js')
@@ -192,16 +206,48 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-let deferredPrompt;
+// زر تثبيت التطبيق
+let deferredPrompt = null;
+const installBtn = document.getElementById('installAppBtn');
+
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
   console.log('📱 التطبيق قابل للتثبيت!');
+  
+  // إظهار زر التثبيت
+  if (installBtn) {
+    installBtn.style.display = 'flex';
+  }
 });
+
+// عند الضغط على زر التثبيت
+if (installBtn) {
+  installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) {
+      alert('✅ التطبيق مثبّت بالفعل على جهازك!');
+      return;
+    }
+    
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    
+    if (outcome === 'accepted') {
+      console.log('✅ تم قبول التثبيت');
+    } else {
+      console.log('❌ تم رفض التثبيت');
+    }
+    
+    deferredPrompt = null;
+  });
+}
 
 window.addEventListener('appinstalled', () => {
   console.log('🎉 تم تثبيت التطبيق!');
   deferredPrompt = null;
+  if (installBtn) {
+    installBtn.style.display = 'none';
+  }
 });
 </script>
 
