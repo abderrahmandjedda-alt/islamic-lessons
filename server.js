@@ -84,7 +84,7 @@ function uploadToCloudinary(buffer, originalName) {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       {
-        resource_type: 'raw',
+        resource_type: 'image',
         folder: 'islamic-lessons',
         public_id: `${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(originalName)}`,
         use_filename: false,
@@ -177,7 +177,7 @@ app.delete('/api/lessons/:id', checkAdmin, async (req, res) => {
     // حذف الملف أولاً
     if (lesson.storage === 'cloudinary' && lesson.storedName) {
       try {
-        const result = await cloudinary.uploader.destroy(lesson.storedName, { resource_type: 'raw' });
+        const result = await cloudinary.uploader.destroy(lesson.storedName, { resource_type: 'image' });
         console.log('☁️ نتيجة حذف Cloudinary:', result.result);
       } catch (err) {
         console.error('خطأ في حذف Cloudinary:', err);
