@@ -1,113 +1,9 @@
+// ═══════════════════════════════════════════════
+// ⚙️ ملاحظة: YEARS, SPECIALIZATIONS, SUBJECTS موجودة في data.js
+// ═══════════════════════════════════════════════
+
 const API = '/api';
 let allLessons = [];
-
-// ═══════════════════════════════════════════════
-// 📅 قائمة السنوات الدراسية
-// ═══════════════════════════════════════════════
-const YEARS = [
-  { id: 'L1', name: 'السنة الأولى ليسانس', icon: '🎓' },
-  { id: 'L2', name: 'السنة الثانية ليسانس', icon: '🎓' },
-  { id: 'L3', name: 'السنة الثالثة ليسانس', icon: '🎓' },
-  { id: 'M1', name: 'السنة الأولى ماستر', icon: '📘' },
-  { id: 'M2', name: 'السنة الثانية ماستر', icon: '📗' }
-];
-
-// ═══════════════════════════════════════════════
-// 🎓 التخصصات لكل سنة (عدّلها كما تريد لاحقاً)
-// ═══════════════════════════════════════════════
-const SPECIALIZATIONS = {
-  'L1': [
-    'العلوم الإسلامية',
-    'اللغة العربية',
-    'الحضارة الإسلامية'
-  ],
-  'L2': [
-    'العلوم الإسلامية',
-    'اللغة العربية',
-    'الحضارة الإسلامية'
-  ],
-  'L3': [
-    'العلوم الإسلامية',
-    'اللغة العربية',
-    'الحضارة الإسلامية'
-  ],
-  'M1': [
-    'اللغة والدراسات القرآنية',
-    'الحديث وعلومه',
-    'العقيدة والفكر الإسلامي',
-    'الفقه وأصوله'
-  ],
-  'M2': [
-    'اللغة والدراسات القرآنية',
-    'الحديث وعلومه',
-    'العقيدة والفكر الإسلامي'
-  ]
-};
-
-// ═══════════════════════════════════════════════
-// 📚 المواد لكل سنة وتخصص
-// ═══════════════════════════════════════════════
-const SUBJECTS = {
-  'M1': {
-    'اللغة والدراسات القرآنية': [
-      { name: 'حفظ القرآن', icon: '📖' },
-      { name: 'تاريخ المصحف', icon: '📜' },
-      { name: 'أصول النحو ومذاهبه', icon: '📝' },
-      { name: 'دراسات في البلاغة العربية', icon: '💭' },
-      { name: 'علم الدلالة', icon: '📚' },
-      { name: 'مصادر الاحتجاج اللغوي', icon: '🔍' },
-      { name: 'علم الرسم والضبط 1', icon: '✒️' },
-      { name: 'غريب القرآن', icon: '📕' },
-      { name: 'اللغة الإنجليزية', icon: '🌍' },
-      { name: 'البرمجة والذكاء الاصطناعي', icon: '🤖' },
-      { name: 'نظرية النظم', icon: '🧠' },
-      { name: 'اللسانيات', icon: '🗣️' }
-    ],
-    'الحديث وعلومه': [
-      { name: 'علم الحديث', icon: '📗' },
-      { name: 'مصطلح الحديث', icon: '📘' },
-      { name: 'تخريج الحديث', icon: '🔍' },
-      { name: 'علل الحديث', icon: '📕' },
-      { name: 'رجال الحديث', icon: '👥' },
-      { name: 'مناهج المحدثين', icon: '📜' }
-    ],
-    'العقيدة والفكر الإسلامي': [
-      { name: 'العقيدة الإسلامية', icon: '🕋' },
-      { name: 'الفكر الإسلامي', icon: '💭' },
-      { name: 'الفرق والمذاهب', icon: '📚' },
-      { name: 'علم الكلام', icon: '🗣️' },
-      { name: 'التصوف الإسلامي', icon: '🕌' },
-      { name: 'الفلسفة الإسلامية', icon: '🧠' }
-    ],
-    'الفقه وأصوله': [
-      { name: 'الفقه المقارن', icon: '⚖️' },
-      { name: 'أصول الفقه', icon: '📖' },
-      { name: 'مقاصد الشريعة', icon: '🎯' },
-      { name: 'القواعد الفقهية', icon: '📏' }
-    ]
-  },
-  'L1': {
-    'العلوم الإسلامية': [
-      { name: 'القرآن الكريم', icon: '📖' },
-      { name: 'السيرة النبوية', icon: '🕌' },
-      { name: 'التوحيد', icon: '🕋' },
-      { name: 'الفقه', icon: '⚖️' },
-      { name: 'الحديث', icon: '📗' }
-    ],
-    'اللغة العربية': [
-      { name: 'النحو', icon: '📝' },
-      { name: 'الصرف', icon: '🔤' },
-      { name: 'البلاغة', icon: '💭' },
-      { name: 'الأدب', icon: '📚' },
-      { name: 'النصوص', icon: '📜' }
-    ],
-    'الحضارة الإسلامية': [
-      { name: 'تاريخ الحضارة', icon: '📜' },
-      { name: 'الفكر الإسلامي', icon: '💭' },
-      { name: 'العلوم الإسلامية', icon: '🔬' }
-    ]
-  }
-};
 
 // ═══════════════════════════════════════════════
 // 🌙 الوضع الليلي
@@ -126,7 +22,7 @@ themeToggle.addEventListener('click', () => {
 });
 
 // ═══════════════════════════════════════════════
-// 🔄 جلب الدروس من السيرفر
+// 🔄 جلب الدروس
 // ═══════════════════════════════════════════════
 async function fetchLessons() {
   try {
@@ -149,7 +45,7 @@ function hideAllSections() {
 }
 
 // ═══════════════════════════════════════════════
-// 🏠 الصفحة الرئيسية: عرض السنوات
+// 🏠 الصفحة الرئيسية
 // ═══════════════════════════════════════════════
 function goHome() {
   hideAllSections();
@@ -174,10 +70,11 @@ function renderYears() {
 }
 
 // ═══════════════════════════════════════════════
-// 📅 اختيار السنة → عرض التخصصات
+// 📅 اختيار السنة
 // ═══════════════════════════════════════════════
 let currentYear = null;
 let currentSpecialization = null;
+let currentSubject = null;
 
 function selectYear(yearId) {
   currentYear = yearId;
@@ -185,7 +82,7 @@ function selectYear(yearId) {
   document.getElementById('specializationsSection').style.display = 'block';
   
   const yearObj = YEARS.find(y => y.id === yearId);
-  document.getElementById('specTitle').textContent = `🎓 تخصصات ${yearObj.name}`;
+  document.getElementById('specTitle').textContent = `تخصصات ${yearObj.name}`;
   document.getElementById('breadcrumb').innerHTML = `
     <span onclick="goHome()" class="crumb-link">🏛️ الرئيسية</span>
     <span class="crumb-sep">›</span>
@@ -212,7 +109,7 @@ function renderSpecializations(yearId) {
     ).length;
     
     return `
-      <div class="specialization-card" onclick="selectSpecialization('${spec}')">
+      <div class="specialization-card" onclick="selectSpecialization('${spec.replace(/'/g, "\\'")}')">
         <div class="spec-header">
           <span class="spec-icon">🎓</span>
           <h4>${spec}</h4>
@@ -227,7 +124,7 @@ function renderSpecializations(yearId) {
 }
 
 // ═══════════════════════════════════════════════
-// 🎓 اختيار التخصص → عرض المواد
+// 🎓 اختيار التخصص
 // ═══════════════════════════════════════════════
 function selectSpecialization(spec) {
   currentSpecialization = spec;
@@ -235,7 +132,7 @@ function selectSpecialization(spec) {
   document.getElementById('subjectsSection').style.display = 'block';
   
   const yearObj = YEARS.find(y => y.id === currentYear);
-  document.getElementById('subjectTitle').textContent = `📚 مواد ${spec}`;
+  document.getElementById('subjectTitle').textContent = `مواد ${spec}`;
   document.getElementById('breadcrumb').innerHTML = `
     <span onclick="goHome()" class="crumb-link">🏛️ الرئيسية</span>
     <span class="crumb-sep">›</span>
@@ -258,16 +155,19 @@ function renderSubjects() {
   }
   
   grid.innerHTML = subjects.map(sub => {
+    const subName = typeof sub === 'string' ? sub : sub.name;
+    const subIcon = typeof sub === 'string' ? '📖' : sub.icon;
+    
     const lessonsCount = allLessons.filter(l => 
       l.year === currentYear && 
       l.specialization === currentSpecialization && 
-      l.subject === sub.name
+      l.subject === subName
     ).length;
     
     return `
-      <div class="subject-card" onclick="selectSubject('${sub.name}')">
-        <span class="icon">${sub.icon}</span>
-        <h4>${sub.name}</h4>
+      <div class="subject-card" onclick="selectSubject('${subName.replace(/'/g, "\\'")}')">
+        <span class="icon">${subIcon}</span>
+        <h4>${subName}</h4>
         <span class="count">${lessonsCount} درس</span>
       </div>
     `;
@@ -275,23 +175,21 @@ function renderSubjects() {
 }
 
 // ═══════════════════════════════════════════════
-// 📚 اختيار المادة → عرض الدروس
+// 📚 اختيار المادة
 // ═══════════════════════════════════════════════
-let currentSubject = null;
-
 function selectSubject(subName) {
   currentSubject = subName;
   hideAllSections();
   document.getElementById('lessonsSection').style.display = 'block';
   
   const yearObj = YEARS.find(y => y.id === currentYear);
-  document.getElementById('lessonsTitle').textContent = `📄 دروس ${subName}`;
+  document.getElementById('lessonsTitle').textContent = `دروس ${subName}`;
   document.getElementById('breadcrumb').innerHTML = `
     <span onclick="goHome()" class="crumb-link">🏛️ الرئيسية</span>
     <span class="crumb-sep">›</span>
     <span onclick="selectYear('${currentYear}')" class="crumb-link">${yearObj.name}</span>
     <span class="crumb-sep">›</span>
-    <span onclick="selectSpecialization('${currentSpecialization}')" class="crumb-link">${currentSpecialization}</span>
+    <span onclick="selectSpecialization('${currentSpecialization.replace(/'/g, "\\'")}')" class="crumb-link">${currentSpecialization}</span>
     <span class="crumb-sep">›</span>
     <span class="crumb-current">${subName}</span>
   `;
@@ -306,7 +204,7 @@ function selectSubject(subName) {
 }
 
 // ═══════════════════════════════════════════════
-// 🔙 أزرار الرجوع
+// 🔙 الرجوع
 // ═══════════════════════════════════════════════
 function backToSpecializations() {
   selectYear(currentYear);
@@ -316,7 +214,7 @@ function backToSubjects() {
 }
 
 // ═══════════════════════════════════════════════
-// 📄 عرض بطاقات الدروس
+// 📄 عرض الدروس
 // ═══════════════════════════════════════════════
 function formatSize(bytes) {
   if (bytes < 1024) return bytes + ' B';
@@ -369,7 +267,7 @@ function escapeHtml(str) {
 }
 
 // ═══════════════════════════════════════════════
-// 🔎 البحث الشامل
+// 🔎 البحث
 // ═══════════════════════════════════════════════
 document.getElementById('searchInput').addEventListener('input', (e) => {
   const q = e.target.value.trim().toLowerCase();
@@ -408,6 +306,77 @@ document.getElementById('homeBtn').addEventListener('click', (e) => {
   goHome();
 });
 
+// ═══════════════════════════════════════════════
+// 🔐 الشعار السري - إظهار زر لوحة التحكم
+// ═══════════════════════════════════════════════
+let logoClickCount = 0;
+let logoClickTimer = null;
+const logo = document.getElementById('secretLogo');
+const adminBtn = document.getElementById('adminBtn');
+
+if (logo && adminBtn) {
+  logo.addEventListener('click', () => {
+    logoClickCount++;
+    
+    logo.classList.add('pulse');
+    setTimeout(() => logo.classList.remove('pulse'), 400);
+    
+    clearTimeout(logoClickTimer);
+    logoClickTimer = setTimeout(() => {
+      logoClickCount = 0;
+    }, 3000);
+    
+    if (logoClickCount >= 5) {
+      adminBtn.classList.add('visible');
+      logoClickCount = 0;
+      showToast('✅ تم إظهار زر لوحة التحكم');
+    }
+  });
+}
+
+function showToast(message) {
+  const toast = document.createElement('div');
+  toast.textContent = message;
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #0d5f4a, #1a7d63);
+    color: white;
+    padding: 14px 28px;
+    border-radius: 30px;
+    font-family: 'Tajawal', sans-serif;
+    font-weight: 700;
+    box-shadow: 0 8px 32px rgba(13, 95, 74, 0.4);
+    z-index: 9999;
+    animation: toastIn 0.4s ease;
+  `;
+  
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.animation = 'toastOut 0.4s ease forwards';
+    setTimeout(() => toast.remove(), 400);
+  }, 3000);
+}
+
+const toastStyle = document.createElement('style');
+toastStyle.textContent = `
+  @keyframes toastIn {
+    from { opacity: 0; transform: translate(-50%, 20px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+  }
+  @keyframes toastOut {
+    from { opacity: 1; transform: translate(-50%, 0); }
+    to { opacity: 0; transform: translate(-50%, 20px); }
+  }
+`;
+document.head.appendChild(toastStyle);
+
+// ═══════════════════════════════════════════════
+// تشغيل التطبيق
+// ═══════════════════════════════════════════════
 (async () => {
   await fetchLessons();
   goHome();
