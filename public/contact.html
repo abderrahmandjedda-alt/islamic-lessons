@@ -25,13 +25,67 @@
   </div>
 </header>
 
-<section class="coming-soon">
-  <div class="coming-soon-box">
-    <span class="coming-soon-icon">📞</span>
-    <h2>تواصل مع الإدارة</h2>
-    <p>هنا ستجد معلومات التواصل مع إدارة المنصة.<br>هذه الميزة قادمة قريباً بإذن الله.</p>
-    <a href="index.html" class="btn-back">🏠 العودة للرئيسية</a>
+<section class="contact-hero">
+  <div class="container">
+    <span class="contact-hero-icon">📞</span>
+    <h1>تواصل مع الإدارة</h1>
+    <p>نرحّب بتواصلكم لأي استفسار، اقتراح، أو ملاحظة</p>
   </div>
+</section>
+
+<section class="container contact-section">
+
+  <div class="contact-card">
+    <div class="contact-card-header">
+      <span class="contact-card-icon">📧</span>
+      <div>
+        <h3>البريد الإلكتروني</h3>
+        <p class="contact-subtitle">للرسائل الرسمية والاستفسارات</p>
+      </div>
+    </div>
+    <div class="contact-value">
+      <span class="contact-value-text">Abderrahmandjedda@gmail.com</span>
+      <button class="copy-btn" onclick="copyToClipboard('Abderrahmandjedda@gmail.com', 'الإيميل')">
+        📋 نسخ
+      </button>
+    </div>
+  </div>
+
+  <div class="contact-card">
+    <div class="contact-card-header">
+      <span class="contact-card-icon">📱</span>
+      <div>
+        <h3>الواتساب</h3>
+        <p class="contact-subtitle">للتواصل السريع</p>
+      </div>
+    </div>
+    <div class="contact-value">
+      <span class="contact-value-text">+213 775 708 161</span>
+      <div class="contact-btns">
+        <button class="copy-btn" onclick="copyToClipboard('+213775708161', 'رقم الواتساب')">
+          📋 نسخ
+        </button>
+        <a href="https://wa.me/213775708161" target="_blank" class="whatsapp-btn">
+          💬 فتح واتساب
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="tips-card">
+    <h3>💡 نصائح للتواصل</h3>
+    <ul>
+      <li>اذكر <strong>اسمك</strong> و<strong>سنتك الدراسية</strong> و<strong>تخصصك</strong></li>
+      <li>حدّد <strong>موضوع التواصل</strong> بوضوح (استفسار / اقتراح / مشكلة)</li>
+      <li>كن مهذباً ومختصراً في رسالتك</li>
+      <li>للمشاكل التقنية، اذكر <strong>تفاصيل المشكلة</strong> مع صورة إن أمكن</li>
+    </ul>
+  </div>
+
+  <div class="contact-back">
+    <a href="index.html" class="btn-back-large">🏠 العودة للرئيسية</a>
+  </div>
+
 </section>
 
 <footer>
@@ -54,6 +108,52 @@ themeToggle.addEventListener('click', () => {
   localStorage.setItem('theme', next);
   themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
 });
+
+function copyToClipboard(text, label) {
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(() => {
+      showToast(`✅ تم نسخ ${label}`);
+    }).catch(() => {
+      fallbackCopy(text, label);
+    });
+  } else {
+    fallbackCopy(text, label);
+  }
+}
+
+function fallbackCopy(text, label) {
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.select();
+  textarea.setSelectionRange(0, 99999);
+  
+  try {
+    document.execCommand('copy');
+    showToast(`✅ تم نسخ ${label}`);
+  } catch (err) {
+    showToast('❌ فشل النسخ');
+  }
+  
+  document.body.removeChild(textarea);
+}
+
+function showToast(message) {
+  const existing = document.querySelector('.toast-notification');
+  if (existing) existing.remove();
+  
+  const toast = document.createElement('div');
+  toast.className = 'toast-notification';
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.classList.add('toast-hide');
+    setTimeout(() => toast.remove(), 300);
+  }, 2500);
+}
 </script>
 </body>
 </html>
