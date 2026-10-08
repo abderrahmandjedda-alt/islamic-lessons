@@ -79,22 +79,20 @@ function isLessonFavorite(lessonId) {
 }
 
 // ═══════════════════════════════════════════════
-// 🌙 الوضع الليلي (محمي)
+// 🌙 الوضع الليلي
 // ═══════════════════════════════════════════════
 const themeToggle = document.getElementById('themeToggle');
 const savedTheme = localStorage.getItem('theme') || 'light';
 document.documentElement.setAttribute('data-theme', savedTheme);
+themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
 
-if (themeToggle) {
-  themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
-  themeToggle.addEventListener('click', () => {
-    const current = document.documentElement.getAttribute('data-theme');
-    const next = current === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('theme', next);
-    themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
-  });
-}
+themeToggle.addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
+});
 
 // ═══════════════════════════════════════════════
 // 🔄 جلب الدروس
@@ -490,9 +488,48 @@ function showToast(message) {
 })();
 
 // ═══════════════════════════════════════════════
-// تشغيل التطبيق
+// 🚀 تشغيل التطبيق
 // ═══════════════════════════════════════════════
 (async () => {
   await fetchLessons();
-  goHome();
+  
+  // ═══════════════════════════════════════════════
+  // 🔗 التحقق من طلب الانتقال من صفحة المفضلة
+  // ═══════════════════════════════════════════════
+  const gotoYear = sessionStorage.getItem('goto_year');
+  const gotoSpec = sessionStorage.getItem('goto_spec');
+  
+  if (gotoYear && gotoSpec) {
+    // مسح الطلب بعد القراءة
+    sessionStorage.removeItem('goto_year');
+    sessionStorage.removeItem('goto_spec');
+    
+    // الانتقال إلى التخصص مباشرة
+    currentYear = gotoYear;
+    currentSpecialization = gotoSpec;
+    
+    // إظهار قسم المواد
+    hideAllSections();
+    document.getElementById('subjectsSection').style.display = 'block';
+    
+    const yearObj = YEARS.find(y => y.id === gotoYear);
+    const yearName = yearObj ? yearObj.name : gotoYear;
+    
+    document.getElementById('subjectTitle').textContent = `مواد ${gotoSpec}`;
+    document.getElementById('breadcrumb').innerHTML = `
+      <span onclick="goHome()" class="crumb-link">🏛️ الرئيسية</span>
+      <span class="crumb-sep">›</span>
+      <span onclick="selectYear('${gotoYear}')" class="crumb-link">${yearName}</span>
+      <span class="crumb-sep">›</span>
+      <span class="crumb-current">${gotoSpec}</span>
+    `;
+    
+    renderSubjects();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    console.log('✅ تم الانتقال إلى:', gotoSpec);
+  } else {
+    // الصفحة الرئيسية العادية
+    goHome();
+  }
 })();
