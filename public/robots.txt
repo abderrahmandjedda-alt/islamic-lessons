@@ -1,0 +1,14 @@
+# Robots.txt for Islamic Lessons Platform
+# منصة الدروس الجامعية - كلية العلوم الإسلامية
+
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /admin.js
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://islamic-lessons.onrender.com/sitemap.xml
+
+# Crawl-delay (للتخفيف على السيرفر)
+Crawl-delay: 1

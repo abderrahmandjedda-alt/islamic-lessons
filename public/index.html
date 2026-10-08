@@ -3,9 +3,67 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>كلية العلوم الإسلامية - الدروس الجامعية</title>
+<title>كلية العلوم الإسلامية - منصة الدروس الجامعية | جامعة وهران 1</title>
 <link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 🔍 SEO - تحسين محركات البحث                    -->
+<!-- ═══════════════════════════════════════════════ -->
+
+<!-- المعلومات الأساسية -->
+<meta name="description" content="منصة الدروس الجامعية لكلية العلوم الإسلامية - جامعة وهران 1 أحمد بن بلة. دروس PDF و Word في 40 تخصصاً و 400+ مادة للسنة الأولى والثانية ماستر وليسانس.">
+<meta name="keywords" content="كلية العلوم الإسلامية, جامعة وهران 1, دروس جامعية, ماستر, ليسانس, اللغة والدراسات القرآنية, الحديث وعلومه, العقيدة والفكر الإسلامي, الفقه وأصوله, دروس PDF, بحوث جامعية, وهران, الجزائر, أحمد بن بلة">
+<meta name="author" content="جدة عبد الرحمن">
+<meta name="robots" content="index, follow">
+<meta name="language" content="Arabic">
+<meta http-equiv="content-language" content="ar">
+
+<!-- Open Graph (فيسبوك، واتساب، تيليجرام) -->
+<meta property="og:title" content="منصة الدروس الجامعية - كلية العلوم الإسلامية">
+<meta property="og:description" content="دروس PDF و Word لكل تخصصات كلية العلوم الإسلامية - جامعة وهران 1">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://islamic-lessons.onrender.com">
+<meta property="og:locale" content="ar_DZ">
+<meta property="og:site_name" content="الدروس الجامعية - كلية العلوم الإسلامية">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="منصة الدروس الجامعية - كلية العلوم الإسلامية">
+<meta name="twitter:description" content="دروس PDF و Word لكل التخصصات - جامعة وهران 1">
+
+<!-- Canonical URL -->
+<link rel="canonical" href="https://islamic-lessons.onrender.com/">
+
+<!-- Favicon -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☪</text></svg>">
+
+<!-- Schema.org - معلومات المنظمة -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  "name": "منصة الدروس الجامعية - كلية العلوم الإسلامية",
+  "alternateName": "Islamic Studies Lessons Platform",
+  "url": "https://islamic-lessons.onrender.com",
+  "description": "منصة تعليمية تجمع دروس كلية العلوم الإسلامية - جامعة وهران 1 أحمد بن بلة",
+  "inLanguage": "ar",
+  "address": {
+    "@type": "PostalAddress",
+    "addressCountry": "DZ",
+    "addressLocality": "وهران",
+    "addressRegion": "وهران"
+  },
+  "parentOrganization": {
+    "@type": "CollegeOrUniversity",
+    "name": "جامعة وهران 1 أحمد بن بلة"
+  },
+  "founder": {
+    "@type": "Person",
+    "name": "جدة عبد الرحمن"
+  }
+}
+</script>
 </head>
 <body>
 
@@ -56,7 +114,7 @@
 <section class="hero">
   <div class="container">
     <h2>﷽</h2>
-    <h2>منصة الدروس الجامعية</h2>
+    <h1>منصة الدروس الجامعية</h1>
     <p>اختر السنة → التخصص → المادة → تصفّح الدروس</p>
     <div class="search-hero">
       <input type="text" id="searchInput" placeholder="ابحث عن درس، مادة، أو ملف...">
@@ -69,25 +127,25 @@
 </div>
 
 <section id="yearsSection" class="container section">
-  <h3 class="section-title">اختر السنة الدراسية</h3>
+  <h2 class="section-title">اختر السنة الدراسية</h2>
   <div id="yearsGrid" class="years-grid"></div>
 </section>
 
 <section id="specializationsSection" class="container section" style="display:none;">
   <button class="back-btn" onclick="goHome()">← رجوع إلى السنوات</button>
-  <h3 class="section-title" id="specTitle">اختر التخصص</h3>
+  <h2 class="section-title" id="specTitle">اختر التخصص</h2>
   <div id="specializationsGrid" class="specializations-grid"></div>
 </section>
 
 <section id="subjectsSection" class="container section" style="display:none;">
   <button class="back-btn" onclick="backToSpecializations()">← رجوع إلى التخصصات</button>
-  <h3 class="section-title" id="subjectTitle">اختر المادة</h3>
+  <h2 class="section-title" id="subjectTitle">اختر المادة</h2>
   <div id="subjectsGrid" class="subjects-grid"></div>
 </section>
 
 <section id="lessonsSection" class="container section" style="display:none;">
   <button class="back-btn" onclick="backToSubjects()">← رجوع إلى المواد</button>
-  <h3 class="section-title" id="lessonsTitle">الدروس</h3>
+  <h2 class="section-title" id="lessonsTitle">الدروس</h2>
   <div id="lessonsGrid" class="lessons-grid"></div>
   <div id="emptyMsg" class="empty" style="display:none;">
     لا توجد دروس في هذه المادة بعد.
@@ -96,7 +154,7 @@
 
 <section id="searchResultsSection" class="container section" style="display:none;">
   <button class="back-btn" onclick="goHome()">← رجوع</button>
-  <h3 class="section-title">نتائج البحث</h3>
+  <h2 class="section-title">نتائج البحث</h2>
   <div id="searchResultsGrid" class="lessons-grid"></div>
   <div id="searchEmptyMsg" class="empty" style="display:none;">
     لا توجد نتائج مطابقة لبحثك.
