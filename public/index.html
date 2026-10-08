@@ -4,22 +4,34 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>كلية العلوم الإسلامية - منصة الدروس الجامعية | جامعة وهران 1</title>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 📱 PWA - تطبيق ويب تقدمي                       -->
+<!-- ═══════════════════════════════════════════════ -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d5f4a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="الدروس الجامعية">
+<meta name="application-name" content="الدروس الجامعية">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+
 <link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
 
 <!-- ═══════════════════════════════════════════════ -->
 <!-- 🔍 SEO - تحسين محركات البحث                    -->
 <!-- ═══════════════════════════════════════════════ -->
-
-<!-- المعلومات الأساسية -->
 <meta name="description" content="منصة الدروس الجامعية لكلية العلوم الإسلامية - جامعة وهران 1 أحمد بن بلة. دروس PDF و Word في 40 تخصصاً و 400+ مادة للسنة الأولى والثانية ماستر وليسانس.">
-<meta name="keywords" content="كلية العلوم الإسلامية, جامعة وهران 1, دروس جامعية, ماستر, ليسانس, اللغة والدراسات القرآنية, الحديث وعلومه, العقيدة والفكر الإسلامي, الفقه وأصوله, دروس PDF, بحوث جامعية, وهران, الجزائر, أحمد بن بلة">
+<meta name="keywords" content="كلية العلوم الإسلامية, جامعة وهران 1, دروس جامعية, ماستر, ليسانس, اللغة والدراسات القرآنية, الحديث وعلومه, العقيدة والفكر الإسلامي, الفقه وأصوله, دروس PDF, بحوث جامعية, وهران, الجزائر">
 <meta name="author" content="جدة عبد الرحمن">
 <meta name="robots" content="index, follow">
 <meta name="language" content="Arabic">
 <meta http-equiv="content-language" content="ar">
 
-<!-- Open Graph (فيسبوك، واتساب، تيليجرام) -->
+<!-- Open Graph -->
 <meta property="og:title" content="منصة الدروس الجامعية - كلية العلوم الإسلامية">
 <meta property="og:description" content="دروس PDF و Word لكل تخصصات كلية العلوم الإسلامية - جامعة وهران 1">
 <meta property="og:type" content="website">
@@ -32,13 +44,10 @@
 <meta name="twitter:title" content="منصة الدروس الجامعية - كلية العلوم الإسلامية">
 <meta name="twitter:description" content="دروس PDF و Word لكل التخصصات - جامعة وهران 1">
 
-<!-- Canonical URL -->
+<!-- Canonical -->
 <link rel="canonical" href="https://islamic-lessons.onrender.com/">
 
-<!-- Favicon -->
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☪</text></svg>">
-
-<!-- Schema.org - معلومات المنظمة -->
+<!-- Schema.org -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -51,8 +60,7 @@
   "address": {
     "@type": "PostalAddress",
     "addressCountry": "DZ",
-    "addressLocality": "وهران",
-    "addressRegion": "وهران"
+    "addressLocality": "وهران"
   },
   "parentOrganization": {
     "@type": "CollegeOrUniversity",
@@ -82,7 +90,6 @@
       <button id="themeToggle" class="theme-btn">🌙</button>
       <button id="menuToggle" class="theme-btn menu-toggle" aria-label="القائمة">☰</button>
 
-      <!-- القائمة المنسدلة -->
       <div id="menuDropdown" class="menu-dropdown">
         <a href="favorites.html" class="menu-item">
           <span class="menu-icon">⭐</span>
@@ -167,6 +174,36 @@
     <p class="footer-author">إعداد: جدة عبد الرحمن</p>
   </div>
 </footer>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 🚀 PWA Service Worker                          -->
+<!-- ═══════════════════════════════════════════════ -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then((registration) => {
+        console.log('✅ PWA: Service Worker مسجّل');
+        console.log('📍 النطاق:', registration.scope);
+      })
+      .catch((err) => {
+        console.error('❌ PWA: فشل التسجيل:', err);
+      });
+  });
+}
+
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  console.log('📱 التطبيق قابل للتثبيت!');
+});
+
+window.addEventListener('appinstalled', () => {
+  console.log('🎉 تم تثبيت التطبيق!');
+  deferredPrompt = null;
+});
+</script>
 
 <script src="data.js"></script>
 <script src="app.js"></script>

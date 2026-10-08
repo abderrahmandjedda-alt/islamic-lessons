@@ -1,0 +1,54 @@
+{
+  "name": "الدروس الجامعية - كلية العلوم الإسلامية",
+  "short_name": "الدروس الجامعية",
+  "description": "منصة الدروس الجامعية لكلية العلوم الإسلامية - جامعة وهران 1 أحمد بن بلة. دروس PDF و Word في 40 تخصصاً.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d5f4a",
+  "theme_color": "#0d5f4a",
+  "lang": "ar",
+  "dir": "rtl",
+  "categories": ["education", "books"],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "المفضلة",
+      "short_name": "مفضلتي",
+      "description": "تخصصاتك ودروسك المفضلة",
+      "url": "/favorites.html",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "البحث",
+      "short_name": "بحث",
+      "description": "ابحث عن درس",
+      "url": "/?focus=search",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
