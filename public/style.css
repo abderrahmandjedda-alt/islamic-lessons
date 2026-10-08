@@ -135,13 +135,18 @@ h1, h2, h3, h4 {
   gap: 16px;
 }
 
-.logo-icon {
-  font-size: 2.5rem;
-  background: var(--gradient-emerald);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  filter: drop-shadow(0 2px 4px rgba(13, 95, 74, 0.2));
+/* 🐆 شعار الفهد */
+.logo-img {
+  width: 55px;
+  height: 55px;
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 6px rgba(212, 165, 116, 0.3));
+  transition: transform 0.3s ease;
+}
+
+.logo:hover .logo-img {
+  transform: scale(1.05);
 }
 
 .logo h1 {
@@ -1058,6 +1063,45 @@ footer::before {
   opacity: 0.6;
 }
 
+.footer-line {
+  font-size: 0.95rem;
+  opacity: 0.85;
+  margin-bottom: 8px;
+}
+
+.footer-author {
+  font-family: 'Amiri', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.5px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(212, 165, 116, 0.3);
+  display: inline-block;
+  padding-left: 30px;
+  padding-right: 30px;
+  position: relative;
+}
+
+.footer-author::before,
+.footer-author::after {
+  content: '✦';
+  color: var(--gold);
+  opacity: 0.6;
+  margin: 0 12px;
+  font-size: 0.8rem;
+  position: absolute;
+  top: 14px;
+}
+
+.footer-author::before { left: 0; }
+.footer-author::after { right: 0; }
+
+[data-theme="dark"] .footer-author {
+  color: var(--gold-light);
+}
+
 /* ═══════════════════════════════════════════════ */
 /* Animations */
 /* ═══════════════════════════════════════════════ */
@@ -1106,7 +1150,7 @@ footer::before {
   nav { width: 100%; justify-content: center; gap: 6px; }
   nav a { font-size: 0.85rem; padding: 8px 12px; }
   .logo h1 { font-size: 1.1rem; }
-  .logo-icon { font-size: 2rem; }
+  .logo-img { width: 42px; height: 42px; }
   
   .years-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
   .year-card { padding: 24px 14px; }
@@ -1146,59 +1190,10 @@ footer::before {
   background: var(--gold);
   color: white;
 }
+
 /* ═══════════════════════════════════════════════ */
-/* ✨ تذييل: اسم المعدّ                             */
+/* 🔐 الشعار السري                                 */
 /* ═══════════════════════════════════════════════ */
-
-.footer-line {
-  font-size: 0.95rem;
-  opacity: 0.85;
-  margin-bottom: 8px;
-}
-
-.footer-author {
-  font-family: 'Amiri', serif;
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--gold);
-  letter-spacing: 0.5px;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(212, 165, 116, 0.3);
-  display: inline-block;
-  padding-left: 30px;
-  padding-right: 30px;
-  position: relative;
-}
-
-/* نجمة قبل الاسم */
-.footer-author::before,
-.footer-author::after {
-  content: '✦';
-  color: var(--gold);
-  opacity: 0.6;
-  margin: 0 12px;
-  font-size: 0.8rem;
-  position: absolute;
-  top: 14px;
-}
-
-.footer-author::before {
-  left: 0;
-}
-
-.footer-author::after {
-  right: 0;
-}
-
-[data-theme="dark"] .footer-author {
-  color: var(--gold-light);
-}
-/* ═══════════════════════════════════════════════ */
-/* 🔐 شعار سري - إخفاء/إظهار زر لوحة التحكم      */
-/* ═══════════════════════════════════════════════ */
-
-/* الشعار يصبح قابلاً للنقر */
 .logo {
   cursor: pointer;
   user-select: none;
@@ -1209,7 +1204,6 @@ footer::before {
   transform: scale(0.98);
 }
 
-/* عند الضغط - تأثير بصري */
 .logo.pulse {
   animation: pulse 0.4s ease;
 }
@@ -1219,7 +1213,6 @@ footer::before {
   50% { transform: scale(1.03); }
   100% { transform: scale(1); }
 }
-
 
 @keyframes slideIn {
   from {
@@ -1231,11 +1224,10 @@ footer::before {
     transform: translateX(0);
   }
 }
+
 /* ═══════════════════════════════════════════════ */
 /* ☰ قائمة المنيو المنسدلة                       */
 /* ═══════════════════════════════════════════════ */
-
-/* زر المنيو - نفس تصميم زر الوضع الليلي */
 .menu-toggle {
   font-weight: 900;
   font-size: 1.3rem;
@@ -1250,7 +1242,6 @@ footer::before {
   transform: rotate(90deg);
 }
 
-/* القائمة المنسدلة */
 .menu-dropdown {
   position: absolute;
   top: calc(100% + 12px);
@@ -1262,8 +1253,6 @@ footer::before {
   box-shadow: 0 20px 60px rgba(13, 95, 74, 0.25), 0 8px 24px rgba(0, 0, 0, 0.15);
   padding: 12px;
   z-index: 1000;
-  
-  /* مخفية افتراضياً */
   opacity: 0;
   visibility: hidden;
   transform: translateY(-10px);
@@ -1276,7 +1265,6 @@ footer::before {
   transform: translateY(0);
 }
 
-/* عنصر داخل القائمة */
 .menu-item {
   display: flex !important;
   align-items: center;
@@ -1312,14 +1300,12 @@ footer::before {
   flex-shrink: 0;
 }
 
-/* الروابط الفرعية (تحت "رفع الدروس") */
 .menu-item.menu-sub {
   padding-right: 40px !important;
   font-size: 0.9rem;
   opacity: 0.9;
 }
 
-/* عنوان مجموعة (رفع الدروس) */
 .menu-group-title {
   display: flex;
   align-items: center;
@@ -1332,7 +1318,6 @@ footer::before {
   letter-spacing: 0.5px;
 }
 
-/* الخط الفاصل */
 .menu-divider {
   height: 1px;
   background: var(--border);
@@ -1340,7 +1325,6 @@ footer::before {
   opacity: 0.6;
 }
 
-/* تأثير فتح القائمة */
 @keyframes menuSlide {
   from {
     opacity: 0;
@@ -1352,9 +1336,6 @@ footer::before {
   }
 }
 
-/* ═══════════════════════════════════════════════ */
-/* 📱 تحسين المنيو للجوال                        */
-/* ═══════════════════════════════════════════════ */
 @media (max-width: 768px) {
   .menu-dropdown {
     left: 16px;
@@ -1363,9 +1344,7 @@ footer::before {
     width: auto;
   }
   
-  .menu-toggle {
-    order: 3;
-  }
+  .menu-toggle { order: 3; }
 }
 
 /* ═══════════════════════════════════════════════ */
@@ -1449,11 +1428,10 @@ footer::before {
   transform: translateY(-2px);
   box-shadow: 0 10px 32px rgba(13, 95, 74, 0.35);
 }
+
 /* ═══════════════════════════════════════════════ */
 /* 📞 صفحة تواصل مع الإدارة                       */
 /* ═══════════════════════════════════════════════ */
-
-/* Hero مصغر */
 .contact-hero {
   background: var(--gradient-hero);
   color: white;
@@ -1500,14 +1478,12 @@ footer::before {
   font-family: 'Tajawal', sans-serif;
 }
 
-/* القسم الرئيسي */
 .contact-section {
   padding: 50px 24px;
   max-width: 780px;
   margin: 0 auto;
 }
 
-/* بطاقة تواصل */
 .contact-card {
   background: var(--card);
   border-radius: 20px;
@@ -1577,7 +1553,6 @@ footer::before {
   font-family: 'Tajawal', sans-serif;
 }
 
-/* قيمة التواصل (إيميل / واتساب) */
 .contact-value {
   display: flex;
   align-items: center;
@@ -1609,7 +1584,6 @@ footer::before {
   flex-wrap: wrap;
 }
 
-/* زر النسخ */
 .copy-btn {
   background: var(--gradient-emerald);
   color: white;
@@ -1636,7 +1610,6 @@ footer::before {
   transform: translateY(0) scale(0.96);
 }
 
-/* زر واتساب */
 .whatsapp-btn {
   background: linear-gradient(135deg, #25d366, #128c7e);
   color: white;
@@ -1660,7 +1633,6 @@ footer::before {
   box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
 }
 
-/* بطاقة النصائح */
 .tips-card {
   background: var(--card);
   border-radius: 20px;
@@ -1734,7 +1706,6 @@ footer::before {
   color: var(--gold);
 }
 
-/* زر العودة الكبير */
 .contact-back {
   text-align: center;
   margin-top: 40px;
@@ -1797,7 +1768,6 @@ footer::before {
   }
 }
 
-/* الجوال */
 @media (max-width: 768px) {
   .contact-hero { padding: 40px 0 35px; }
   .contact-hero-icon { font-size: 2.8rem; }
@@ -1815,9 +1785,7 @@ footer::before {
     padding: 14px 16px;
   }
   
-  .contact-btns {
-    width: 100%;
-  }
+  .contact-btns { width: 100%; }
   
   .copy-btn, .whatsapp-btn {
     flex: 1;
@@ -1834,10 +1802,10 @@ footer::before {
     font-size: 0.95rem;
   }
 }
-/* ═══════════════════════════════════════════════ */
-/* ⭐ زر المفضلة (تخصص + درس)                    */
-/* ═══════════════════════════════════════════════ */
 
+/* ═══════════════════════════════════════════════ */
+/* ⭐ زر المفضلة                                  */
+/* ═══════════════════════════════════════════════ */
 .fav-btn {
   background: var(--bg-alt);
   border: 2px solid var(--border);
@@ -1874,14 +1842,12 @@ footer::before {
   transform: scale(1.15) rotate(10deg);
 }
 
-/* زر مفضلة الدرس */
 .lesson-fav {
   width: 36px;
   height: 36px;
   font-size: 1rem;
 }
 
-/* حاوية شارات الدرس */
 .lesson-badges {
   display: flex;
   align-items: center;
@@ -1889,7 +1855,6 @@ footer::before {
   flex-shrink: 0;
 }
 
-/* في بطاقة التخصص - الزر على اليمين */
 .specialization-card .spec-meta {
   display: flex;
   align-items: center;
@@ -1902,12 +1867,8 @@ footer::before {
   margin-left: 0;
 }
 
-/* تعديل header البطاقة ليكون قابلاً للنقر */
-.spec-header {
-  cursor: pointer;
-}
+.spec-header { cursor: pointer; }
 
-/* دعم الوضع الليلي */
 [data-theme="dark"] .fav-btn {
   background: var(--bg);
   border-color: var(--border);
@@ -1918,9 +1879,6 @@ footer::before {
   border-color: var(--gold-light);
 }
 
-/* ═══════════════════════════════════════════════ */
-/* ✨ حركة قلب البطاقة                            */
-/* ═══════════════════════════════════════════════ */
 @keyframes heartBeat {
   0% { transform: scale(1); }
   25% { transform: scale(1.3); }
@@ -1929,9 +1887,6 @@ footer::before {
   100% { transform: scale(1); }
 }
 
-/* ═══════════════════════════════════════════════ */
-/* 📱 الجوال                                      */
-/* ═══════════════════════════════════════════════ */
 @media (max-width: 768px) {
   .fav-btn {
     width: 36px;
@@ -1944,17 +1899,13 @@ footer::before {
     height: 32px;
   }
   
-  .lesson-badges {
-    gap: 6px;
-  }
+  .lesson-badges { gap: 6px; }
 }
+
 /* ═══════════════════════════════════════════════ */
 /* ⭐ صفحة المفضلة                                */
 /* ═══════════════════════════════════════════════ */
-
-.fav-section {
-  margin-bottom: 50px;
-}
+.fav-section { margin-bottom: 50px; }
 
 .fav-section-title {
   font-family: 'Amiri', serif;
@@ -2090,7 +2041,6 @@ footer::before {
   transform: scale(1.1);
 }
 
-/* الحالة الفارغة */
 .fav-empty {
   text-align: center;
   padding: 50px 24px;
@@ -2124,34 +2074,27 @@ footer::before {
   color: var(--gold);
 }
 
-/* الجوال */
 @media (max-width: 768px) {
   .fav-card {
     flex-direction: column;
     align-items: stretch;
   }
   
-  .fav-card-actions {
-    justify-content: stretch;
-  }
+  .fav-card-actions { justify-content: stretch; }
   
   .fav-go-btn {
     flex: 1;
     justify-content: center;
   }
   
-  .fav-remove-btn {
-    flex: 0 0 42px;
-  }
+  .fav-remove-btn { flex: 0 0 42px; }
   
-  .fav-section-title {
-    font-size: 1.3rem;
-  }
+  .fav-section-title { font-size: 1.3rem; }
 }
+
 /* ═══════════════════════════════════════════════ */
 /* 📱 زر تثبيت التطبيق                            */
 /* ═══════════════════════════════════════════════ */
-
 .install-btn {
   background: linear-gradient(135deg, #d4a574, #b8935a) !important;
   color: white !important;

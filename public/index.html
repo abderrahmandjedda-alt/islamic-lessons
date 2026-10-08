@@ -27,8 +27,6 @@
 <!-- ═══════════════════════════════════════════════ -->
 <!-- 🔍 SEO - تحسين محركات البحث                    -->
 <!-- ═══════════════════════════════════════════════ -->
-
-<!-- المعلومات الأساسية -->
 <meta name="description" content="منصة الدروس الجامعية لكلية العلوم الإسلامية - جامعة وهران 1 أحمد بن بلة. دروس PDF و Word في 40 تخصصاً و 400+ مادة للسنة الأولى والثانية ماستر وليسانس.">
 <meta name="keywords" content="كلية العلوم الإسلامية, جامعة وهران 1, دروس جامعية, ماستر, ليسانس, اللغة والدراسات القرآنية, الحديث وعلومه, العقيدة والفكر الإسلامي, الفقه وأصوله, دروس PDF, بحوث جامعية, وهران, الجزائر, أحمد بن بلة">
 <meta name="author" content="جدة عبد الرحمن">
@@ -36,7 +34,7 @@
 <meta name="language" content="Arabic">
 <meta http-equiv="content-language" content="ar">
 
-<!-- Open Graph (فيسبوك، واتساب، تيليجرام) -->
+<!-- Open Graph -->
 <meta property="og:title" content="منصة الدروس الجامعية - كلية العلوم الإسلامية">
 <meta property="og:description" content="دروس PDF و Word لكل تخصصات كلية العلوم الإسلامية - جامعة وهران 1">
 <meta property="og:type" content="website">
@@ -52,7 +50,7 @@
 <!-- Canonical URL -->
 <link rel="canonical" href="https://islamic-lessons.onrender.com/">
 
-<!-- Schema.org - معلومات المنظمة -->
+<!-- Schema.org -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -83,7 +81,7 @@
 <header class="navbar">
   <div class="container nav-wrap">
     <div class="logo" id="secretLogo" title="كلية العلوم الإسلامية">
-      <span class="logo-icon">☪</span>
+      <img src="lion.png" alt="جامعة وهران 1" class="logo-img">
       <div>
         <h1>كلية العلوم الإسلامية</h1>
         <p>جامعة وهران 1 أحمد بن بلة</p>
@@ -215,13 +213,11 @@ window.addEventListener('beforeinstallprompt', (e) => {
   deferredPrompt = e;
   console.log('📱 التطبيق قابل للتثبيت!');
   
-  // إظهار زر التثبيت
   if (installBtn) {
     installBtn.style.display = 'flex';
   }
 });
 
-// عند الضغط على زر التثبيت
 if (installBtn) {
   installBtn.addEventListener('click', async () => {
     if (!deferredPrompt) {
