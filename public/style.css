@@ -1194,3 +1194,40 @@ footer::before {
 [data-theme="dark"] .footer-author {
   color: var(--gold-light);
 }
+/* ═══════════════════════════════════════════════ */
+/* 🔐 شعار سري - إخفاء/إظهار زر لوحة التحكم      */
+/* ═══════════════════════════════════════════════ */
+
+/* الشعار يصبح قابلاً للنقر */
+.logo {
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.2s ease;
+}
+
+.logo:active {
+  transform: scale(0.98);
+}
+
+/* عند الضغط - تأثير بصري */
+.logo.pulse {
+  animation: pulse 0.4s ease;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

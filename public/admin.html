@@ -36,52 +36,23 @@
   <div class="upload-card">
     <h3>📤 رفع درس جديد</h3>
     <form id="uploadForm">
-  <label>السنة الدراسية</label>
-  <select name="year" id="yearSelect" required onchange="updateSpecializations()">
-    <option value="">اختر السنة</option>
-  </select>
+      <label>السنة الدراسية</label>
+      <select name="year" id="yearSelect" required onchange="updateSpecializations()">
+        <option value="">اختر السنة</option>
+      </select>
 
-  <label>التخصص</label>
-  <select name="specialization" id="specializationSelect" required onchange="updateSubjects()">
-    <option value="">اختر السنة أولاً</option>
-  </select>
+      <label>التخصص</label>
+      <select name="specialization" id="specializationSelect" required onchange="updateSubjects()">
+        <option value="">اختر السنة أولاً</option>
+      </select>
 
-  <label>المادة</label>
-  <select name="subject" id="subjectSelect" required>
-    <option value="">اختر التخصص أولاً</option>
-  </select>
+      <label>المادة</label>
+      <select name="subject" id="subjectSelect" required>
+        <option value="">اختر التخصص أولاً</option>
+      </select>
 
-  <label>عنوان الدرس</label>
-  <input type="text" name="title" required placeholder="مثال: المدخل إلى الحضارة الإسلامية">
-
-  <label>وصف مختصر (اختياري)</label>
-  <textarea name="description" rows="3" placeholder="وصف موجز عن الدرس"></textarea>
-
-  <label>الملف (PDF أو Word)</label>
-  <input type="file" name="file" accept=".pdf,.doc,.docx" required>
-
-  <button type="submit" class="btn-primary">📥 رفع الدرس</button>
-  <p id="uploadStatus" class="status"></p>
-</form>
       <label>عنوان الدرس</label>
       <input type="text" name="title" required placeholder="مثال: المدخل إلى الحضارة الإسلامية">
-
-     <label>المادة</label>
-<select name="subject" id="subjectSelect" required>
-  <option value="حفظ القرآن">حفظ القرآن</option>
-  <option value="تاريخ المصحف">تاريخ المصحف</option>
-  <option value="أصول النحو ومذاهبه">أصول النحو ومذاهبه</option>
-  <option value="دراسات في البلاغة العربية">دراسات في البلاغة العربية</option>
-  <option value="علم الدلالة">علم الدلالة</option>
-  <option value="مصادر الاحتجاج اللغوي">مصادر الاحتجاج اللغوي</option>
-  <option value="علم الرسم والضبط 1">علم الرسم والضبط 1</option>
-  <option value="غريب القرآن">غريب القرآن</option>
-  <option value="اللغة الإنجليزية">اللغة الإنجليزية</option>
-  <option value="البرمجة والذكاء الاصطناعي">البرمجة والذكاء الاصطناعي</option>
-  <option value="نظرية النظم">نظرية النظم</option>
-  <option value="اللسانيات">اللسانيات</option>
-  <option value="عام">عام</option>
-</select>
 
       <label>وصف مختصر (اختياري)</label>
       <textarea name="description" rows="3" placeholder="وصف موجز عن الدرس"></textarea>
@@ -101,6 +72,6 @@
 </div>
 
 <script src="data.js"></script>
-<script src="app.js"></script>
+<script src="admin.js"></script>
 </body>
 </html>
