@@ -4,6 +4,8 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const cloudinary = require('cloudinary').v2;
+const mongoose = require('mongoose');
+const Lesson = require('./models/Lesson');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,8 +19,8 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-const useCloudinary = !!(process.env.CLOUDINARY_CLOUD_NAME && 
-                          process.env.CLOUDINARY_API_KEY && 
+const useCloudinary = !!(process.env.CLOUDINARY_CLOUD_NAME &&
+                          process.env.CLOUDINARY_API_KEY &&
                           process.env.CLOUDINARY_API_SECRET);
 
 if (useCloudinary) {
@@ -28,15 +30,10 @@ if (useCloudinary) {
 }
 
 // ═══════════════════════════════════════════════
-// 📁 المجلدات
+// 📁 مجلد الرفع المحلي (احتياطي فقط)
 // ═══════════════════════════════════════════════
 const UPLOAD_DIR = path.join(__dirname, 'uploads');
-const DATA_DIR = path.join(__dirname, 'data');
-const DATA_FILE = path.join(DATA_DIR, 'lessons.json');
-
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR);
-if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR);
-if (!fs.existsSync(DATA_FILE)) fs.writeFileSync(DATA_FILE, '[]');
 
 // ═══════════════════════════════════════════════
 // 🔐 كلمة سر الأدمن
@@ -70,12 +67,6 @@ const upload = multer({
     else cb(new Error('نوع الملف غير مدعوم. المسموح: PDF, DOC, DOCX'));
   }
 });
-
-// ═══════════════════════════════════════════════
-// 💾 قراءة/كتابة قاعدة البيانات
-// ═══════════════════════════════════════════════
-const readData = () => JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-const writeData = (data) => fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
 
 // ═══════════════════════════════════════════════
 // 🔒 التحقق من كلمة سر الأدمن
@@ -138,8 +129,8 @@ app.post('/api/lessons', checkAdmin, upload.single('file'), async (req, res) => 
       console.log('📁 تم رفع الملف محلياً:', fileUrl);
     }
 
-    const lessons = readData();
-    const lesson = {
+    // حفظ بيانات الدرس في MongoDB
+    const lesson = await Lesson.create({
       id: Date.now().toString(),
       title: title || 'بدون عنوان',
       year: year || 'غير محدد',
@@ -152,10 +143,9 @@ app.post('/api/lessons', checkAdmin, upload.single('file'), async (req, res) => 
       type: path.extname(req.file.originalname).slice(1).toLowerCase(),
       url: fileUrl,
       storage: useCloudinary ? 'cloudinary' : 'local',
-      date: new Date().toISOString()
-    };
-    lessons.unshift(lesson);
-    writeData(lessons);
+      date: new Date()
+    });
+
     res.json({ success: true, lesson });
   } catch (err) {
     console.error('خطأ عام:', err);
@@ -164,37 +154,46 @@ app.post('/api/lessons', checkAdmin, upload.single('file'), async (req, res) => 
 });
 
 // ═══════════════════════════════════════════════
-// 📚 كل الدروس
+// 📚 كل الدروس (الأحدث أولاً)
 // ═══════════════════════════════════════════════
-app.get('/api/lessons', (req, res) => {
-  res.json(readData());
+app.get('/api/lessons', async (req, res) => {
+  try {
+    const lessons = await Lesson.find().sort({ date: -1 });
+    res.json(lessons);
+  } catch (err) {
+    console.error('خطأ في جلب الدروس:', err);
+    res.status(500).json({ error: 'تعذر جلب الدروس' });
+  }
 });
 
 // ═══════════════════════════════════════════════
 // 🗑️ حذف درس
 // ═══════════════════════════════════════════════
 app.delete('/api/lessons/:id', checkAdmin, async (req, res) => {
-  const lessons = readData();
-  const idx = lessons.findIndex(l => l.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'غير موجود' });
+  try {
+    const lesson = await Lesson.findOne({ id: req.params.id });
+    if (!lesson) return res.status(404).json({ error: 'غير موجود' });
 
-  const lesson = lessons[idx];
-
-  if (lesson.storage === 'cloudinary' && lesson.storedName) {
-    try {
-      await cloudinary.uploader.destroy(lesson.storedName, { resource_type: 'raw' });
-      console.log('☁️ تم حذف الملف من Cloudinary');
-    } catch (err) {
-      console.error('خطأ في حذف Cloudinary:', err);
+    // حذف الملف أولاً
+    if (lesson.storage === 'cloudinary' && lesson.storedName) {
+      try {
+        const result = await cloudinary.uploader.destroy(lesson.storedName, { resource_type: 'raw' });
+        console.log('☁️ نتيجة حذف Cloudinary:', result.result);
+      } catch (err) {
+        console.error('خطأ في حذف Cloudinary:', err);
+      }
+    } else if (lesson.storedName) {
+      const filePath = path.join(UPLOAD_DIR, lesson.storedName);
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
     }
-  } else {
-    const filePath = path.join(UPLOAD_DIR, lesson.storedName);
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-  }
 
-  lessons.splice(idx, 1);
-  writeData(lessons);
-  res.json({ success: true });
+    // ثم حذف السجل من MongoDB
+    await Lesson.deleteOne({ id: req.params.id });
+    res.json({ success: true });
+  } catch (err) {
+    console.error('خطأ في الحذف:', err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // ═══════════════════════════════════════════════
@@ -206,8 +205,22 @@ app.post('/api/login', (req, res) => {
 });
 
 // ═══════════════════════════════════════════════
-// 🚀 بدء السيرفر
+// 🚀 الاتصال بـ MongoDB ثم بدء السيرفر
 // ═══════════════════════════════════════════════
-app.listen(PORT, () => {
-  console.log(`✅ الموقع يعمل على http://localhost:${PORT}`);
-});
+if (!process.env.MONGODB_URI) {
+  console.error('❌ المتغير MONGODB_URI غير موجود. تأكد من ملف .env');
+  process.exit(1);
+}
+
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => {
+    console.log('🍃 تم الاتصال بـ MongoDB بنجاح');
+    app.listen(PORT, () => {
+      console.log(`✅ الموقع يعمل على http://localhost:${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error('❌ فشل الاتصال بـ MongoDB:', err.message);
+    process.exit(1);
+  });
