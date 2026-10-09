@@ -4,14 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>بوابة التلاميذ - كلية العلوم الإسلامية</title>
+<meta name="description" content="بوابة التلاميذ لرفع الدروس للمراجعة">
+<meta name="robots" content="noindex, nofollow">
 <link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
 
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 🏛️ الشريط العلوي                              -->
+<!-- ═══════════════════════════════════════════════ -->
 <header class="navbar">
   <div class="container nav-wrap">
-    <div class="logo" onclick="window.location.href='index.html'">
+    <div class="logo" onclick="window.location.href='index.html'" title="العودة للرئيسية">
       <img src="lion.png" alt="جامعة وهران 1" class="logo-img">
       <div>
         <h1>كلية العلوم الإسلامية</h1>
@@ -20,40 +25,222 @@
     </div>
     <nav>
       <a href="index.html">🏠 الرئيسية</a>
-      <button id="themeToggle" class="theme-btn">🌙</button>
+      <button id="themeToggle" class="theme-btn" aria-label="الوضع الليلي">🌙</button>
     </nav>
   </div>
 </header>
 
-<section class="coming-soon">
-  <div class="coming-soon-box">
-    <span class="coming-soon-icon">👨‍🎓</span>
-    <h2>بوابة التلاميذ</h2>
-    <p>هنا سيتمكن التلاميذ من رفع دروسهم لمراجعة الإدارة قبل النشر.<br>هذه الميزة قادمة قريباً بإذن الله.</p>
-    <a href="index.html" class="btn-back">🏠 العودة للرئيسية</a>
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 🎨 Hero                                        -->
+<!-- ═══════════════════════════════════════════════ -->
+<section class="student-hero">
+  <div class="container">
+    <div class="student-hero-content">
+      <span class="student-hero-icon">👨‍🎓</span>
+      <h1>بوابة التلاميذ</h1>
+      <p class="student-hero-subtitle">
+        شاركنا دروسك وملفاتك العلمية — سنراجعها وننشرها للجميع
+      </p>
+      <div class="student-hero-features">
+        <span class="feature-chip">📤 رفع حتى 5 ملفات</span>
+        <span class="feature-chip">⏳ مراجعة سريعة</span>
+        <span class="feature-chip">🎓 نشر باسمك</span>
+        <span class="feature-chip">🌟 إثراء المحتوى</span>
+      </div>
+    </div>
   </div>
 </section>
 
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 📤 لوحة الطالب                                -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="container section">
+
+  <!-- تنبيه: بدون كلمة سر -->
+  <div class="student-notice">
+    <span class="notice-icon">💡</span>
+    <div class="notice-text">
+      <strong>لا حاجة لتسجيل الدخول</strong>
+      <p>املأ بياناتك وارفع دروسك — سنراجعها وننشرها في غضون أيام</p>
+    </div>
+  </div>
+
+  <!-- بطاقة الرفع -->
+  <div class="upload-card student-upload-card">
+    
+    <div class="upload-card-header student-header">
+      <div class="upload-card-title">
+        <span class="upload-card-icon">📤</span>
+        <div>
+          <h3>رفع دروسك للمراجعة</h3>
+          <p class="upload-card-subtitle">حتى 5 ملفات PDF أو Word في وقت واحد</p>
+        </div>
+      </div>
+    </div>
+
+    <form id="uploadForm" enctype="multipart/form-data">
+      
+      <!-- معلوماتك -->
+      <div class="form-section">
+        <h4 class="form-section-title">
+          <span>👤</span>
+          <span>معلوماتك</span>
+        </h4>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="studentName">
+              👤 اسمك
+              <span class="required">*</span>
+            </label>
+            <input 
+              type="text" 
+              name="studentName" 
+              id="studentName"
+              placeholder="مثال: محمد أحمد"
+              maxlength="100"
+              required
+            >
+          </div>
+          
+          <div class="form-group">
+            <label for="studentEmail">
+              📧 بريدك الإلكتروني (اختياري)
+            </label>
+            <input 
+              type="email" 
+              name="studentEmail" 
+              id="studentEmail"
+              placeholder="مثال: student@example.com"
+              maxlength="150"
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- معلومات الدرس -->
+      <div class="form-section">
+        <h4 class="form-section-title">
+          <span>📋</span>
+          <span>معلومات الدرس</span>
+        </h4>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="yearSelect">
+              📅 السنة الدراسية
+              <span class="required">*</span>
+            </label>
+            <select name="year" id="yearSelect" required>
+              <option value="">— اختر السنة —</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="specializationSelect">
+              🎓 التخصص
+              <span class="required">*</span>
+            </label>
+            <select name="specialization" id="specializationSelect" required>
+              <option value="">— اختر السنة أولاً —</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="subjectSelect">
+              📚 المادة
+              <span class="required">*</span>
+            </label>
+            <select name="subject" id="subjectSelect" required>
+              <option value="">— اختر التخصص أولاً —</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- الملفات -->
+      <div class="form-section">
+        <h4 class="form-section-title">
+          <span>📄</span>
+          <span>الملفات (حتى 5 ملفات)</span>
+        </h4>
+
+        <div class="teacher-files-info">
+          <div class="files-info-left">
+            <span class="files-info-icon">📊</span>
+            <span id="filesCount" class="files-count">0 من 5 ملفات</span>
+          </div>
+          <button type="button" id="addFileBtn" class="btn-add-file">
+            <span>➕</span>
+            <span>إضافة ملف جديد</span>
+          </button>
+        </div>
+
+        <div id="filesContainer" class="files-container"></div>
+
+        <div class="files-hint">
+          <span>💡</span>
+          <span>العنوان اختياري — إذا تركته فارغاً، سيُستخدم اسم الملف</span>
+        </div>
+      </div>
+
+      <!-- ملاحظة -->
+      <div class="form-section">
+        <h4 class="form-section-title">
+          <span>💬</span>
+          <span>ملاحظة للإدارة (اختياري)</span>
+        </h4>
+        
+        <div class="form-group">
+          <textarea 
+            name="note" 
+            id="noteInput"
+            rows="3"
+            placeholder="مثال: هذه محاضرات إضافية من الكتاب المقرر..."
+            maxlength="500"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- زر الإرسال -->
+      <div class="form-actions">
+        <button type="submit" class="btn-primary btn-upload-submit student-submit-btn">
+          <span>📤</span>
+          <span>إرسال للمراجعة</span>
+        </button>
+      </div>
+
+      <p id="uploadStatus" class="status" role="status"></p>
+
+    </form>
+  </div>
+
+  <!-- نتائج الإرسال -->
+  <div id="uploadResults" class="upload-results" style="display:none;">
+    <div class="results-header">
+      <span class="results-icon">📊</span>
+      <h3>نتائج الإرسال</h3>
+    </div>
+    <div id="resultsContent"></div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 📄 التذييل                                     -->
+<!-- ═══════════════════════════════════════════════ -->
 <footer>
   <div class="container">
-    <p class="footer-line">© 2025 — كلية العلوم الإسلامية | جامعة وهران 1 أحمد بن بلة</p>
+    <p class="footer-line">
+      © 2025 — كلية العلوم الإسلامية | جامعة وهران 1 أحمد بن بلة
+    </p>
     <p class="footer-author">إعداد: جدة عبد الرحمن</p>
   </div>
 </footer>
 
-<script>
-const themeToggle = document.getElementById('themeToggle');
-const savedTheme = localStorage.getItem('theme') || 'light';
-document.documentElement.setAttribute('data-theme', savedTheme);
-themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
-
-themeToggle.addEventListener('click', () => {
-  const current = document.documentElement.getAttribute('data-theme');
-  const next = current === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem('theme', next);
-  themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
-});
-</script>
+<script src="data.js"></script>
+<script src="student.js"></script>
 </body>
 </html>

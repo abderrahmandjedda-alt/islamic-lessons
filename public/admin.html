@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>لوحة التحكم — رفع الدروس</title>
+<meta name="robots" content="noindex, nofollow">
 <link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
 </head>
@@ -12,7 +13,7 @@
 <header class="navbar">
   <div class="container nav-wrap">
     <div class="logo">
-      <span class="logo-icon">👨‍🎓</span>
+      <img src="lion.png" alt="جامعة وهران 1" class="logo-img">
       <div><h1>لوحة التحكم</h1><p>رفع وإدارة الدروس</p></div>
     </div>
     <nav>
@@ -22,6 +23,7 @@
   </div>
 </header>
 
+<!-- شاشة الدخول -->
 <div id="loginScreen" class="container section">
   <div class="login-box">
     <h3>🔐 الدخول إلى لوحة التحكم</h3>
@@ -32,17 +34,51 @@
   </div>
 </div>
 
+<!-- لوحة الأدمن -->
 <div id="adminPanel" class="container section" style="display:none;">
+
+  <!-- 📥 قسم المراجعة -->
+  <div class="review-card">
+    <div class="review-header">
+      <div class="review-title">
+        <span class="review-icon">📥</span>
+        <div>
+          <h3>الدروس بانتظار المراجعة</h3>
+          <p class="review-subtitle">
+            <span id="pendingCount">0</span> درس
+          </p>
+        </div>
+      </div>
+      <button id="refreshPendingBtn" class="btn-refresh">🔄 تحديث</button>
+    </div>
+
+    <!-- شاشة دخول المراجعة -->
+    <div id="reviewLoginScreen" class="review-login">
+      <div class="review-login-box">
+        <span class="review-login-icon">🔐</span>
+        <h4>الدخول إلى قسم المراجعة</h4>
+        <p>أدخل كلمة سر المراجعة</p>
+        <input type="password" id="reviewPasswordInput" placeholder="كلمة سر المراجعة">
+        <button id="reviewLoginBtn" class="btn-primary">دخول</button>
+        <p id="reviewLoginError" class="error"></p>
+      </div>
+    </div>
+
+    <!-- قائمة الدروس -->
+    <div id="pendingList" class="pending-list" style="display:none;"></div>
+  </div>
+
+  <!-- 📤 رفع درس جديد -->
   <div class="upload-card">
     <h3>📤 رفع درس جديد</h3>
     <form id="uploadForm">
       <label>السنة الدراسية</label>
-      <select name="year" id="yearSelect" required onchange="updateSpecializations()">
+      <select name="year" id="yearSelect" required>
         <option value="">اختر السنة</option>
       </select>
 
       <label>التخصص</label>
-      <select name="specialization" id="specializationSelect" required onchange="updateSubjects()">
+      <select name="specialization" id="specializationSelect" required>
         <option value="">اختر السنة أولاً</option>
       </select>
 
@@ -65,11 +101,20 @@
     </form>
   </div>
 
+  <!-- 🗂️ إدارة الدروس -->
   <div class="manage-card">
     <h3>🗂️ إدارة الدروس المرفوعة</h3>
     <div id="adminLessons"></div>
   </div>
+
 </div>
+
+<footer>
+  <div class="container">
+    <p class="footer-line">© 2025 — كلية العلوم الإسلامية | جامعة وهران 1 أحمد بن بلة</p>
+    <p class="footer-author">إعداد: جدة عبد الرحمن</p>
+  </div>
+</footer>
 
 <script src="data.js"></script>
 <script src="admin.js"></script>
