@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>بوابة الأساتذة - كلية العلوم الإسلامية</title>
-<meta name="description" content="بوابة الأساتذة لرفع الدروس مباشرة إلى منصة الدروس الجامعية - كلية العلوم الإسلامية، جامعة وهران 1">
+<meta name="description" content="بوابة الأساتذة لرفع الدروس مباشرة إلى المنصة">
 <meta name="robots" content="noindex, nofollow">
 <link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -91,6 +91,11 @@
 <!-- ═══════════════════════════════════════════════ -->
 <div id="teacherPanel" class="container section" style="display:none;">
 
+  <!-- 👋 ترحيب -->
+  <div id="welcomeTeacher" style="display:none;" class="teacher-welcome">
+    <!-- يُملأ بواسطة JavaScript -->
+  </div>
+
   <!-- بطاقة الرفع -->
   <div class="upload-card teacher-upload-card">
     
@@ -145,19 +150,6 @@
               <option value="">— اختر التخصص أولاً —</option>
             </select>
           </div>
-          
-          <div class="form-group">
-            <label for="teacherNameInput">
-              👤 اسمك (اختياري)
-            </label>
-            <input 
-              type="text" 
-              name="teacherName" 
-              id="teacherNameInput"
-              placeholder="مثال: أ. محمد أحمد"
-              maxlength="100"
-            >
-          </div>
         </div>
       </div>
 
@@ -168,7 +160,6 @@
           <span>الملفات (حتى 10 ملفات)</span>
         </h4>
 
-        <!-- شريط الإحصائيات -->
         <div class="teacher-files-info">
           <div class="files-info-left">
             <span class="files-info-icon">📊</span>
@@ -180,21 +171,14 @@
           </button>
         </div>
 
-        <!-- حاوية الملفات -->
-        <div id="filesContainer" class="files-container">
-          <!-- تُملأ بواسطة JavaScript -->
-        </div>
+        <div id="filesContainer" class="files-container"></div>
 
-        <!-- ملاحظة -->
         <div class="files-hint">
           <span>💡</span>
-          <span>
-            العنوان اختياري — إذا تركته فارغاً، سيُستخدم اسم الملف تلقائياً
-          </span>
+          <span>العنوان اختياري — إذا تركته فارغاً، سيُستخدم اسم الملف تلقائياً</span>
         </div>
       </div>
 
-      <!-- زر الرفع -->
       <div class="form-actions">
         <button type="submit" class="btn-primary btn-upload-submit">
           <span>📥</span>
@@ -202,7 +186,6 @@
         </button>
       </div>
 
-      <!-- حالة الرفع -->
       <p id="uploadStatus" class="status" role="status"></p>
 
     </form>
@@ -215,6 +198,28 @@
       <h3>نتائج الرفع</h3>
     </div>
     <div id="resultsContent"></div>
+  </div>
+
+  <!-- 📚 قسم دروسي المرفوعة -->
+  <div class="my-lessons-section">
+    <div class="my-lessons-header">
+      <div class="my-lessons-title">
+        <span class="my-lessons-icon">📚</span>
+        <div>
+          <h3>دروسي المرفوعة</h3>
+          <p class="my-lessons-subtitle">
+            <span id="myLessonsCount">0</span> درس في المنصة
+          </p>
+        </div>
+      </div>
+      <button type="button" id="refreshLessonsBtn" class="btn-refresh" title="تحديث">
+        🔄 تحديث
+      </button>
+    </div>
+
+    <div id="myLessonsList" class="my-lessons-list">
+      <!-- تُملأ بواسطة JavaScript -->
+    </div>
   </div>
 
 </div>
@@ -231,9 +236,6 @@
   </div>
 </footer>
 
-<!-- ═══════════════════════════════════════════════ -->
-<!-- 📜 Scripts                                     -->
-<!-- ═══════════════════════════════════════════════ -->
 <script src="data.js"></script>
 <script src="teacher.js"></script>
 </body>

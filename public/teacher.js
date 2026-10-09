@@ -1,10 +1,13 @@
 // ═══════════════════════════════════════════════
-// 👨‍🏫 بوابة الأساتذة - نسخة نظيفة
+// 👨‍🏫 بوابة الأساتذة - نظام كلمات سر متعددة
 // ═══════════════════════════════════════════════
 
 const API = '/api';
 const MAX_FILES = 10;
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+
 let teacherPassword = sessionStorage.getItem('teacherPwd') || '';
+let teacherName = sessionStorage.getItem('teacherName') || '';
 let fileCounter = 0;
 let resetTimer = null;
 let resultsTimer = null;
@@ -34,6 +37,28 @@ function setStatus(msg, color) {
   if (!status) return;
   status.textContent = msg;
   status.style.color = color || '';
+}
+
+function formatSize(bytes) {
+  if (!bytes) return '—';
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1024 / 1024).toFixed(2) + ' MB';
+}
+
+function showToast(msg) {
+  const existing = document.querySelector('.toast-notification');
+  if (existing) existing.remove();
+  
+  const toast = document.createElement('div');
+  toast.className = 'toast-notification';
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  
+  setTimeout(function() {
+    toast.classList.add('toast-hide');
+    setTimeout(function() { toast.remove(); }, 300);
+  }, 2500);
 }
 
 // ═══════════════════════════════════════════════
@@ -78,8 +103,12 @@ async function doLogin() {
     });
     
     if (res.ok) {
+      const data = await res.json();
       teacherPassword = pwd;
+      teacherName = data.name || '';
       sessionStorage.setItem('teacherPwd', pwd);
+      sessionStorage.setItem('teacherName', teacherName);
+      errEl.textContent = '';
       showPanel();
     } else {
       errEl.textContent = '❌ كلمة السر غير صحيحة';
@@ -94,75 +123,9 @@ async function doLogin() {
 // 🌐 جعل الدالة عامة
 window.doLogin = doLogin;
 
-// ربط الزر
-document.addEventListener('DOMContentLoaded', function() {
-  const loginBtn = $('loginBtn');
-  if (loginBtn) {
-    loginBtn.addEventListener('click', doLogin);
-  }
-  
-  const pwdInput = $('passwordInput');
-  if (pwdInput) {
-    pwdInput.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        doLogin();
-      }
-    });
-  }
-  
-  // زر الخروج
-  const logoutBtn = $('logoutBtn');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', function() {
-      sessionStorage.removeItem('teacherPwd');
-      location.reload();
-    });
-  }
-  
-  // زر إضافة ملف
-  const addFileBtn = $('addFileBtn');
-  if (addFileBtn) {
-    addFileBtn.addEventListener('click', addFileInput);
-  }
-  
-  // ربط القوائم
-  const yearSelect = $('yearSelect');
-  if (yearSelect) {
-    yearSelect.addEventListener('change', updateSpecializations);
-  }
-  
-  const specSelect = $('specializationSelect');
-  if (specSelect) {
-    specSelect.addEventListener('change', updateSubjects);
-  }
-  
-  // حذف ملفات (event delegation)
-  const container = $('filesContainer');
-  if (container) {
-    container.addEventListener('click', function(e) {
-      const btn = e.target.closest('.file-remove-btn');
-      if (!btn) return;
-      const item = btn.closest('.file-input-item');
-      if (item) {
-        item.remove();
-        updateFilesCount();
-      }
-    });
-  }
-  
-  // النموذج
-  const form = $('uploadForm');
-  if (form) {
-    form.addEventListener('submit', handleUpload);
-  }
-  
-  // التحقق التلقائي
-  if (teacherPassword) {
-    verifyAndShow();
-  }
-});
-
+// ═══════════════════════════════════════════════
+// ✅ التحقق التلقائي
+// ═══════════════════════════════════════════════
 async function verifyAndShow() {
   try {
     const res = await fetch(API + '/teacher-login', {
@@ -170,17 +133,26 @@ async function verifyAndShow() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ password: teacherPassword })
     });
+    
     if (res.ok) {
+      const data = await res.json();
+      teacherName = data.name || teacherName;
+      sessionStorage.setItem('teacherName', teacherName);
       showPanel();
     } else {
       sessionStorage.removeItem('teacherPwd');
+      sessionStorage.removeItem('teacherName');
       teacherPassword = '';
+      teacherName = '';
     }
   } catch (err) {
     console.error('خطأ:', err);
   }
 }
 
+// ═══════════════════════════════════════════════
+// 🎨 عرض اللوحة
+// ═══════════════════════════════════════════════
 function showPanel() {
   const loginScreen = $('loginScreen');
   const panel = $('teacherPanel');
@@ -190,8 +162,18 @@ function showPanel() {
   if (panel) panel.style.display = 'block';
   if (logoutBtn) logoutBtn.style.display = 'inline-flex';
   
+  // 👋 عرض اسم الأستاذ
+  const welcomeEl = $('welcomeTeacher');
+  if (welcomeEl && teacherName) {
+    welcomeEl.textContent = 'مرحباً، ' + teacherName;
+    welcomeEl.style.display = 'block';
+  }
+  
   fillYears();
   if (currentFilesCount() === 0) addFileInput();
+  
+  // 📚 تحميل دروسي
+  loadMyLessons();
 }
 
 // ═══════════════════════════════════════════════
@@ -250,6 +232,10 @@ function updateSubjects() {
   }
 }
 
+// 🌐 جعل الدوال عامة
+window.updateSpecializations = updateSpecializations;
+window.updateSubjects = updateSubjects;
+
 // ═══════════════════════════════════════════════
 // 📄 إدارة الملفات
 // ═══════════════════════════════════════════════
@@ -291,10 +277,7 @@ function updateFilesCount() {
   }
 }
 
-// جعل الدوال عامة
 window.addFileInput = addFileInput;
-window.updateSpecializations = updateSpecializations;
-window.updateSubjects = updateSubjects;
 
 // ═══════════════════════════════════════════════
 // 📤 الرفع
@@ -305,7 +288,6 @@ async function handleUpload(e) {
   const year = $('yearSelect').value;
   const specialization = $('specializationSelect').value;
   const subject = $('subjectSelect').value;
-  const teacherName = $('teacherNameInput') ? $('teacherNameInput').value : '';
   
   if (!year || !specialization || !subject) {
     setStatus('❌ يجب اختيار السنة والتخصص والمادة', 'red');
@@ -329,11 +311,30 @@ async function handleUpload(e) {
     return;
   }
   
+  // ✅ التحقق من حجم الملفات
+  const oversized = [];
+  for (let i = 0; i < files.length; i++) {
+    if (files[i].size > MAX_FILE_SIZE) {
+      const sizeMB = (files[i].size / 1024 / 1024).toFixed(1);
+      oversized.push(files[i].name + ' (' + sizeMB + ' MB)');
+    }
+  }
+  
+  if (oversized.length > 0) {
+    setStatus('❌ ملفات كبيرة (الحد 10 MB)', 'red');
+    alert(
+      '❌ الملفات التالية كبيرة جداً:\n\n' + 
+      oversized.join('\n') + 
+      '\n\nالحد الأقصى: 10 MB لكل ملف\n\n' +
+      '💡 استخدم ilovepdf.com للضغط'
+    );
+    return;
+  }
+  
   const formData = new FormData();
   formData.append('year', year);
   formData.append('specialization', specialization);
   formData.append('subject', subject);
-  formData.append('teacherName', teacherName);
   files.forEach(function(f) { formData.append('files', f); });
   titles.forEach(function(t) { formData.append('titles', t); });
   
@@ -350,8 +351,9 @@ async function handleUpload(e) {
     });
     
     if (res.status === 401 || res.status === 403) {
-      setStatus('❌ انتهت الجلسة، سجّل الدخول من جديد', 'red');
+      setStatus('❌ انتهت الجلسة', 'red');
       sessionStorage.removeItem('teacherPwd');
+      sessionStorage.removeItem('teacherName');
       setTimeout(function() { location.reload(); }, 2000);
       return;
     }
@@ -361,6 +363,7 @@ async function handleUpload(e) {
     if (res.ok && data.success) {
       setStatus('✅ تم رفع ' + data.uploaded + ' ملف بنجاح!', 'green');
       showResults(data);
+      loadMyLessons();
       clearTimeout(resetTimer);
       resetTimer = setTimeout(resetForm, 2000);
     } else {
@@ -373,6 +376,9 @@ async function handleUpload(e) {
   }
 }
 
+// ═══════════════════════════════════════════════
+// 📊 عرض النتائج
+// ═══════════════════════════════════════════════
 function showResults(data) {
   const results = $('uploadResults');
   const content = $('resultsContent');
@@ -410,3 +416,173 @@ function resetForm() {
   addFileInput();
   setStatus('', '');
 }
+
+// ═══════════════════════════════════════════════
+// 📚 إدارة دروسي المرفوعة
+// ═══════════════════════════════════════════════
+async function loadMyLessons() {
+  const list = $('myLessonsList');
+  const countEl = $('myLessonsCount');
+  
+  if (!list) return;
+  
+  list.innerHTML = '<div class="my-lessons-loading">⏳ جارٍ التحميل...</div>';
+  
+  try {
+    const res = await fetch(API + '/teacher/my-lessons', {
+      headers: { 'x-teacher-password': teacherPassword }
+    });
+    
+    if (!res.ok) {
+      list.innerHTML = '<div class="my-lessons-empty">❌ تعذّر تحميل الدروس</div>';
+      return;
+    }
+    
+    const lessons = await res.json();
+    
+    if (countEl) countEl.textContent = lessons.length;
+    
+    if (!lessons.length) {
+      list.innerHTML = 
+        '<div class="my-lessons-empty">' +
+          '<span class="empty-icon">📭</span>' +
+          '<p>لم ترفع أي دروس بعد</p>' +
+        '</div>';
+      return;
+    }
+    
+    list.innerHTML = lessons.map(function(lesson) {
+      const date = new Date(lesson.date).toLocaleDateString('ar-EG', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+      
+      return '<div class="my-lesson-item">' +
+        '<div class="my-lesson-info">' +
+          '<span class="my-lesson-icon">📄</span>' +
+          '<div class="my-lesson-text">' +
+            '<h4>' + escapeHtml(lesson.title) + '</h4>' +
+            '<p>📅 ' + escapeHtml(date) + ' · 💾 ' + formatSize(lesson.size) + ' · 📚 ' + escapeHtml(lesson.subject) + '</p>' +
+          '</div>' +
+        '</div>' +
+        '<div class="my-lesson-actions">' +
+          '<a href="' + escapeHtml(lesson.url) + '" target="_blank" class="my-lesson-btn view" title="فتح">👁️</a>' +
+          '<button type="button" class="my-lesson-btn delete" onclick="deleteMyLesson(\'' + escapeHtml(lesson.id) + '\', \'' + escapeHtml(lesson.title).replace(/'/g, "\\'") + '\')" title="حذف">🗑️</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+    
+  } catch (err) {
+    console.error('خطأ:', err);
+    list.innerHTML = '<div class="my-lessons-empty">❌ خطأ في الاتصال</div>';
+  }
+}
+
+// 🗑️ حذف درس
+async function deleteMyLesson(id, title) {
+  if (!confirm('⚠️ هل أنت متأكد من حذف هذا الدرس؟\n\n' + title + '\n\nلا يمكن التراجع!')) {
+    return;
+  }
+  
+  try {
+    const res = await fetch(API + '/teacher/lessons/' + id, {
+      method: 'DELETE',
+      headers: { 'x-teacher-password': teacherPassword }
+    });
+    
+    if (res.ok) {
+      showToast('✅ تم حذف الدرس');
+      loadMyLessons();
+    } else {
+      const data = await res.json();
+      showToast('❌ ' + (data.error || 'فشل الحذف'));
+    }
+  } catch (err) {
+    showToast('❌ خطأ في الاتصال');
+    console.error('خطأ:', err);
+  }
+}
+
+window.loadMyLessons = loadMyLessons;
+window.deleteMyLesson = deleteMyLesson;
+
+// ═══════════════════════════════════════════════
+// 🎯 ربط الأحداث
+// ═══════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function() {
+  // زر الدخول
+  const loginBtn = $('loginBtn');
+  if (loginBtn) {
+    loginBtn.addEventListener('click', doLogin);
+  }
+  
+  // Enter للدخول
+  const pwdInput = $('passwordInput');
+  if (pwdInput) {
+    pwdInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        doLogin();
+      }
+    });
+  }
+  
+  // زر الخروج
+  const logoutBtn = $('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', function() {
+      sessionStorage.removeItem('teacherPwd');
+      sessionStorage.removeItem('teacherName');
+      location.reload();
+    });
+  }
+  
+  // زر إضافة ملف
+  const addFileBtn = $('addFileBtn');
+  if (addFileBtn) {
+    addFileBtn.addEventListener('click', addFileInput);
+  }
+  
+  // زر تحديث الدروس
+  const refreshBtn = $('refreshLessonsBtn');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', loadMyLessons);
+  }
+  
+  // ربط القوائم
+  const yearSelect = $('yearSelect');
+  if (yearSelect) {
+    yearSelect.addEventListener('change', updateSpecializations);
+  }
+  
+  const specSelect = $('specializationSelect');
+  if (specSelect) {
+    specSelect.addEventListener('change', updateSubjects);
+  }
+  
+  // حذف ملفات
+  const container = $('filesContainer');
+  if (container) {
+    container.addEventListener('click', function(e) {
+      const btn = e.target.closest('.file-remove-btn');
+      if (!btn) return;
+      const item = btn.closest('.file-input-item');
+      if (item) {
+        item.remove();
+        updateFilesCount();
+      }
+    });
+  }
+  
+  // النموذج
+  const form = $('uploadForm');
+  if (form) {
+    form.addEventListener('submit', handleUpload);
+  }
+  
+  // التحقق التلقائي
+  if (teacherPassword) {
+    verifyAndShow();
+  }
+});
