@@ -3471,3 +3471,4 @@ button:disabled {
     font-size: 0.65rem;
   }
 }
+.admin-hidden { display: none !important; }

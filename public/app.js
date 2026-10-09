@@ -533,3 +533,34 @@ function showToast(message) {
     goHome();
   }
 })();
+
+// ═══════════════════════════════════════════════
+// 🔐 إظهار لوحة التحكم بعد الضغط على الشعار 5 مرات
+// (✏️ كود جديد - أُضيف في آخر الملف)
+// ═══════════════════════════════════════════════
+(function () {
+  const logo = document.getElementById('secretLogo');
+  const adminBtn = document.getElementById('adminBtn');
+  if (!logo || !adminBtn) return;
+
+  // إن كان ظاهراً من قبل في هذه الجلسة، أظهره مباشرة
+  if (sessionStorage.getItem('showAdmin') === '1') {
+    adminBtn.classList.remove('admin-hidden');
+  }
+
+  let clicks = 0;
+  let timer;
+
+  logo.addEventListener('click', function () {
+    clicks++;
+    clearTimeout(timer);
+    // إن توقفت عن الضغط ثانيتين يبدأ العدّ من جديد
+    timer = setTimeout(() => { clicks = 0; }, 2000);
+
+    if (clicks >= 5) {
+      adminBtn.classList.remove('admin-hidden');
+      sessionStorage.setItem('showAdmin', '1');
+      clicks = 0;
+    }
+  });
+})();
