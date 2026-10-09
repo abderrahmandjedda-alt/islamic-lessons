@@ -4,14 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>بوابة الأساتذة - كلية العلوم الإسلامية</title>
+<meta name="description" content="بوابة الأساتذة لرفع الدروس مباشرة إلى منصة الدروس الجامعية - كلية العلوم الإسلامية، جامعة وهران 1">
+<meta name="robots" content="noindex, nofollow">
 <link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
 
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 🏛️ الشريط العلوي                              -->
+<!-- ═══════════════════════════════════════════════ -->
 <header class="navbar">
   <div class="container nav-wrap">
-    <div class="logo" onclick="window.location.href='index.html'">
+    <div class="logo" onclick="window.location.href='index.html'" title="العودة للرئيسية">
       <img src="lion.png" alt="جامعة وهران 1" class="logo-img">
       <div>
         <h1>كلية العلوم الإسلامية</h1>
@@ -20,40 +25,216 @@
     </div>
     <nav>
       <a href="index.html">🏠 الرئيسية</a>
-      <button id="themeToggle" class="theme-btn">🌙</button>
+      <button id="logoutBtn" class="btn-logout" style="display:none;" title="تسجيل الخروج">
+        🚪 خروج
+      </button>
+      <button id="themeToggle" class="theme-btn" aria-label="الوضع الليلي">🌙</button>
     </nav>
   </div>
 </header>
 
-<section class="coming-soon">
-  <div class="coming-soon-box">
-    <span class="coming-soon-icon">👨‍🏫</span>
-    <h2>بوابة الأساتذة</h2>
-    <p>هنا سيتمكن الأساتذة من رفع دروسهم مباشرة إلى المنصة.<br>هذه الميزة قادمة قريباً بإذن الله.</p>
-    <a href="index.html" class="btn-back">🏠 العودة للرئيسية</a>
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 🎨 Hero                                        -->
+<!-- ═══════════════════════════════════════════════ -->
+<section class="teacher-hero">
+  <div class="container">
+    <div class="teacher-hero-content">
+      <span class="teacher-hero-icon">👨‍🏫</span>
+      <h1>بوابة الأساتذة</h1>
+      <p class="teacher-hero-subtitle">
+        منصة مخصصة لرفع الدروس والمحاضرات مباشرة إلى قاعدة بيانات الكلية
+      </p>
+      <div class="teacher-hero-features">
+        <span class="feature-chip">📤 رفع حتى 10 ملفات</span>
+        <span class="feature-chip">⚡ نشر فوري</span>
+        <span class="feature-chip">☁️ تخزين دائم</span>
+        <span class="feature-chip">🔒 آمن ومشفر</span>
+      </div>
+    </div>
   </div>
 </section>
 
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 🔐 شاشة الدخول                                 -->
+<!-- ═══════════════════════════════════════════════ -->
+<div id="loginScreen" class="container section">
+  <div class="login-box">
+    <div class="login-icon">🔐</div>
+    <h3>الدخول إلى بوابة الأساتذة</h3>
+    <p>أدخل كلمة السر الخاصة بك للوصول إلى لوحة الرفع</p>
+    
+    <div class="login-input-group">
+      <input 
+        type="password" 
+        id="passwordInput" 
+        placeholder="كلمة السر"
+        autocomplete="current-password"
+        autofocus
+      >
+    </div>
+    
+    <button id="loginBtn" class="btn-primary">
+      🔓 دخول
+    </button>
+    
+    <p id="loginError" class="error" role="alert"></p>
+    
+    <div class="login-note">
+      <span>💡</span>
+      <span>إذا نسيت كلمة السر، تواصل مع إدارة المنصة</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 📤 لوحة الأستاذ                                -->
+<!-- ═══════════════════════════════════════════════ -->
+<div id="teacherPanel" class="container section" style="display:none;">
+
+  <!-- بطاقة الرفع -->
+  <div class="upload-card teacher-upload-card">
+    
+    <div class="upload-card-header">
+      <div class="upload-card-title">
+        <span class="upload-card-icon">📤</span>
+        <div>
+          <h3>رفع دروس جديدة</h3>
+          <p class="upload-card-subtitle">حتى 10 ملفات PDF أو Word في وقت واحد</p>
+        </div>
+      </div>
+    </div>
+
+    <form id="uploadForm" enctype="multipart/form-data">
+      
+      <!-- القسم الأول: معلومات الدرس -->
+      <div class="form-section">
+        <h4 class="form-section-title">
+          <span>📋</span>
+          <span>معلومات الدرس</span>
+        </h4>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="yearSelect">
+              📅 السنة الدراسية
+              <span class="required">*</span>
+            </label>
+            <select name="year" id="yearSelect" required>
+              <option value="">— اختر السنة —</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="specializationSelect">
+              🎓 التخصص
+              <span class="required">*</span>
+            </label>
+            <select name="specialization" id="specializationSelect" required>
+              <option value="">— اختر السنة أولاً —</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="subjectSelect">
+              📚 المادة
+              <span class="required">*</span>
+            </label>
+            <select name="subject" id="subjectSelect" required>
+              <option value="">— اختر التخصص أولاً —</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="teacherNameInput">
+              👤 اسمك (اختياري)
+            </label>
+            <input 
+              type="text" 
+              name="teacherName" 
+              id="teacherNameInput"
+              placeholder="مثال: أ. محمد أحمد"
+              maxlength="100"
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- القسم الثاني: الملفات -->
+      <div class="form-section">
+        <h4 class="form-section-title">
+          <span>📄</span>
+          <span>الملفات (حتى 10 ملفات)</span>
+        </h4>
+
+        <!-- شريط الإحصائيات -->
+        <div class="teacher-files-info">
+          <div class="files-info-left">
+            <span class="files-info-icon">📊</span>
+            <span id="filesCount" class="files-count">0 من 10 ملفات</span>
+          </div>
+          <button type="button" id="addFileBtn" class="btn-add-file">
+            <span>➕</span>
+            <span>إضافة ملف جديد</span>
+          </button>
+        </div>
+
+        <!-- حاوية الملفات -->
+        <div id="filesContainer" class="files-container">
+          <!-- تُملأ بواسطة JavaScript -->
+        </div>
+
+        <!-- ملاحظة -->
+        <div class="files-hint">
+          <span>💡</span>
+          <span>
+            العنوان اختياري — إذا تركته فارغاً، سيُستخدم اسم الملف تلقائياً
+          </span>
+        </div>
+      </div>
+
+      <!-- زر الرفع -->
+      <div class="form-actions">
+        <button type="submit" class="btn-primary btn-upload-submit">
+          <span>📥</span>
+          <span>رفع جميع الدروس</span>
+        </button>
+      </div>
+
+      <!-- حالة الرفع -->
+      <p id="uploadStatus" class="status" role="status"></p>
+
+    </form>
+  </div>
+
+  <!-- نتائج الرفع -->
+  <div id="uploadResults" class="upload-results" style="display:none;">
+    <div class="results-header">
+      <span class="results-icon">📊</span>
+      <h3>نتائج الرفع</h3>
+    </div>
+    <div id="resultsContent"></div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 📄 التذييل                                     -->
+<!-- ═══════════════════════════════════════════════ -->
 <footer>
   <div class="container">
-    <p class="footer-line">© 2025 — كلية العلوم الإسلامية | جامعة وهران 1 أحمد بن بلة</p>
+    <p class="footer-line">
+      © 2025 — كلية العلوم الإسلامية | جامعة وهران 1 أحمد بن بلة
+    </p>
     <p class="footer-author">إعداد: جدة عبد الرحمن</p>
   </div>
 </footer>
 
-<script>
-const themeToggle = document.getElementById('themeToggle');
-const savedTheme = localStorage.getItem('theme') || 'light';
-document.documentElement.setAttribute('data-theme', savedTheme);
-themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
-
-themeToggle.addEventListener('click', () => {
-  const current = document.documentElement.getAttribute('data-theme');
-  const next = current === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem('theme', next);
-  themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
-});
-</script>
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 📜 Scripts                                     -->
+<!-- ═══════════════════════════════════════════════ -->
+<script src="data.js"></script>
+<script src="teacher.js"></script>
 </body>
 </html>

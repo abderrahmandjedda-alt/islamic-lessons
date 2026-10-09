@@ -14,12 +14,26 @@ const lessonSchema = new mongoose.Schema(
     type: String,
     url: String,
     storage: String,
-    date: { type: Date, default: Date.now }
+    date: { type: Date, default: Date.now },
+    
+    status: { 
+      type: String, 
+      enum: ['approved', 'pending', 'rejected'], 
+      default: 'approved' 
+    },
+    uploader: { 
+      type: String, 
+      enum: ['admin', 'teacher', 'student'], 
+      default: 'admin' 
+    },
+    uploaderName: { type: String, default: '' },
+    uploaderEmail: { type: String, default: '' },
+    reviewNote: { type: String, default: '' },
+    reviewedAt: { type: Date }
   },
   { versionKey: false }
 );
 
-// إخفاء الحقل الداخلي _id حتى يبقى شكل البيانات مطابقًا لما تتوقعه الواجهة
 lessonSchema.set('toJSON', {
   transform: (doc, ret) => {
     delete ret._id;
