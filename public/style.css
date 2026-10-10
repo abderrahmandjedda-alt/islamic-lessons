@@ -3403,3 +3403,15 @@ button:disabled {
 }
 
 .admin-hidden { display: none !important; }
+/* ═══════════════════════════════════════════════ */
+/* 🛠️ إصلاح اهتزاز بطاقة المفضلة عند تمرير الفأرة */
+/* ═══════════════════════════════════════════════ */
+.fav-card,
+.fav-card:hover {
+  transform: none !important;
+  animation: none !important;
+}
+
+.fav-card {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
