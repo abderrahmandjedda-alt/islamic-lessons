@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════
-// 👨‍🎓 بوابة التلاميذ - بدون كلمة سر
+// 👨‍🎓 بوابة الطلبة - بدون كلمة سر
 // ═══════════════════════════════════════════════
 
 const API = '/api';
@@ -423,4 +423,4 @@ document.addEventListener('DOMContentLoaded', function() {
   if (form) {
     form.addEventListener('submit', handleSubmit);
   }
-});
+})
