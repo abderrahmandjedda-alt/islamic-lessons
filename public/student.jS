@@ -11,6 +11,44 @@ let resetTimer = null;
 let resultsTimer = null;
 
 // ═══════════════════════════════════════════════
+// 🎨 نظام الأيقونات (Lucide)
+// ═══════════════════════════════════════════════
+// icon('star') يرجع كود أيقونة، وتتحول تلقائياً إلى رسمة SVG
+function icon(name, cls) {
+  return '<i data-lucide="' + name + '"' + (cls ? ' class="' + cls + '"' : '') + '></i>';
+}
+
+function refreshIcons() {
+  if (window.lucide) window.lucide.createIcons();
+}
+
+// مراقب: كلما أُضيف محتوى جديد للصفحة يحوّل أيقوناته تلقائياً
+(function watchIcons() {
+  if (!window.lucide) return;
+  let scheduled = false;
+  new MutationObserver(function() {
+    if (scheduled) return;
+    scheduled = true;
+    requestAnimationFrame(function() {
+      scheduled = false;
+      refreshIcons();
+    });
+  }).observe(document.body, { childList: true, subtree: true });
+  refreshIcons();
+})();
+
+// رسالة نصية بجانبها أيقونة (النص يُضاف كنص عادي فلا خطر عليه)
+function setMsg(el, msg, iconName) {
+  if (!el) return;
+  el.innerHTML = '';
+  if (!msg) return;
+  if (iconName && window.lucide) {
+    el.insertAdjacentHTML('beforeend', icon(iconName, iconName === 'loader-circle' ? 'spin' : ''));
+  }
+  el.appendChild(document.createTextNode(msg));
+}
+
+// ═══════════════════════════════════════════════
 // 🛠️ أدوات
 // ═══════════════════════════════════════════════
 function $(id) {
@@ -30,20 +68,22 @@ function currentFilesCount() {
   return document.querySelectorAll('.file-input-item').length;
 }
 
-function setStatus(msg, color) {
+function setStatus(msg, color, iconName) {
   const status = $('uploadStatus');
   if (!status) return;
-  status.textContent = msg;
+  setMsg(status, msg, iconName);
   status.style.color = color || '';
 }
 
-function showToast(msg) {
+// iconName اختياري: اسم أيقونة تظهر بجانب الرسالة
+function showToast(msg, iconName) {
   const existing = document.querySelector('.toast-notification');
   if (existing) existing.remove();
   
   const toast = document.createElement('div');
   toast.className = 'toast-notification';
-  toast.textContent = msg;
+  toast.innerHTML = (iconName && window.lucide ? icon(iconName) : '') + '<span></span>';
+  toast.querySelector('span').textContent = msg;
   document.body.appendChild(toast);
   
   setTimeout(function() {
@@ -59,15 +99,25 @@ function showToast(msg) {
   const themeToggle = $('themeToggle');
   if (!themeToggle) return;
   
+  // أيقونة الزر: قمر نهاراً، شمس ليلاً
+  function setThemeIcon(theme) {
+    if (window.lucide) {
+      themeToggle.innerHTML = icon(theme === 'dark' ? 'sun' : 'moon');
+      refreshIcons();
+    } else {
+      themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+    }
+  }
+  
   const savedTheme = localStorage.getItem('theme') || 'light';
   document.documentElement.setAttribute('data-theme', savedTheme);
-  themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+  setThemeIcon(savedTheme);
   
   themeToggle.addEventListener('click', function() {
     const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
     localStorage.setItem('theme', next);
-    themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
+    setThemeIcon(next);
   });
 })();
 
@@ -148,8 +198,8 @@ function addFileInput() {
   
   div.innerHTML = 
     '<div class="file-input-header">' +
-      '<span class="file-number">📄 ملف</span>' +
-      '<button type="button" class="file-remove-btn" title="حذف">✖️</button>' +
+      '<span class="file-number">' + icon('file-text') + ' ملف</span>' +
+      '<button type="button" class="file-remove-btn" title="حذف" aria-label="حذف">' + icon('x') + '</button>' +
     '</div>' +
     '<input type="file" name="files" accept=".pdf,.doc,.docx" class="file-input">' +
     '<input type="text" name="titles" placeholder="عنوان الدرس (اختياري)" class="file-title-input" maxlength="200">';
@@ -162,7 +212,7 @@ function updateFilesCount() {
   const items = document.querySelectorAll('.file-input-item');
   items.forEach(function(item, i) {
     const num = item.querySelector('.file-number');
-    if (num) num.textContent = '📄 ملف ' + (i + 1);
+    if (num) num.innerHTML = icon('file-text') + ' ملف ' + (i + 1);
   });
   
   const countEl = $('filesCount');
@@ -188,13 +238,13 @@ async function handleSubmit(e) {
   
   // التحقق من البيانات
   if (!studentName) {
-    setStatus('❌ يجب كتابة اسمك', 'red');
+    setStatus('يجب كتابة اسمك', 'red', 'circle-x');
     $('studentName').focus();
     return;
   }
   
   if (!year || !specialization || !subject) {
-    setStatus('❌ يجب اختيار السنة والتخصص والمادة', 'red');
+    setStatus('يجب اختيار السنة والتخصص والمادة', 'red', 'circle-x');
     return;
   }
   
@@ -211,7 +261,7 @@ async function handleSubmit(e) {
   });
   
   if (files.length === 0) {
-    setStatus('❌ اختر ملفاً واحداً على الأقل', 'red');
+    setStatus('اختر ملفاً واحداً على الأقل', 'red', 'circle-x');
     return;
   }
   
@@ -225,19 +275,19 @@ async function handleSubmit(e) {
   }
   
   if (oversized.length > 0) {
-    setStatus('❌ ملفات كبيرة (الحد 10 MB)', 'red');
+    setStatus('ملفات كبيرة (الحد 10 MB)', 'red', 'circle-x');
     alert(
-      '❌ الملفات التالية كبيرة جداً:\n\n' + 
+      'الملفات التالية كبيرة جداً:\n\n' + 
       oversized.join('\n') + 
       '\n\nالحد الأقصى: 10 MB لكل ملف\n\n' +
-      '💡 استخدم ilovepdf.com للضغط'
+      'نصيحة: استخدم ilovepdf.com للضغط'
     );
     return;
   }
   
   // تأكيد
   const confirmed = confirm(
-    '📤 هل تريد إرسال ' + files.length + ' ملف للمراجعة؟\n\n' +
+    'هل تريد إرسال ' + files.length + ' ملف للمراجعة؟\n\n' +
     'سيتم مراجعتها من قبل الإدارة قبل النشر.'
   );
   
@@ -256,7 +306,7 @@ async function handleSubmit(e) {
   const submitBtn = $('uploadForm').querySelector('[type="submit"]');
   if (submitBtn) submitBtn.disabled = true;
   
-  setStatus('⏳ جارٍ إرسال ' + files.length + ' ملف...', 'var(--emerald)');
+  setStatus('جارٍ إرسال ' + files.length + ' ملف...', 'var(--emerald)', 'loader-circle');
   
   try {
     const res = await fetch(API + '/student/submit', {
@@ -267,16 +317,16 @@ async function handleSubmit(e) {
     const data = await res.json();
     
     if (res.ok && data.success) {
-      setStatus('✅ تم إرسال ' + data.submitted + ' ملف للمراجعة!', 'green');
+      setStatus('تم إرسال ' + data.submitted + ' ملف للمراجعة!', 'green', 'circle-check');
       showResults(data);
       
       clearTimeout(resetTimer);
       resetTimer = setTimeout(resetForm, 3000);
     } else {
-      setStatus('❌ ' + (data.error || 'فشل الإرسال'), 'red');
+      setStatus(data.error || 'فشل الإرسال', 'red', 'circle-x');
     }
   } catch (err) {
-    setStatus('❌ خطأ في الاتصال: ' + err.message, 'red');
+    setStatus('خطأ في الاتصال: ' + err.message, 'red', 'circle-x');
   } finally {
     if (submitBtn) submitBtn.disabled = false;
   }
@@ -292,10 +342,10 @@ function showResults(data) {
   
   let html = 
     '<div class="result-summary">' +
-      '<p>✅ تم الإرسال: <strong>' + (Number(data.submitted) || 0) + '</strong></p>' +
-      (data.failed > 0 ? '<p>❌ فشل: <strong>' + Number(data.failed) + '</strong></p>' : '') +
-      '<p class="result-note">📩 سيتم مراجعة دروسك ونشرها قريباً</p>' +
-      '<p class="result-thanks">شكراً لمساهمتك! 🤲</p>' +
+      '<p>' + icon('circle-check') + ' تم الإرسال: <strong>' + (Number(data.submitted) || 0) + '</strong></p>' +
+      (data.failed > 0 ? '<p>' + icon('circle-x') + ' فشل: <strong>' + Number(data.failed) + '</strong></p>' : '') +
+      '<p class="result-note">' + icon('mail-check') + ' سيتم مراجعة دروسك ونشرها قريباً</p>' +
+      '<p class="result-thanks">شكراً لمساهمتك! ' + icon('hand-heart') + '</p>' +
     '</div>';
   
   if (Array.isArray(data.errors) && data.errors.length > 0) {

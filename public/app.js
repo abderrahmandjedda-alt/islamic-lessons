@@ -1,38 +1,61 @@
+
+'use strict';
+
 // ═══════════════════════════════════════════════
-// ⚙️ YEARS, SPECIALIZATIONS, SUBJECTS في data.js
+// ⚙️ الإعدادات العامة
 // ═══════════════════════════════════════════════
 
 const API = '/api';
 let allLessons = [];
 
+const FAVORITES_KEY = 'islamic_lessons_favorites';
+
 // ═══════════════════════════════════════════════
-// 🎨 نظام الأيقونات (Lucide)
+// 🎨 نظام الأيقونات - Lucide
 // ═══════════════════════════════════════════════
-// icon('star') يرجع كود أيقونة، وتتحول تلقائياً إلى رسمة SVG
-function icon(name, cls) {
-  return `<i data-lucide="${name}"${cls ? ` class="${cls}"` : ''}></i>`;
+
+function icon(name, cls = '') {
+  const safeName = String(name || 'book-open').replace(/[^a-z0-9-]/gi, '');
+  const safeClass = cls ? ` class="${cls}"` : '';
+
+  return `<i data-lucide="${safeName}"${safeClass} aria-hidden="true"></i>`;
 }
 
 function refreshIcons() {
-  if (window.lucide) window.lucide.createIcons();
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
 }
 
-// مراقب: كلما أُضيف محتوى جديد للصفحة (دروس، بطاقات...) يحوّل أيقوناته تلقائياً
+// تحديث الأيقونات بعد إنشاء المحتوى
 (function watchIcons() {
-  if (!window.lucide) return;
+  if (!window.lucide || !document.body) return;
+
   let scheduled = false;
-  new MutationObserver(() => {
+
+  const observer = new MutationObserver(() => {
     if (scheduled) return;
+
     scheduled = true;
+
     requestAnimationFrame(() => {
       scheduled = false;
       refreshIcons();
     });
-  }).observe(document.body, { childList: true, subtree: true });
+  });
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+
   refreshIcons();
 })();
 
-// أيقونة كل سنة دراسية (بدل الإيموجي القديمة في data.js)
+// ═══════════════════════════════════════════════
+// 📅 أيقونات السنوات الدراسية
+// ═══════════════════════════════════════════════
+
 const YEAR_ICONS = {
   L1: 'sprout',
   L2: 'book-open',
@@ -42,23 +65,83 @@ const YEAR_ICONS = {
 };
 
 // ═══════════════════════════════════════════════
-// ⭐ نظام المفضلة (localStorage)
+// 🎓 أيقونات التخصصات
 // ═══════════════════════════════════════════════
-const FAVORITES_KEY = 'islamic_lessons_favorites';
 
-// قراءة المفضلة
+const SPECIALIZATION_ICONS = {
+  'جذع مشترك علوم إسلامية': 'book-open',
+  'شعبة الشريعة': 'scale',
+  'شعبة أصول الدين': 'landmark',
+  'شعبة اللغة العربية والحضارة الإسلامية': 'languages',
+  'الفقه وأصوله': 'scale',
+  'الشريعة والقانون': 'scale',
+  'الكتاب والسنة': 'book-open-text',
+  'العقيدة ومقارنة الأديان': 'shield-check',
+  'الدعوة والإعلام الإسلامي': 'megaphone',
+  'تاريخ وحضارة إسلامية': 'landmark',
+  'اللغة والدراسات القرآنية': 'book-open-text',
+  'الحضارة الإسلامية': 'landmark',
+  'تاريخ إسلامي': 'history',
+  'إعجاز القرآن': 'sparkles',
+  'تفسير وعلوم القرآن': 'book-open',
+  'عقيدة إسلامية': 'shield-check',
+  'مقارنة الأديان': 'git-compare',
+  'مقارنة أديان': 'git-compare',
+  'حديث وعلومه': 'scroll-text',
+  'فقه الأحوال الشخصية المقارن': 'users-round',
+  'الفقه المالكي': 'scale',
+  'فقه مالكي وأصوله': 'scale',
+  'الفقه المقارن وأصوله': 'git-compare',
+  'فقه المعاملات المالية المعاصرة': 'hand-coins',
+  'إعجاز والدراسات البيانية': 'feather',
+  'المعاملات المالية المعاصرة': 'coins'
+};
+
+function getSpecializationIcon(spec) {
+  return SPECIALIZATION_ICONS[spec] || 'graduation-cap';
+}
+
+// ═══════════════════════════════════════════════
+// 📚 أيقونات المواد
+// تعتمد على SUBJECT_ICONS الموجودة في data.js
+// ═══════════════════════════════════════════════
+
+function getSubjectIcon(subject) {
+  if (
+    typeof SUBJECT_ICONS !== 'undefined' &&
+    SUBJECT_ICONS &&
+    SUBJECT_ICONS[subject]
+  ) {
+    return SUBJECT_ICONS[subject];
+  }
+
+  return 'book-open';
+}
+
+// ═══════════════════════════════════════════════
+// ⭐ نظام المفضلة
+// ═══════════════════════════════════════════════
+
 function getFavorites() {
   try {
-    return JSON.parse(localStorage.getItem(FAVORITES_KEY)) || {
+    const stored = JSON.parse(localStorage.getItem(FAVORITES_KEY));
+
+    return {
+      specializations: Array.isArray(stored?.specializations)
+        ? stored.specializations
+        : [],
+      lessons: Array.isArray(stored?.lessons)
+        ? stored.lessons
+        : []
+    };
+  } catch (err) {
+    return {
       specializations: [],
       lessons: []
     };
-  } catch (err) {
-    return { specializations: [], lessons: [] };
   }
 }
 
-// حفظ المفضلة
 function saveFavorites(favs) {
   try {
     localStorage.setItem(FAVORITES_KEY, JSON.stringify(favs));
@@ -67,546 +150,847 @@ function saveFavorites(favs) {
   }
 }
 
-// إضافة/إزالة تخصص من المفضلة
 function toggleFavoriteSpecialization(yearId, spec) {
   const favs = getFavorites();
-  const key = `${yearId}|${spec}`;
-  const index = favs.specializations.findIndex(f => `${f.year}|${f.spec}` === key);
-  
+
+  const index = favs.specializations.findIndex(
+    item => item.year === yearId && item.spec === spec
+  );
+
   if (index >= 0) {
     favs.specializations.splice(index, 1);
     showToast('تمت الإزالة من المفضلة', 'trash-2');
-  } else {
-    favs.specializations.push({ year: yearId, spec });
-    showToast('تمت الإضافة للمفضلة', 'star');
+    saveFavorites(favs);
+    return false;
   }
-  
+
+  favs.specializations.push({
+    year: yearId,
+    spec
+  });
+
   saveFavorites(favs);
-  return index < 0; // true إذا أُضيف
+  showToast('تمت الإضافة للمفضلة', 'star');
+
+  return true;
 }
 
-// إضافة/إزالة درس من المفضلة
 function toggleFavoriteLesson(lessonId) {
   const favs = getFavorites();
-  const index = favs.lessons.findIndex(id => id === lessonId);
-  
+  const index = favs.lessons.indexOf(lessonId);
+
   if (index >= 0) {
     favs.lessons.splice(index, 1);
+    saveFavorites(favs);
     showToast('تمت الإزالة من المفضلة', 'trash-2');
-  } else {
-    favs.lessons.push(lessonId);
-    showToast('تمت الإضافة للمفضلة', 'heart');
+    return false;
   }
-  
+
+  favs.lessons.push(lessonId);
   saveFavorites(favs);
-  return index < 0; // true إذا أُضيف
+  showToast('تمت الإضافة للمفضلة', 'heart');
+
+  return true;
 }
 
-// هل التخصص في المفضلة؟
 function isSpecFavorite(yearId, spec) {
-  const favs = getFavorites();
-  return favs.specializations.some(f => f.year === yearId && f.spec === spec);
+  return getFavorites().specializations.some(
+    item => item.year === yearId && item.spec === spec
+  );
 }
 
-// هل الدرس في المفضلة؟
 function isLessonFavorite(lessonId) {
-  const favs = getFavorites();
-  return favs.lessons.includes(lessonId);
+  return getFavorites().lessons.includes(lessonId);
 }
 
 // ═══════════════════════════════════════════════
 // 🌙 الوضع الليلي
 // ═══════════════════════════════════════════════
+
 const themeToggle = document.getElementById('themeToggle');
-const savedTheme = localStorage.getItem('theme') || 'light';
+
+let savedTheme = 'light';
+
+try {
+  savedTheme = localStorage.getItem('theme') || 'light';
+} catch (err) {
+  console.warn('تعذر قراءة إعداد الوضع الليلي.');
+}
+
 document.documentElement.setAttribute('data-theme', savedTheme);
 
-// أيقونة الزر: قمر في الوضع النهاري، شمس في الوضع الليلي
-// (إن لم تُحمَّل مكتبة الأيقونات في الصفحة نستعمل الإيموجي القديمة مؤقتاً)
 function setThemeIcon(theme) {
-  if (window.lucide) {
-    themeToggle.innerHTML = icon(theme === 'dark' ? 'sun' : 'moon');
-    refreshIcons();
-  } else {
-    themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
-  }
+  if (!themeToggle) return;
+
+  themeToggle.innerHTML = icon(theme === 'dark' ? 'sun' : 'moon');
+  refreshIcons();
 }
+
 setThemeIcon(savedTheme);
 
-themeToggle.addEventListener('click', () => {
-  const current = document.documentElement.getAttribute('data-theme');
-  const next = current === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem('theme', next);
-  setThemeIcon(next);
-});
+if (themeToggle) {
+  themeToggle.addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+
+    document.documentElement.setAttribute('data-theme', next);
+
+    try {
+      localStorage.setItem('theme', next);
+    } catch (err) {
+      console.warn('تعذر حفظ إعداد الوضع الليلي.');
+    }
+
+    setThemeIcon(next);
+  });
+}
 
 // ═══════════════════════════════════════════════
-// 🔄 جلب الدروس
+// 🔄 جلب الدروس من الخادم
 // ═══════════════════════════════════════════════
+
 async function fetchLessons() {
   try {
-    const res = await fetch(`${API}/lessons`);
-    allLessons = await res.json();
+    const response = await fetch(`${API}/lessons`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    allLessons = Array.isArray(data) ? data : [];
   } catch (err) {
+    console.error('تعذر جلب الدروس:', err);
     allLessons = [];
   }
 }
 
 // ═══════════════════════════════════════════════
-// 🎯 إظهار/إخفاء الأقسام
+// 🎯 إظهار وإخفاء الأقسام
 // ═══════════════════════════════════════════════
+
 function hideAllSections() {
-  document.getElementById('yearsSection').style.display = 'none';
-  document.getElementById('specializationsSection').style.display = 'none';
-  document.getElementById('subjectsSection').style.display = 'none';
-  document.getElementById('lessonsSection').style.display = 'none';
-  document.getElementById('searchResultsSection').style.display = 'none';
+  [
+    'yearsSection',
+    'specializationsSection',
+    'subjectsSection',
+    'lessonsSection',
+    'searchResultsSection'
+  ].forEach(id => {
+    const section = document.getElementById(id);
+
+    if (section) {
+      section.style.display = 'none';
+    }
+  });
 }
 
 // ═══════════════════════════════════════════════
 // 🏠 الصفحة الرئيسية
 // ═══════════════════════════════════════════════
+
 function goHome() {
   hideAllSections();
-  document.getElementById('yearsSection').style.display = 'block';
-  document.getElementById('breadcrumb').innerHTML = '';
+
+  const yearsSection = document.getElementById('yearsSection');
+
+  if (yearsSection) {
+    yearsSection.style.display = 'block';
+  }
+
+  const breadcrumb = document.getElementById('breadcrumb');
+
+  if (breadcrumb) {
+    breadcrumb.innerHTML = '';
+  }
+
   renderYears();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function renderYears() {
   const grid = document.getElementById('yearsGrid');
-  grid.innerHTML = YEARS.map(y => {
-    const specs = SPECIALIZATIONS[y.id] || [];
+
+  if (!grid || typeof YEARS === 'undefined') return;
+
+  grid.innerHTML = YEARS.map(year => {
+    const specs = SPECIALIZATIONS[year.id] || [];
+    const yearIcon = YEAR_ICONS[year.id] || 'book-open';
+
     return `
-      <div class="year-card" onclick="selectYear('${y.id}')">
-        <span class="year-icon">${icon(YEAR_ICONS[y.id] || 'book-open')}</span>
-        <h4>${y.name}</h4>
+      <div class="year-card" onclick="selectYear('${year.id}')">
+        <span class="year-icon">
+          ${icon(yearIcon)}
+        </span>
+
+        <h4>${escapeHtml(year.name)}</h4>
+
         <span class="count">${specs.length} تخصص</span>
       </div>
     `;
   }).join('');
+
+  refreshIcons();
 }
 
 // ═══════════════════════════════════════════════
 // 📅 اختيار السنة
 // ═══════════════════════════════════════════════
+
 let currentYear = null;
 let currentSpecialization = null;
 let currentSubject = null;
 
 function selectYear(yearId) {
   currentYear = yearId;
+  currentSpecialization = null;
+  currentSubject = null;
+
   hideAllSections();
-  document.getElementById('specializationsSection').style.display = 'block';
-  
-  const yearObj = YEARS.find(y => y.id === yearId);
-  document.getElementById('specTitle').textContent = `تخصصات ${yearObj.name}`;
+
+  const section = document.getElementById('specializationsSection');
+
+  if (section) {
+    section.style.display = 'block';
+  }
+
+  const yearObj = YEARS.find(year => year.id === yearId);
+
+  if (!yearObj) return;
+
+  document.getElementById('specTitle').textContent =
+    `تخصصات ${yearObj.name}`;
+
   document.getElementById('breadcrumb').innerHTML = `
-    <span onclick="goHome()" class="crumb-link">${icon('landmark')} الرئيسية</span>
+    <span onclick="goHome()" class="crumb-link">
+      ${icon('landmark')} الرئيسية
+    </span>
     <span class="crumb-sep">›</span>
-    <span class="crumb-current">${yearObj.name}</span>
+    <span class="crumb-current">${escapeHtml(yearObj.name)}</span>
   `;
-  
+
   renderSpecializations(yearId);
+  refreshIcons();
+
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// ═══════════════════════════════════════════════
+// 🎓 عرض التخصصات
+// ═══════════════════════════════════════════════
+
 function renderSpecializations(yearId) {
   const grid = document.getElementById('specializationsGrid');
+
+  if (!grid) return;
+
   const specs = SPECIALIZATIONS[yearId] || [];
-  
+
   if (!specs.length) {
     grid.innerHTML = '<p class="empty">لا توجد تخصصات في هذه السنة بعد.</p>';
     return;
   }
-  
+
   grid.innerHTML = specs.map(spec => {
-    const subjects = (SUBJECTS[yearId] && SUBJECTS[yearId][spec]) || [];
-    const lessonsCount = allLessons.filter(l => 
-      l.year === yearId && l.specialization === spec
+    const subjects =
+      (SUBJECTS[yearId] && SUBJECTS[yearId][spec]) || [];
+
+    const lessonsCount = allLessons.filter(lesson =>
+      lesson.year === yearId &&
+      lesson.specialization === spec
     ).length;
-    
+
     const isFav = isSpecFavorite(yearId, spec);
-    const specEscaped = spec.replace(/'/g, "\\'");
-    
+    const specJson = JSON.stringify(spec);
+
     return `
       <div class="specialization-card">
-        <div class="spec-header" onclick="selectSpecialization('${specEscaped}')">
-          <span class="spec-icon">${icon('graduation-cap')}</span>
-          <h4>${spec}</h4>
+        <div
+          class="spec-header"
+          onclick='selectSpecialization(${specJson})'
+        >
+          <span class="spec-icon">
+            ${icon(getSpecializationIcon(spec))}
+          </span>
+
+          <h4>${escapeHtml(spec)}</h4>
         </div>
+
         <div class="spec-meta">
-          <span>${icon('library')} ${subjects.length} مادة</span>
-          <span>${icon('file-text')} ${lessonsCount} درس</span>
-          <button class="fav-btn ${isFav ? 'active' : ''}" 
-                  onclick="handleSpecFavorite(event, '${yearId}', '${specEscaped}')"
-                  title="${isFav ? 'إزالة من المفضلة' : 'أضف للمفضلة'}">
+          <span>
+            ${icon('library')} ${subjects.length} مادة
+          </span>
+
+          <span>
+            ${icon('file-text')} ${lessonsCount} درس
+          </span>
+
+          <button
+            type="button"
+            class="fav-btn ${isFav ? 'active' : ''}"
+            onclick='handleSpecFavorite(event, ${JSON.stringify(yearId)}, ${specJson})'
+            title="${isFav ? 'إزالة من المفضلة' : 'أضف للمفضلة'}"
+            aria-label="${isFav ? 'إزالة من المفضلة' : 'أضف للمفضلة'}"
+          >
             ${icon('star')}
           </button>
         </div>
       </div>
     `;
   }).join('');
+
+  refreshIcons();
 }
 
-// معالج زر المفضلة للتخصص
 function handleSpecFavorite(event, yearId, spec) {
   event.stopPropagation();
+
   const added = toggleFavoriteSpecialization(yearId, spec);
-  
-  // تحديث الزر مباشرة (النجمة تمتلئ عند التفعيل عبر CSS)
-  const btn = event.currentTarget;
-  btn.classList.toggle('active', added);
-  btn.title = added ? 'إزالة من المفضلة' : 'أضف للمفضلة';
+  const button = event.currentTarget;
+
+  button.classList.toggle('active', added);
+  button.title = added ? 'إزالة من المفضلة' : 'أضف للمفضلة';
+  button.setAttribute('aria-label', button.title);
 }
 
 // ═══════════════════════════════════════════════
-// 🎓 اختيار التخصص
+// 📚 اختيار التخصص
 // ═══════════════════════════════════════════════
+
 function selectSpecialization(spec) {
   currentSpecialization = spec;
+  currentSubject = null;
+
   hideAllSections();
+
   document.getElementById('subjectsSection').style.display = 'block';
-  
-  const yearObj = YEARS.find(y => y.id === currentYear);
   document.getElementById('subjectTitle').textContent = `مواد ${spec}`;
+
+  const yearObj = YEARS.find(year => year.id === currentYear);
+
   document.getElementById('breadcrumb').innerHTML = `
-    <span onclick="goHome()" class="crumb-link">${icon('landmark')} الرئيسية</span>
+    <span onclick="goHome()" class="crumb-link">
+      ${icon('landmark')} الرئيسية
+    </span>
+
     <span class="crumb-sep">›</span>
-    <span onclick="selectYear('${currentYear}')" class="crumb-link">${yearObj.name}</span>
+
+    <span
+      onclick="selectYear(${JSON.stringify(currentYear)})"
+      class="crumb-link"
+    >
+      ${escapeHtml(yearObj ? yearObj.name : currentYear)}
+    </span>
+
     <span class="crumb-sep">›</span>
-    <span class="crumb-current">${spec}</span>
+
+    <span class="crumb-current">${escapeHtml(spec)}</span>
   `;
-  
+
   renderSubjects();
+  refreshIcons();
+
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// ═══════════════════════════════════════════════
+// 🧾 عرض المواد بأيقونات مخصصة
+// ═══════════════════════════════════════════════
+
 function renderSubjects() {
   const grid = document.getElementById('subjectsGrid');
-  const subjects = (SUBJECTS[currentYear] && SUBJECTS[currentYear][currentSpecialization]) || [];
-  
+
+  if (!grid) return;
+
+  const subjects =
+    (SUBJECTS[currentYear] &&
+      SUBJECTS[currentYear][currentSpecialization]) || [];
+
   if (!subjects.length) {
     grid.innerHTML = '<p class="empty">لا توجد مواد في هذا التخصص بعد.</p>';
     return;
   }
-  
-  grid.innerHTML = subjects.map(sub => {
-    const subName = typeof sub === 'string' ? sub : sub.name;
-    
-    const lessonsCount = allLessons.filter(l => 
-      l.year === currentYear && 
-      l.specialization === currentSpecialization && 
-      l.subject === subName
+
+  grid.innerHTML = subjects.map(subject => {
+    const subjectName =
+      typeof subject === 'string' ? subject : subject.name;
+
+    const lessonsCount = allLessons.filter(lesson =>
+      lesson.year === currentYear &&
+      lesson.specialization === currentSpecialization &&
+      lesson.subject === subjectName
     ).length;
-    
+
+    const subjectIcon = getSubjectIcon(subjectName);
+
     return `
-      <div class="subject-card" onclick="selectSubject('${subName.replace(/'/g, "\\'")}')">
-        <span class="icon">${icon('book-open')}</span>
-        <h4>${subName}</h4>
+      <div
+        class="subject-card"
+        onclick='selectSubject(${JSON.stringify(subjectName)})'
+      >
+        <span class="icon">
+          ${icon(subjectIcon)}
+        </span>
+
+        <h4>${escapeHtml(subjectName)}</h4>
+
         <span class="count">${lessonsCount} درس</span>
       </div>
     `;
   }).join('');
+
+  refreshIcons();
 }
 
 // ═══════════════════════════════════════════════
-// 📚 اختيار المادة
+// 📖 اختيار المادة
 // ═══════════════════════════════════════════════
-function selectSubject(subName) {
-  currentSubject = subName;
+
+function selectSubject(subjectName) {
+  currentSubject = subjectName;
+
   hideAllSections();
+
   document.getElementById('lessonsSection').style.display = 'block';
-  
-  const yearObj = YEARS.find(y => y.id === currentYear);
-  document.getElementById('lessonsTitle').textContent = `دروس ${subName}`;
+  document.getElementById('lessonsTitle').textContent =
+    `دروس ${subjectName}`;
+
+  const yearObj = YEARS.find(year => year.id === currentYear);
+
   document.getElementById('breadcrumb').innerHTML = `
-    <span onclick="goHome()" class="crumb-link">${icon('landmark')} الرئيسية</span>
+    <span onclick="goHome()" class="crumb-link">
+      ${icon('landmark')} الرئيسية
+    </span>
+
     <span class="crumb-sep">›</span>
-    <span onclick="selectYear('${currentYear}')" class="crumb-link">${yearObj.name}</span>
+
+    <span
+      onclick="selectYear(${JSON.stringify(currentYear)})"
+      class="crumb-link"
+    >
+      ${escapeHtml(yearObj ? yearObj.name : currentYear)}
+    </span>
+
     <span class="crumb-sep">›</span>
-    <span onclick="selectSpecialization('${currentSpecialization.replace(/'/g, "\\'")}')" class="crumb-link">${currentSpecialization}</span>
+
+    <span
+      onclick='selectSpecialization(${JSON.stringify(currentSpecialization)})'
+      class="crumb-link"
+    >
+      ${escapeHtml(currentSpecialization)}
+    </span>
+
     <span class="crumb-sep">›</span>
-    <span class="crumb-current">${subName}</span>
+
+    <span class="crumb-current">${escapeHtml(subjectName)}</span>
   `;
-  
-  const filtered = allLessons.filter(l => 
-    l.year === currentYear && 
-    l.specialization === currentSpecialization && 
-    l.subject === subName
+
+  const filtered = allLessons.filter(lesson =>
+    lesson.year === currentYear &&
+    lesson.specialization === currentSpecialization &&
+    lesson.subject === subjectName
   );
+
   renderLessons(filtered, 'lessonsGrid', 'emptyMsg');
+  refreshIcons();
+
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ═══════════════════════════════════════════════
-// 🔙 الرجوع
+// 🔙 أزرار الرجوع
 // ═══════════════════════════════════════════════
+
 function backToSpecializations() {
-  selectYear(currentYear);
+  if (currentYear) {
+    selectYear(currentYear);
+  } else {
+    goHome();
+  }
 }
+
 function backToSubjects() {
-  selectSpecialization(currentSpecialization);
+  if (currentSpecialization) {
+    selectSpecialization(currentSpecialization);
+  } else {
+    goHome();
+  }
 }
 
 // ═══════════════════════════════════════════════
-// 📄 عرض الدروس
+// 🧰 أدوات مساعدة
 // ═══════════════════════════════════════════════
+
 function formatSize(bytes) {
-  if (bytes < 1024) return bytes + ' B';
-  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-  return (bytes / 1024 / 1024).toFixed(2) + ' MB';
+  const size = Number(bytes) || 0;
+
+  if (size < 1024) return `${size} B`;
+  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+
+  return `${(size / (1024 * 1024)).toFixed(2)} MB`;
 }
 
-function formatDate(iso) {
-  return new Date(iso).toLocaleDateString('ar-EG', {
-    year: 'numeric', month: 'long', day: 'numeric'
+function formatDate(value) {
+  if (!value) return 'غير محدد';
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return 'غير محدد';
+  }
+
+  return date.toLocaleDateString('ar-DZ', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
   });
 }
 
-function renderLessons(lessons, gridId, emptyId) {
-  const grid = document.getElementById(gridId);
-  const empty = document.getElementById(emptyId);
-  
-  if (!lessons.length) {
-    grid.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
-  empty.style.display = 'none';
-  
-  grid.innerHTML = lessons.map(l => {
-    const isFav = isLessonFavorite(l.id);
-    return `
-      <div class="lesson-card">
-        <div class="lesson-header">
-          <h4>${escapeHtml(l.title)}</h4>
-          <div class="lesson-badges">
-            <span class="file-badge ${l.type === 'pdf' ? 'pdf' : 'doc'}">
-              ${l.type.toUpperCase()}
-            </span>
-            <button class="fav-btn lesson-fav ${isFav ? 'active' : ''}" 
-                    onclick="handleLessonFavorite(event, '${l.id}')"
-                    title="${isFav ? 'إزالة الإعجاب' : 'أعجبني'}">
-              ${icon('heart')}
-            </button>
-          </div>
-        </div>
-        ${l.description ? `<p class="lesson-desc">${escapeHtml(l.description)}</p>` : ''}
-        <div class="lesson-meta">
-          <span>${icon('calendar')} ${formatDate(l.date)}</span>
-          <span>${icon('hard-drive')} ${formatSize(l.size)}</span>
-        </div>
-        <div class="lesson-actions">
-          <a href="${l.url}" target="_blank" class="btn btn-view">${icon('eye')} فتح</a>
-          <a href="${l.url}" download="${escapeHtml(l.filename)}" class="btn btn-download">${icon('download')} تحميل</a>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-// معالج زر الإعجاب للدرس
-function handleLessonFavorite(event, lessonId) {
-  event.stopPropagation();
-  const added = toggleFavoriteLesson(lessonId);
-  
-  // (القلب يمتلئ عند التفعيل عبر CSS)
-  const btn = event.currentTarget;
-  btn.classList.toggle('active', added);
-  btn.title = added ? 'إزالة الإعجاب' : 'أعجبني';
-}
-
-function escapeHtml(str) {
+function escapeHtml(value) {
   const div = document.createElement('div');
-  div.textContent = str || '';
+  div.textContent = value == null ? '' : String(value);
+
   return div.innerHTML;
 }
 
 // ═══════════════════════════════════════════════
-// 🔎 البحث (محمي - يعمل فقط في index.html)
+// 📄 عرض بطاقات الدروس
 // ═══════════════════════════════════════════════
+
+function renderLessons(lessons, gridId, emptyId) {
+  const grid = document.getElementById(gridId);
+  const empty = document.getElementById(emptyId);
+
+  if (!grid || !empty) return;
+
+  if (!lessons.length) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    refreshIcons();
+    return;
+  }
+
+  empty.style.display = 'none';
+
+  grid.innerHTML = lessons.map(lesson => {
+    const isFav = isLessonFavorite(lesson.id);
+    const lessonIdJson = JSON.stringify(String(lesson.id));
+    const lessonUrl = escapeHtml(lesson.url || '#');
+    const lessonTitle = escapeHtml(lesson.title || 'درس بدون عنوان');
+    const fileName = escapeHtml(lesson.filename || 'lesson');
+
+    return `
+      <div class="lesson-card">
+        <div class="lesson-header">
+          <h4>${lessonTitle}</h4>
+
+          <div class="lesson-badges">
+            <span class="file-badge ${lesson.type === 'pdf' ? 'pdf' : 'doc'}">
+              ${escapeHtml(String(lesson.type || 'file').toUpperCase())}
+            </span>
+
+            <button
+              type="button"
+              class="fav-btn lesson-fav ${isFav ? 'active' : ''}"
+              onclick='handleLessonFavorite(event, ${lessonIdJson})'
+              title="${isFav ? 'إزالة من المفضلة' : 'أضف للمفضلة'}"
+              aria-label="${isFav ? 'إزالة من المفضلة' : 'أضف للمفضلة'}"
+            >
+              ${icon('heart')}
+            </button>
+          </div>
+        </div>
+
+        ${
+          lesson.description
+            ? `<p class="lesson-desc">${escapeHtml(lesson.description)}</p>`
+            : ''
+        }
+
+        <div class="lesson-meta">
+          <span>
+            ${icon('calendar')} ${formatDate(lesson.date)}
+          </span>
+
+          <span>
+            ${icon('hard-drive')} ${formatSize(lesson.size)}
+          </span>
+        </div>
+
+        <div class="lesson-actions">
+          <a
+            href="${lessonUrl}"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn-view"
+          >
+            ${icon('eye')} فتح
+          </a>
+
+          <a
+            href="${lessonUrl}"
+            download="${fileName}"
+            class="btn btn-download"
+          >
+            ${icon('download')} تحميل
+          </a>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  refreshIcons();
+}
+
+function handleLessonFavorite(event, lessonId) {
+  event.stopPropagation();
+
+  const added = toggleFavoriteLesson(lessonId);
+  const button = event.currentTarget;
+
+  button.classList.toggle('active', added);
+  button.title = added ? 'إزالة من المفضلة' : 'أضف للمفضلة';
+  button.setAttribute('aria-label', button.title);
+}
+
+// ═══════════════════════════════════════════════
+// 🔎 البحث
+// ═══════════════════════════════════════════════
+
 const searchInput = document.getElementById('searchInput');
+
 if (searchInput) {
-  searchInput.addEventListener('input', (e) => {
-    const q = e.target.value.trim().toLowerCase();
-    
-    if (!q) {
+  searchInput.addEventListener('input', event => {
+    const query = event.target.value.trim().toLowerCase();
+
+    if (!query) {
       goHome();
       return;
     }
-    
+
     hideAllSections();
+
     document.getElementById('searchResultsSection').style.display = 'block';
+
     document.getElementById('breadcrumb').innerHTML = `
-      <span onclick="goHome()" class="crumb-link">${icon('landmark')} الرئيسية</span>
+      <span onclick="goHome()" class="crumb-link">
+        ${icon('landmark')} الرئيسية
+      </span>
+
       <span class="crumb-sep">›</span>
+
       <span class="crumb-current">نتائج البحث</span>
     `;
-    
-    const filtered = allLessons.filter(l =>
-      (l.title || '').toLowerCase().includes(q) ||
-      (l.subject || '').toLowerCase().includes(q) ||
-      (l.specialization || '').toLowerCase().includes(q) ||
-      (l.year || '').toLowerCase().includes(q) ||
-      (l.description || '').toLowerCase().includes(q) ||
-      (l.filename || '').toLowerCase().includes(q)
-    );
-    
+
+    const filtered = allLessons.filter(lesson => {
+      const fields = [
+        lesson.title,
+        lesson.subject,
+        lesson.specialization,
+        lesson.year,
+        lesson.description,
+        lesson.filename
+      ];
+
+      return fields.some(value =>
+        String(value || '').toLowerCase().includes(query)
+      );
+    });
+
     renderLessons(filtered, 'searchResultsGrid', 'searchEmptyMsg');
+    refreshIcons();
   });
 }
 
 // ═══════════════════════════════════════════════
-// 🚀 بدء التطبيق
+// 🏠 زر الرئيسية
 // ═══════════════════════════════════════════════
+
 const homeBtn = document.getElementById('homeBtn');
+
 if (homeBtn) {
-  homeBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    const si = document.getElementById('searchInput');
-    if (si) si.value = '';
+  homeBtn.addEventListener('click', event => {
+    event.preventDefault();
+
+    if (searchInput) {
+      searchInput.value = '';
+    }
+
     goHome();
   });
 }
 
 // ═══════════════════════════════════════════════
-// 💬 إشعار Toast
+// 💬 إشعارات Toast
 // ═══════════════════════════════════════════════
-// iconName اختياري: اسم أيقونة تظهر بجانب الرسالة
+
 function showToast(message, iconName) {
   const existing = document.querySelector('.toast-notification');
-  if (existing) existing.remove();
-  
+
+  if (existing) {
+    existing.remove();
+  }
+
   const toast = document.createElement('div');
   toast.className = 'toast-notification';
-  toast.innerHTML = (iconName && window.lucide ? icon(iconName) : '') + '<span></span>';
-  toast.querySelector('span').textContent = message;
+
+  if (iconName) {
+    toast.insertAdjacentHTML('beforeend', icon(iconName));
+  }
+
+  const text = document.createElement('span');
+  text.textContent = message;
+
+  toast.appendChild(text);
   document.body.appendChild(toast);
-  
+
+  refreshIcons();
+
   setTimeout(() => {
     toast.classList.add('toast-hide');
-    setTimeout(() => toast.remove(), 300);
+
+    setTimeout(() => {
+      toast.remove();
+    }, 300);
   }, 2500);
 }
 
 // ═══════════════════════════════════════════════
 // ☰ القائمة المنسدلة
 // ═══════════════════════════════════════════════
+
 (function initMenu() {
   const menuToggle = document.getElementById('menuToggle');
   const menuDropdown = document.getElementById('menuDropdown');
-  
+
   if (!menuToggle || !menuDropdown) return;
-  
-  menuToggle.addEventListener('click', (e) => {
-    e.stopPropagation();
+
+  menuToggle.addEventListener('click', event => {
+    event.stopPropagation();
+
     const isOpen = menuDropdown.classList.toggle('open');
     menuToggle.classList.toggle('active', isOpen);
+    menuToggle.setAttribute('aria-expanded', String(isOpen));
   });
-  
-  menuDropdown.addEventListener('click', (e) => {
-    e.stopPropagation();
+
+  menuDropdown.addEventListener('click', event => {
+    event.stopPropagation();
   });
-  
+
   document.addEventListener('click', () => {
-    if (menuDropdown.classList.contains('open')) {
+    menuDropdown.classList.remove('open');
+    menuToggle.classList.remove('active');
+    menuToggle.setAttribute('aria-expanded', 'false');
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
       menuDropdown.classList.remove('open');
       menuToggle.classList.remove('active');
+      menuToggle.setAttribute('aria-expanded', 'false');
     }
   });
-  
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && menuDropdown.classList.contains('open')) {
-      menuDropdown.classList.remove('open');
-      menuToggle.classList.remove('active');
-    }
-  });
-  
+
   window.addEventListener('resize', () => {
-    if (window.innerWidth > 768) return;
-    if (menuDropdown.classList.contains('open')) {
+    if (window.innerWidth > 768) {
       menuDropdown.classList.remove('open');
       menuToggle.classList.remove('active');
+      menuToggle.setAttribute('aria-expanded', 'false');
     }
   });
 })();
 
 // ═══════════════════════════════════════════════
-// 🚀 تشغيل التطبيق
+// 🔐 إظهار رابط لوحة التحكم بعد 5 ضغطات على الشعار
 // ═══════════════════════════════════════════════
-(async () => {
-  await fetchLessons();
-  
-  // ═══════════════════════════════════════════════
-  // 🔗 التحقق من طلب الانتقال من صفحة المفضلة
-  // ═══════════════════════════════════════════════
-  const gotoYear = sessionStorage.getItem('goto_year');
-  const gotoSpec = sessionStorage.getItem('goto_spec');
-  
-  if (gotoYear && gotoSpec) {
-    // مسح الطلب بعد القراءة
-    sessionStorage.removeItem('goto_year');
-    sessionStorage.removeItem('goto_spec');
-    
-    // الانتقال إلى التخصص مباشرة
-    currentYear = gotoYear;
-    currentSpecialization = gotoSpec;
-    
-    // إظهار قسم المواد
-    hideAllSections();
-    document.getElementById('subjectsSection').style.display = 'block';
-    
-    const yearObj = YEARS.find(y => y.id === gotoYear);
-    const yearName = yearObj ? yearObj.name : gotoYear;
-    
-    document.getElementById('subjectTitle').textContent = `مواد ${gotoSpec}`;
-    document.getElementById('breadcrumb').innerHTML = `
-      <span onclick="goHome()" class="crumb-link">${icon('landmark')} الرئيسية</span>
-      <span class="crumb-sep">›</span>
-      <span onclick="selectYear('${gotoYear}')" class="crumb-link">${yearName}</span>
-      <span class="crumb-sep">›</span>
-      <span class="crumb-current">${gotoSpec}</span>
-    `;
-    
-    renderSubjects();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    
-    console.log('✅ تم الانتقال إلى:', gotoSpec);
-  } else {
-    // الصفحة الرئيسية العادية
-    goHome();
-  }
-})();
 
-// ═══════════════════════════════════════════════
-// 🔐 إظهار لوحة التحكم بعد الضغط على الشعار 5 مرات
-// ═══════════════════════════════════════════════
-(function () {
+(function initSecretAdmin() {
   const logo = document.getElementById('secretLogo');
   const adminBtn = document.getElementById('adminBtn');
+
   if (!logo || !adminBtn) return;
 
-  // إن كان ظاهراً من قبل في هذه الجلسة، أظهره مباشرة
-  if (sessionStorage.getItem('showAdmin') === '1') {
-    adminBtn.classList.remove('admin-hidden');
+  try {
+    if (sessionStorage.getItem('showAdmin') === '1') {
+      adminBtn.classList.remove('admin-hidden');
+    }
+  } catch (err) {
+    // يستمر الموقع حتى إن تعذر استخدام sessionStorage.
   }
 
   let clicks = 0;
   let timer;
 
-  logo.addEventListener('click', function () {
+  logo.addEventListener('click', () => {
     clicks++;
     clearTimeout(timer);
-    // إن توقفت عن الضغط ثانيتين يبدأ العدّ من جديد
-    timer = setTimeout(() => { clicks = 0; }, 2000);
+
+    timer = setTimeout(() => {
+      clicks = 0;
+    }, 2000);
 
     if (clicks >= 5) {
       adminBtn.classList.remove('admin-hidden');
-      sessionStorage.setItem('showAdmin', '1');
+
+      try {
+        sessionStorage.setItem('showAdmin', '1');
+      } catch (err) {
+        // لا يمنع ذلك إظهار الرابط في الجلسة الحالية.
+      }
+
       clicks = 0;
+      showToast('تم إظهار رابط لوحة التحكم', 'shield-check');
     }
   });
+})();
+
+// ═══════════════════════════════════════════════
+// 🔗 الانتقال من صفحة المفضلة إلى التخصص
+// ═══════════════════════════════════════════════
+
+function restoreFavoriteNavigation() {
+  let gotoYear = null;
+  let gotoSpec = null;
+
+  try {
+    gotoYear = sessionStorage.getItem('goto_year');
+    gotoSpec = sessionStorage.getItem('goto_spec');
+
+    if (gotoYear && gotoSpec) {
+      sessionStorage.removeItem('goto_year');
+      sessionStorage.removeItem('goto_spec');
+    }
+  } catch (err) {
+    console.warn('تعذر استعادة الانتقال من صفحة المفضلة.');
+  }
+
+  if (!gotoYear || !gotoSpec) {
+    goHome();
+    return;
+  }
+
+  if (
+    !YEARS.some(year => year.id === gotoYear) ||
+    !(SPECIALIZATIONS[gotoYear] || []).includes(gotoSpec)
+  ) {
+    goHome();
+    return;
+  }
+
+  currentYear = gotoYear;
+  currentSpecialization = gotoSpec;
+
+  selectSpecialization(gotoSpec);
+}
+
+// ═══════════════════════════════════════════════
+// 🚀 بدء التطبيق
+// ═══════════════════════════════════════════════
+
+(async function startApp() {
+  await fetchLessons();
+
+  restoreFavoriteNavigation();
+
+  refreshIcons();
 })();

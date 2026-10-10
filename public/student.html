@@ -24,8 +24,8 @@
       </div>
     </div>
     <nav>
-      <a href="index.html">🏠 الرئيسية</a>
-      <button id="themeToggle" class="theme-btn" aria-label="الوضع الليلي">🌙</button>
+      <a href="index.html"><i data-lucide="house"></i> الرئيسية</a>
+      <button id="themeToggle" class="theme-btn" aria-label="الوضع الليلي"></button>
     </nav>
   </div>
 </header>
@@ -36,16 +36,16 @@
 <section class="student-hero">
   <div class="container">
     <div class="student-hero-content">
-      <span class="student-hero-icon">👨‍🎓</span>
+      <span class="student-hero-icon"><i data-lucide="graduation-cap"></i></span>
       <h1>بوابة الطلبة</h1>
       <p class="student-hero-subtitle">
         شاركنا دروسك وملفاتك العلمية — سنراجعها وننشرها للجميع
       </p>
       <div class="student-hero-features">
-        <span class="feature-chip">📤 رفع حتى 5 ملفات</span>
-        <span class="feature-chip">⏳ مراجعة سريعة</span>
-        <span class="feature-chip">🎓 نشر باسمك</span>
-        <span class="feature-chip">🌟 إثراء المحتوى</span>
+        <span class="feature-chip"><i data-lucide="upload"></i> رفع حتى 5 ملفات</span>
+        <span class="feature-chip"><i data-lucide="hourglass"></i> مراجعة سريعة</span>
+        <span class="feature-chip"><i data-lucide="user-check"></i> نشر باسمك</span>
+        <span class="feature-chip"><i data-lucide="sparkles"></i> إثراء المحتوى</span>
       </div>
     </div>
   </div>
@@ -58,7 +58,7 @@
 
   <!-- تنبيه: بدون كلمة سر -->
   <div class="student-notice">
-    <span class="notice-icon">💡</span>
+    <span class="notice-icon"><i data-lucide="lightbulb"></i></span>
     <div class="notice-text">
       <strong>لا حاجة لتسجيل الدخول</strong>
       <p>املأ بياناتك وارفع دروسك — سنراجعها وننشرها في غضون أيام</p>
@@ -70,7 +70,7 @@
     
     <div class="upload-card-header student-header">
       <div class="upload-card-title">
-        <span class="upload-card-icon">📤</span>
+        <span class="upload-card-icon"><i data-lucide="upload"></i></span>
         <div>
           <h3>رفع دروسك للمراجعة</h3>
           <p class="upload-card-subtitle">حتى 5 ملفات PDF أو Word في وقت واحد</p>
@@ -83,14 +83,14 @@
       <!-- معلوماتك -->
       <div class="form-section">
         <h4 class="form-section-title">
-          <span>👤</span>
+          <span><i data-lucide="user"></i></span>
           <span>معلوماتك</span>
         </h4>
         
         <div class="form-row">
           <div class="form-group">
             <label for="studentName">
-              👤 اسمك
+              <i data-lucide="user"></i> اسمك
               <span class="required">*</span>
             </label>
             <input 
@@ -105,7 +105,7 @@
           
           <div class="form-group">
             <label for="studentEmail">
-              📧 بريدك الإلكتروني (اختياري)
+              <i data-lucide="mail"></i> بريدك الإلكتروني (اختياري)
             </label>
             <input 
               type="email" 
@@ -121,14 +121,14 @@
       <!-- معلومات الدرس -->
       <div class="form-section">
         <h4 class="form-section-title">
-          <span>📋</span>
+          <span><i data-lucide="clipboard-list"></i></span>
           <span>معلومات الدرس</span>
         </h4>
         
         <div class="form-row">
           <div class="form-group">
             <label for="yearSelect">
-              📅 السنة الدراسية
+              <i data-lucide="calendar"></i> السنة الدراسية
               <span class="required">*</span>
             </label>
             <select name="year" id="yearSelect" required>
@@ -138,7 +138,7 @@
           
           <div class="form-group">
             <label for="specializationSelect">
-              🎓 التخصص
+              <i data-lucide="graduation-cap"></i> التخصص
               <span class="required">*</span>
             </label>
             <select name="specialization" id="specializationSelect" required>
@@ -150,7 +150,7 @@
         <div class="form-row">
           <div class="form-group">
             <label for="subjectSelect">
-              📚 المادة
+              <i data-lucide="library"></i> المادة
               <span class="required">*</span>
             </label>
             <select name="subject" id="subjectSelect" required>
@@ -163,17 +163,17 @@
       <!-- الملفات -->
       <div class="form-section">
         <h4 class="form-section-title">
-          <span>📄</span>
+          <span><i data-lucide="file-text"></i></span>
           <span>الملفات (حتى 5 ملفات)</span>
         </h4>
 
         <div class="teacher-files-info">
           <div class="files-info-left">
-            <span class="files-info-icon">📊</span>
+            <span class="files-info-icon"><i data-lucide="files"></i></span>
             <span id="filesCount" class="files-count">0 من 5 ملفات</span>
           </div>
           <button type="button" id="addFileBtn" class="btn-add-file">
-            <span>➕</span>
+            <span><i data-lucide="plus"></i></span>
             <span>إضافة ملف جديد</span>
           </button>
         </div>
@@ -181,7 +181,7 @@
         <div id="filesContainer" class="files-container"></div>
 
         <div class="files-hint">
-          <span>💡</span>
+          <i data-lucide="lightbulb"></i>
           <span>العنوان اختياري — إذا تركته فارغاً، سيُستخدم اسم الملف</span>
         </div>
       </div>
@@ -189,7 +189,7 @@
       <!-- ملاحظة -->
       <div class="form-section">
         <h4 class="form-section-title">
-          <span>💬</span>
+          <span><i data-lucide="message-square"></i></span>
           <span>ملاحظة للإدارة (اختياري)</span>
         </h4>
         
@@ -207,7 +207,7 @@
       <!-- زر الإرسال -->
       <div class="form-actions">
         <button type="submit" class="btn-primary btn-upload-submit student-submit-btn">
-          <span>📤</span>
+          <i data-lucide="send"></i>
           <span>إرسال للمراجعة</span>
         </button>
       </div>
@@ -220,7 +220,7 @@
   <!-- نتائج الإرسال -->
   <div id="uploadResults" class="upload-results" style="display:none;">
     <div class="results-header">
-      <span class="results-icon">📊</span>
+      <span class="results-icon"><i data-lucide="clipboard-check"></i></span>
       <h3>نتائج الإرسال</h3>
     </div>
     <div id="resultsContent"></div>
@@ -240,6 +240,8 @@
   </div>
 </footer>
 
+<!-- ✏️ جديد: مكتبة الأيقونات (قبل student.js) -->
+<script src="lucide.min.js"></script>
 <script src="data.js"></script>
 <script src="student.js"></script>
 </body>

@@ -24,11 +24,11 @@
       </div>
     </div>
     <nav>
-      <a href="index.html">🏠 الرئيسية</a>
+      <a href="index.html"><i data-lucide="house"></i> الرئيسية</a>
       <button id="logoutBtn" class="btn-logout" style="display:none;" title="تسجيل الخروج">
-        🚪 خروج
+        <i data-lucide="log-out"></i> خروج
       </button>
-      <button id="themeToggle" class="theme-btn" aria-label="الوضع الليلي">🌙</button>
+      <button id="themeToggle" class="theme-btn" aria-label="الوضع الليلي"></button>
     </nav>
   </div>
 </header>
@@ -39,16 +39,16 @@
 <section class="teacher-hero">
   <div class="container">
     <div class="teacher-hero-content">
-      <span class="teacher-hero-icon">👨‍🏫</span>
+      <span class="teacher-hero-icon"><i data-lucide="presentation"></i></span>
       <h1>بوابة الأساتذة</h1>
       <p class="teacher-hero-subtitle">
         منصة مخصصة لرفع الدروس والمحاضرات مباشرة إلى قاعدة بيانات الكلية
       </p>
       <div class="teacher-hero-features">
-        <span class="feature-chip">📤 رفع حتى 10 ملفات</span>
-        <span class="feature-chip">⚡ نشر فوري</span>
-        <span class="feature-chip">☁️ تخزين دائم</span>
-        <span class="feature-chip">🔒 آمن ومشفر</span>
+        <span class="feature-chip"><i data-lucide="upload"></i> رفع حتى 10 ملفات</span>
+        <span class="feature-chip"><i data-lucide="zap"></i> نشر فوري</span>
+        <span class="feature-chip"><i data-lucide="cloud"></i> تخزين دائم</span>
+        <span class="feature-chip"><i data-lucide="lock"></i> آمن ومشفر</span>
       </div>
     </div>
   </div>
@@ -59,7 +59,7 @@
 <!-- ═══════════════════════════════════════════════ -->
 <div id="loginScreen" class="container section">
   <div class="login-box">
-    <div class="login-icon">🔐</div>
+    <div class="login-icon"><i data-lucide="lock-keyhole"></i></div>
     <h3>الدخول إلى بوابة الأساتذة</h3>
     <p>أدخل كلمة السر الخاصة بك للوصول إلى لوحة الرفع</p>
     
@@ -74,13 +74,13 @@
     </div>
     
     <button id="loginBtn" class="btn-primary">
-      🔓 دخول
+      <i data-lucide="log-in"></i> دخول
     </button>
     
     <p id="loginError" class="error" role="alert"></p>
     
     <div class="login-note">
-      <span>💡</span>
+      <i data-lucide="lightbulb"></i>
       <span>إذا نسيت كلمة السر، تواصل مع إدارة المنصة</span>
     </div>
   </div>
@@ -101,7 +101,7 @@
     
     <div class="upload-card-header">
       <div class="upload-card-title">
-        <span class="upload-card-icon">📤</span>
+        <span class="upload-card-icon"><i data-lucide="upload"></i></span>
         <div>
           <h3>رفع دروس جديدة</h3>
           <p class="upload-card-subtitle">حتى 10 ملفات PDF أو Word في وقت واحد</p>
@@ -114,14 +114,14 @@
       <!-- القسم الأول: معلومات الدرس -->
       <div class="form-section">
         <h4 class="form-section-title">
-          <span>📋</span>
+          <span><i data-lucide="clipboard-list"></i></span>
           <span>معلومات الدرس</span>
         </h4>
         
         <div class="form-row">
           <div class="form-group">
             <label for="yearSelect">
-              📅 السنة الدراسية
+              <i data-lucide="calendar"></i> السنة الدراسية
               <span class="required">*</span>
             </label>
             <select name="year" id="yearSelect" required>
@@ -131,7 +131,7 @@
           
           <div class="form-group">
             <label for="specializationSelect">
-              🎓 التخصص
+              <i data-lucide="graduation-cap"></i> التخصص
               <span class="required">*</span>
             </label>
             <select name="specialization" id="specializationSelect" required>
@@ -143,7 +143,7 @@
         <div class="form-row">
           <div class="form-group">
             <label for="subjectSelect">
-              📚 المادة
+              <i data-lucide="library"></i> المادة
               <span class="required">*</span>
             </label>
             <select name="subject" id="subjectSelect" required>
@@ -156,17 +156,17 @@
       <!-- القسم الثاني: الملفات -->
       <div class="form-section">
         <h4 class="form-section-title">
-          <span>📄</span>
+          <span><i data-lucide="file-text"></i></span>
           <span>الملفات (حتى 10 ملفات)</span>
         </h4>
 
         <div class="teacher-files-info">
           <div class="files-info-left">
-            <span class="files-info-icon">📊</span>
+            <span class="files-info-icon"><i data-lucide="files"></i></span>
             <span id="filesCount" class="files-count">0 من 10 ملفات</span>
           </div>
           <button type="button" id="addFileBtn" class="btn-add-file">
-            <span>➕</span>
+            <span><i data-lucide="plus"></i></span>
             <span>إضافة ملف جديد</span>
           </button>
         </div>
@@ -174,14 +174,14 @@
         <div id="filesContainer" class="files-container"></div>
 
         <div class="files-hint">
-          <span>💡</span>
+          <i data-lucide="lightbulb"></i>
           <span>العنوان اختياري — إذا تركته فارغاً، سيُستخدم اسم الملف تلقائياً</span>
         </div>
       </div>
 
       <div class="form-actions">
         <button type="submit" class="btn-primary btn-upload-submit">
-          <span>📥</span>
+          <i data-lucide="cloud-upload"></i>
           <span>رفع جميع الدروس</span>
         </button>
       </div>
@@ -194,7 +194,7 @@
   <!-- نتائج الرفع -->
   <div id="uploadResults" class="upload-results" style="display:none;">
     <div class="results-header">
-      <span class="results-icon">📊</span>
+      <span class="results-icon"><i data-lucide="clipboard-check"></i></span>
       <h3>نتائج الرفع</h3>
     </div>
     <div id="resultsContent"></div>
@@ -204,7 +204,7 @@
   <div class="my-lessons-section">
     <div class="my-lessons-header">
       <div class="my-lessons-title">
-        <span class="my-lessons-icon">📚</span>
+        <span class="my-lessons-icon"><i data-lucide="library"></i></span>
         <div>
           <h3>دروسي المرفوعة</h3>
           <p class="my-lessons-subtitle">
@@ -213,7 +213,7 @@
         </div>
       </div>
       <button type="button" id="refreshLessonsBtn" class="btn-refresh" title="تحديث">
-        🔄 تحديث
+        <i data-lucide="refresh-cw"></i> تحديث
       </button>
     </div>
 
@@ -236,6 +236,8 @@
   </div>
 </footer>
 
+<!-- ✏️ جديد: مكتبة الأيقونات (قبل teacher.js) -->
+<script src="lucide.min.js"></script>
 <script src="data.js"></script>
 <script src="teacher.js"></script>
 </body>

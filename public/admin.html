@@ -1,12 +1,28 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>لوحة التحكم — رفع الدروس</title>
-<meta name="robots" content="noindex, nofollow">
-<link rel="stylesheet" href="style.css">
-<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة التحكم — رفع الدروس</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    .admin-icon { width: 1.2em; height: 1.2em; stroke-width: 1.9; flex-shrink: 0; vertical-align: middle; }
+    .navbar nav a, .theme-btn, .btn-refresh, .btn-primary, .pending-btn,
+    .btn-view, .btn-delete, .review-title, .upload-card h3, .manage-card h3,
+    .login-box h3, .review-login-box h4 {
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .theme-btn { justify-content: center; }
+    .btn-view, .btn-delete { justify-content: center; }
+    .btn-delete svg, .pending-btn.reject svg { color: #b42318; }
+    .pending-btn.approve svg { color: var(--emerald); }
+    .review-title > i, .upload-card h3 svg, .manage-card h3 svg { color: var(--gold-dark); }
+    [data-theme="dark"] .review-title > i,
+    [data-theme="dark"] .upload-card h3 svg,
+    [data-theme="dark"] .manage-card h3 svg { color: var(--gold); }
+  </style>
 </head>
 <body>
 
@@ -17,8 +33,10 @@
       <div><h1>لوحة التحكم</h1><p>رفع وإدارة الدروس</p></div>
     </div>
     <nav>
-      <a href="index.html">🏠 الرئيسية</a>
-      <button id="themeToggle" class="theme-btn">🌙</button>
+      <a href="index.html"><i data-lucide="house" class="admin-icon"></i> الرئيسية</a>
+      <button id="themeToggle" class="theme-btn" type="button" aria-label="تبديل الوضع الليلي">
+        <i data-lucide="moon" class="admin-icon"></i>
+      </button>
     </nav>
   </div>
 </header>
@@ -26,10 +44,10 @@
 <!-- شاشة الدخول -->
 <div id="loginScreen" class="container section">
   <div class="login-box">
-    <h3>🔐 الدخول إلى لوحة التحكم</h3>
+    <h3><i data-lucide="shield-check" class="admin-icon"></i> الدخول إلى لوحة التحكم</h3>
     <p>أدخل كلمة السر الخاصة بك</p>
-    <input type="password" id="passwordInput" placeholder="كلمة السر">
-    <button id="loginBtn" class="btn-primary">دخول</button>
+    <input type="password" id="passwordInput" placeholder="كلمة السر" autocomplete="current-password">
+    <button id="loginBtn" class="btn-primary" type="button"><i data-lucide="log-in" class="admin-icon"></i> دخول</button>
     <p id="loginError" class="error"></p>
   </div>
 </div>
@@ -37,29 +55,29 @@
 <!-- لوحة الأدمن -->
 <div id="adminPanel" class="container section" style="display:none;">
 
-  <!-- 📥 قسم المراجعة -->
+  <!-- قسم المراجعة -->
   <div class="review-card">
     <div class="review-header">
       <div class="review-title">
-        <span class="review-icon">📥</span>
+        <i data-lucide="inbox" class="admin-icon"></i>
         <div>
           <h3>الدروس بانتظار المراجعة</h3>
-          <p class="review-subtitle">
-            <span id="pendingCount">0</span> درس
-          </p>
+          <p class="review-subtitle"><span id="pendingCount">0</span> درس</p>
         </div>
       </div>
-      <button id="refreshPendingBtn" class="btn-refresh">🔄 تحديث</button>
+      <button id="refreshPendingBtn" class="btn-refresh" type="button">
+        <i data-lucide="refresh-cw" class="admin-icon"></i> تحديث
+      </button>
     </div>
 
     <!-- شاشة دخول المراجعة -->
     <div id="reviewLoginScreen" class="review-login">
       <div class="review-login-box">
-        <span class="review-login-icon">🔐</span>
+        <i data-lucide="lock-keyhole" class="admin-icon"></i>
         <h4>الدخول إلى قسم المراجعة</h4>
         <p>أدخل كلمة سر المراجعة</p>
-        <input type="password" id="reviewPasswordInput" placeholder="كلمة سر المراجعة">
-        <button id="reviewLoginBtn" class="btn-primary">دخول</button>
+        <input type="password" id="reviewPasswordInput" placeholder="كلمة سر المراجعة" autocomplete="current-password">
+        <button id="reviewLoginBtn" class="btn-primary" type="button"><i data-lucide="log-in" class="admin-icon"></i> دخول</button>
         <p id="reviewLoginError" class="error"></p>
       </div>
     </div>
@@ -68,42 +86,42 @@
     <div id="pendingList" class="pending-list" style="display:none;"></div>
   </div>
 
-  <!-- 📤 رفع درس جديد -->
+  <!-- رفع درس جديد -->
   <div class="upload-card">
-    <h3>📤 رفع درس جديد</h3>
+    <h3><i data-lucide="cloud-upload" class="admin-icon"></i> رفع درس جديد</h3>
     <form id="uploadForm">
-      <label>السنة الدراسية</label>
+      <label for="yearSelect">السنة الدراسية</label>
       <select name="year" id="yearSelect" required>
         <option value="">اختر السنة</option>
       </select>
 
-      <label>التخصص</label>
+      <label for="specializationSelect">التخصص</label>
       <select name="specialization" id="specializationSelect" required>
         <option value="">اختر السنة أولاً</option>
       </select>
 
-      <label>المادة</label>
+      <label for="subjectSelect">المادة</label>
       <select name="subject" id="subjectSelect" required>
         <option value="">اختر التخصص أولاً</option>
       </select>
 
-      <label>عنوان الدرس</label>
-      <input type="text" name="title" required placeholder="مثال: المدخل إلى الحضارة الإسلامية">
+      <label for="lessonTitle">عنوان الدرس</label>
+      <input id="lessonTitle" type="text" name="title" required placeholder="مثال: المدخل إلى الحضارة الإسلامية">
 
-      <label>وصف مختصر (اختياري)</label>
-      <textarea name="description" rows="3" placeholder="وصف موجز عن الدرس"></textarea>
+      <label for="lessonDescription">وصف مختصر (اختياري)</label>
+      <textarea id="lessonDescription" name="description" rows="3" placeholder="وصف موجز عن الدرس"></textarea>
 
-      <label>الملف (PDF أو Word)</label>
-      <input type="file" name="file" accept=".pdf,.doc,.docx" required>
+      <label for="lessonFile">الملف (PDF أو Word)</label>
+      <input id="lessonFile" type="file" name="file" accept=".pdf,.doc,.docx" required>
 
-      <button type="submit" class="btn-primary">📥 رفع الدرس</button>
-      <p id="uploadStatus" class="status"></p>
+      <button type="submit" class="btn-primary"><i data-lucide="upload" class="admin-icon"></i> رفع الدرس</button>
+      <p id="uploadStatus" class="status" aria-live="polite"></p>
     </form>
   </div>
 
-  <!-- 🗂️ إدارة الدروس -->
+  <!-- إدارة الدروس -->
   <div class="manage-card">
-    <h3>🗂️ إدارة الدروس المرفوعة</h3>
+    <h3><i data-lucide="library-big" class="admin-icon"></i> إدارة الدروس المرفوعة</h3>
     <div id="adminLessons"></div>
   </div>
 
@@ -117,6 +135,12 @@
 </footer>
 
 <script src="data.js"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
 <script src="admin.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.lucide) window.lucide.createIcons();
+  });
+</script>
 </body>
 </html>

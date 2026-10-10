@@ -19,15 +19,15 @@
       </div>
     </div>
     <nav>
-      <a href="index.html">🏠 الرئيسية</a>
-      <button id="themeToggle" class="theme-btn">🌙</button>
+      <a href="index.html"><i data-lucide="house"></i> الرئيسية</a>
+      <button id="themeToggle" class="theme-btn" aria-label="تبديل الوضع"></button>
     </nav>
   </div>
 </header>
 
 <section class="contact-hero">
   <div class="container">
-    <span class="contact-hero-icon">⭐</span>
+    <span class="contact-hero-icon"><i data-lucide="star"></i></span>
     <h1>مفضلتي</h1>
     <p>تخصصاتك المفضلة ودروسك المُعجَبة في مكان واحد</p>
   </div>
@@ -37,7 +37,7 @@
 
   <div class="fav-section">
     <h2 class="fav-section-title">
-      🎓 التخصصات المفضلة
+      <i data-lucide="graduation-cap"></i> التخصصات المفضلة
       <span class="fav-count" id="specCount">(0)</span>
     </h2>
     <div id="favSpecsList" class="fav-list"></div>
@@ -45,14 +45,14 @@
 
   <div class="fav-section">
     <h2 class="fav-section-title">
-      ❤️ الدروس المُعجَبة
+      <i data-lucide="heart"></i> الدروس المُعجَبة
       <span class="fav-count" id="lessonsCount">(0)</span>
     </h2>
     <div id="favLessonsList" class="fav-list"></div>
   </div>
 
   <div class="contact-back">
-    <a href="index.html" class="btn-back-large">🏠 العودة للرئيسية</a>
+    <a href="index.html" class="btn-back-large"><i data-lucide="house"></i> العودة للرئيسية</a>
   </div>
 
 </section>
@@ -64,6 +64,8 @@
   </div>
 </footer>
 
+<!-- ✏️ جديد: مكتبة الأيقونات (يجب أن تكون قبل app.js) -->
+<script src="lucide.min.js"></script>
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
@@ -72,19 +74,19 @@
 // ═══════════════════════════════════════════════
 // ملاحظة مهمة:
 // - themeToggle و savedTheme معرّفتان في app.js
-// - لا نعيد تعريفهما هنا
-// - نستخدم window.themeToggle إذا احتجنا
+// - دالة icon() أيضاً معرّفة في app.js
+// - لا نعيد تعريفها هنا
 
 (function() {
   'use strict';
 
-  // ✏️ جديد: متغيرات خاصة بجلب الدروس
+  // متغيرات خاصة بجلب الدروس
   let serverLessons = [];
   let lessonsLoaded = false;
   let loadFailed = false;
   let loadAttempts = 0;
 
-  // ✏️ جديد: جلب الدروس وتنظيف المفضلة من الدروس المحذوفة
+  // جلب الدروس وتنظيف المفضلة من الدروس المحذوفة
   async function loadLessons() {
     loadAttempts++;
     try {
@@ -141,7 +143,7 @@
       if (!favs.specializations.length) {
         specsList.innerHTML = `
           <div class="fav-empty">
-            <span>📭</span>
+            <span>${icon('inbox')}</span>
             <p>لا توجد تخصصات في المفضلة بعد</p>
             <a href="index.html">تصفح التخصصات وأضف</a>
           </div>
@@ -155,20 +157,20 @@
           return `
             <div class="fav-card">
               <div class="fav-card-content">
-                <span class="fav-card-icon">🎓</span>
+                <span class="fav-card-icon">${icon('graduation-cap')}</span>
                 <div>
                   <h4>${fav.spec}</h4>
-                  <p>📅 ${yearName}</p>
+                  <p>${icon('calendar')} ${yearName}</p>
                 </div>
               </div>
               <div class="fav-card-actions">
                 <button onclick="window.goToSpecialization('${fav.year}', '${specEscaped}')" 
                         class="fav-go-btn">
-                  🚀 اذهب
+                  ${icon('arrow-left')} اذهب
                 </button>
                 <button onclick="window.removeSpecFavorite('${fav.year}', '${specEscaped}')" 
-                        class="fav-remove-btn">
-                  ❌
+                        class="fav-remove-btn" aria-label="إزالة من المفضلة">
+                  ${icon('x')}
                 </button>
               </div>
             </div>
@@ -189,31 +191,30 @@
       if (!favs.lessons.length) {
         lessonsList.innerHTML = `
           <div class="fav-empty">
-            <span>📭</span>
+            <span>${icon('inbox')}</span>
             <p>لا توجد دروس مُعجَبة بعد</p>
             <a href="index.html">تصفح الدروس وأضف إعجاب</a>
           </div>
         `;
       } else {
-        // ✏️ معدّل: نستخدم الدروس التي جلبناها بأنفسنا
         const allLessonsData = serverLessons;
         
-        // ✏️ معدّل: نفرّق بين "لم يُحمَّل بعد" و"محمَّل وفارغ"
+        // نفرّق بين "لم يُحمَّل بعد" و"محمَّل وفارغ"
         if (!lessonsLoaded) {
           lessonsList.innerHTML = loadFailed
             ? `
               <div class="fav-empty">
-                <span>⚠️</span>
+                <span>${icon('triangle-alert')}</span>
                 <p>تعذر تحميل الدروس الآن. أعد تحميل الصفحة بعد قليل.</p>
               </div>
             `
             : `
               <div class="fav-empty">
-                <span>⏳</span>
+                <span>${icon('hourglass')}</span>
                 <p>جارٍ تحميل الدروس...</p>
               </div>
             `;
-          // (لا حاجة لإعادة المحاولة هنا، تُعرض القائمة بعد انتهاء الجلب)
+          // (تُعرض القائمة بعد انتهاء الجلب)
           return;
         }
         
@@ -222,7 +223,7 @@
         if (!favLessons.length) {
           lessonsList.innerHTML = `
             <div class="fav-empty">
-              <span>📭</span>
+              <span>${icon('inbox')}</span>
               <p>الدروس المُعجَبة لم تعد متاحة</p>
             </div>
           `;
@@ -234,16 +235,16 @@
             return `
               <div class="fav-card">
                 <div class="fav-card-content">
-                  <span class="fav-card-icon">📄</span>
+                  <span class="fav-card-icon">${icon('file-text')}</span>
                   <div>
                     <h4>${title}</h4>
-                    <p>📚 ${subject}</p>
+                    <p>${icon('library')} ${subject}</p>
                   </div>
                 </div>
                 <div class="fav-card-actions">
-                  <a href="${l.url}" target="_blank" class="fav-go-btn">👁️ فتح</a>
-                  <button onclick="window.removeLessonFavorite('${l.id}')" class="fav-remove-btn">
-                    ❌
+                  <a href="${l.url}" target="_blank" class="fav-go-btn">${icon('eye')} فتح</a>
+                  <button onclick="window.removeLessonFavorite('${l.id}')" class="fav-remove-btn" aria-label="إزالة من المفضلة">
+                    ${icon('x')}
                   </button>
                 </div>
               </div>
@@ -282,7 +283,7 @@
   // تشغيل عند التحميل
   // ═══════════════════════════════════════════════
   function init() {
-    loadLessons(); // ✏️ جديد
+    loadLessons();
     renderFavorites();
   }
   

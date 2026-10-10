@@ -13,6 +13,44 @@ let resetTimer = null;
 let resultsTimer = null;
 
 // ═══════════════════════════════════════════════
+// 🎨 نظام الأيقونات (Lucide)
+// ═══════════════════════════════════════════════
+// icon('star') يرجع كود أيقونة، وتتحول تلقائياً إلى رسمة SVG
+function icon(name, cls) {
+  return '<i data-lucide="' + name + '"' + (cls ? ' class="' + cls + '"' : '') + '></i>';
+}
+
+function refreshIcons() {
+  if (window.lucide) window.lucide.createIcons();
+}
+
+// مراقب: كلما أُضيف محتوى جديد للصفحة يحوّل أيقوناته تلقائياً
+(function watchIcons() {
+  if (!window.lucide) return;
+  let scheduled = false;
+  new MutationObserver(function() {
+    if (scheduled) return;
+    scheduled = true;
+    requestAnimationFrame(function() {
+      scheduled = false;
+      refreshIcons();
+    });
+  }).observe(document.body, { childList: true, subtree: true });
+  refreshIcons();
+})();
+
+// رسالة نصية بجانبها أيقونة (النص يُضاف كنص عادي فلا خطر عليه)
+function setMsg(el, msg, iconName) {
+  if (!el) return;
+  el.innerHTML = '';
+  if (!msg) return;
+  if (iconName && window.lucide) {
+    el.insertAdjacentHTML('beforeend', icon(iconName, iconName === 'loader-circle' ? 'spin' : ''));
+  }
+  el.appendChild(document.createTextNode(msg));
+}
+
+// ═══════════════════════════════════════════════
 // 🛠️ أدوات
 // ═══════════════════════════════════════════════
 function $(id) {
@@ -32,10 +70,10 @@ function currentFilesCount() {
   return document.querySelectorAll('.file-input-item').length;
 }
 
-function setStatus(msg, color) {
+function setStatus(msg, color, iconName) {
   const status = $('uploadStatus');
   if (!status) return;
-  status.textContent = msg;
+  setMsg(status, msg, iconName);
   status.style.color = color || '';
 }
 
@@ -46,13 +84,15 @@ function formatSize(bytes) {
   return (bytes / 1024 / 1024).toFixed(2) + ' MB';
 }
 
-function showToast(msg) {
+// iconName اختياري: اسم أيقونة تظهر بجانب الرسالة
+function showToast(msg, iconName) {
   const existing = document.querySelector('.toast-notification');
   if (existing) existing.remove();
   
   const toast = document.createElement('div');
   toast.className = 'toast-notification';
-  toast.textContent = msg;
+  toast.innerHTML = (iconName && window.lucide ? icon(iconName) : '') + '<span></span>';
+  toast.querySelector('span').textContent = msg;
   document.body.appendChild(toast);
   
   setTimeout(function() {
@@ -68,15 +108,25 @@ function showToast(msg) {
   const themeToggle = $('themeToggle');
   if (!themeToggle) return;
   
+  // أيقونة الزر: قمر نهاراً، شمس ليلاً
+  function setThemeIcon(theme) {
+    if (window.lucide) {
+      themeToggle.innerHTML = icon(theme === 'dark' ? 'sun' : 'moon');
+      refreshIcons();
+    } else {
+      themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+    }
+  }
+  
   const savedTheme = localStorage.getItem('theme') || 'light';
   document.documentElement.setAttribute('data-theme', savedTheme);
-  themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+  setThemeIcon(savedTheme);
   
   themeToggle.addEventListener('click', function() {
     const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
     localStorage.setItem('theme', next);
-    themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
+    setThemeIcon(next);
   });
 })();
 
@@ -88,11 +138,11 @@ async function doLogin() {
   const errEl = $('loginError');
   
   if (!pwd) {
-    errEl.textContent = '❌ أدخل كلمة السر';
+    setMsg(errEl, 'أدخل كلمة السر', 'circle-x');
     return;
   }
   
-  errEl.textContent = '⏳ جارٍ التحقق...';
+  setMsg(errEl, 'جارٍ التحقق...', 'loader-circle');
   errEl.style.color = 'var(--emerald)';
   
   try {
@@ -108,14 +158,14 @@ async function doLogin() {
       teacherName = data.name || '';
       sessionStorage.setItem('teacherPwd', pwd);
       sessionStorage.setItem('teacherName', teacherName);
-      errEl.textContent = '';
+      setMsg(errEl, '');
       showPanel();
     } else {
-      errEl.textContent = '❌ كلمة السر غير صحيحة';
+      setMsg(errEl, 'كلمة السر غير صحيحة', 'circle-x');
       errEl.style.color = 'red';
     }
   } catch (err) {
-    errEl.textContent = '❌ خطأ في الاتصال';
+    setMsg(errEl, 'خطأ في الاتصال', 'circle-x');
     errEl.style.color = 'red';
   }
 }
@@ -254,8 +304,8 @@ function addFileInput() {
   
   div.innerHTML = 
     '<div class="file-input-header">' +
-      '<span class="file-number">📄 ملف</span>' +
-      '<button type="button" class="file-remove-btn" title="حذف">✖️</button>' +
+      '<span class="file-number">' + icon('file-text') + ' ملف</span>' +
+      '<button type="button" class="file-remove-btn" title="حذف" aria-label="حذف">' + icon('x') + '</button>' +
     '</div>' +
     '<input type="file" name="files" accept=".pdf,.doc,.docx" class="file-input">' +
     '<input type="text" name="titles" placeholder="عنوان الدرس (اختياري)" class="file-title-input" maxlength="200">';
@@ -268,7 +318,7 @@ function updateFilesCount() {
   const items = document.querySelectorAll('.file-input-item');
   items.forEach(function(item, i) {
     const num = item.querySelector('.file-number');
-    if (num) num.textContent = '📄 ملف ' + (i + 1);
+    if (num) num.innerHTML = icon('file-text') + ' ملف ' + (i + 1);
   });
   
   const countEl = $('filesCount');
@@ -290,7 +340,7 @@ async function handleUpload(e) {
   const subject = $('subjectSelect').value;
   
   if (!year || !specialization || !subject) {
-    setStatus('❌ يجب اختيار السنة والتخصص والمادة', 'red');
+    setStatus('يجب اختيار السنة والتخصص والمادة', 'red', 'circle-x');
     return;
   }
   
@@ -307,7 +357,7 @@ async function handleUpload(e) {
   });
   
   if (files.length === 0) {
-    setStatus('❌ اختر ملفاً واحداً على الأقل', 'red');
+    setStatus('اختر ملفاً واحداً على الأقل', 'red', 'circle-x');
     return;
   }
   
@@ -321,12 +371,12 @@ async function handleUpload(e) {
   }
   
   if (oversized.length > 0) {
-    setStatus('❌ ملفات كبيرة (الحد 10 MB)', 'red');
+    setStatus('ملفات كبيرة (الحد 10 MB)', 'red', 'circle-x');
     alert(
-      '❌ الملفات التالية كبيرة جداً:\n\n' + 
+      'الملفات التالية كبيرة جداً:\n\n' + 
       oversized.join('\n') + 
       '\n\nالحد الأقصى: 10 MB لكل ملف\n\n' +
-      '💡 استخدم ilovepdf.com للضغط'
+      'نصيحة: استخدم ilovepdf.com للضغط'
     );
     return;
   }
@@ -341,7 +391,7 @@ async function handleUpload(e) {
   const submitBtn = $('uploadForm').querySelector('[type="submit"]');
   if (submitBtn) submitBtn.disabled = true;
   
-  setStatus('⏳ جارٍ رفع ' + files.length + ' ملف...', 'var(--emerald)');
+  setStatus('جارٍ رفع ' + files.length + ' ملف...', 'var(--emerald)', 'loader-circle');
   
   try {
     const res = await fetch(API + '/teacher/batch', {
@@ -351,7 +401,7 @@ async function handleUpload(e) {
     });
     
     if (res.status === 401 || res.status === 403) {
-      setStatus('❌ انتهت الجلسة', 'red');
+      setStatus('انتهت الجلسة', 'red', 'circle-x');
       sessionStorage.removeItem('teacherPwd');
       sessionStorage.removeItem('teacherName');
       setTimeout(function() { location.reload(); }, 2000);
@@ -361,16 +411,16 @@ async function handleUpload(e) {
     const data = await res.json();
     
     if (res.ok && data.success) {
-      setStatus('✅ تم رفع ' + data.uploaded + ' ملف بنجاح!', 'green');
+      setStatus('تم رفع ' + data.uploaded + ' ملف بنجاح!', 'green', 'circle-check');
       showResults(data);
       loadMyLessons();
       clearTimeout(resetTimer);
       resetTimer = setTimeout(resetForm, 2000);
     } else {
-      setStatus('❌ ' + (data.error || 'فشل الرفع'), 'red');
+      setStatus(data.error || 'فشل الرفع', 'red', 'circle-x');
     }
   } catch (err) {
-    setStatus('❌ خطأ في الاتصال: ' + err.message, 'red');
+    setStatus('خطأ في الاتصال: ' + err.message, 'red', 'circle-x');
   } finally {
     if (submitBtn) submitBtn.disabled = false;
   }
@@ -385,10 +435,10 @@ function showResults(data) {
   if (!results || !content) return;
   
   let html = '<div class="result-summary">' +
-    '<p>✅ نجح: <strong>' + (Number(data.uploaded) || 0) + '</strong></p>';
+    '<p>' + icon('circle-check') + ' نجح: <strong>' + (Number(data.uploaded) || 0) + '</strong></p>';
   
   if (data.failed > 0) {
-    html += '<p>❌ فشل: <strong>' + Number(data.failed) + '</strong></p>';
+    html += '<p>' + icon('circle-x') + ' فشل: <strong>' + Number(data.failed) + '</strong></p>';
   }
   html += '</div>';
   
@@ -426,7 +476,7 @@ async function loadMyLessons() {
   
   if (!list) return;
   
-  list.innerHTML = '<div class="my-lessons-loading">⏳ جارٍ التحميل...</div>';
+  list.innerHTML = '<div class="my-lessons-loading">' + icon('loader-circle', 'spin') + ' جارٍ التحميل...</div>';
   
   try {
     const res = await fetch(API + '/teacher/my-lessons', {
@@ -434,7 +484,7 @@ async function loadMyLessons() {
     });
     
     if (!res.ok) {
-      list.innerHTML = '<div class="my-lessons-empty">❌ تعذّر تحميل الدروس</div>';
+      list.innerHTML = '<div class="my-lessons-empty">' + icon('circle-x') + ' تعذّر تحميل الدروس</div>';
       return;
     }
     
@@ -445,7 +495,7 @@ async function loadMyLessons() {
     if (!lessons.length) {
       list.innerHTML = 
         '<div class="my-lessons-empty">' +
-          '<span class="empty-icon">📭</span>' +
+          '<span class="empty-icon">' + icon('inbox') + '</span>' +
           '<p>لم ترفع أي دروس بعد</p>' +
         '</div>';
       return;
@@ -460,28 +510,32 @@ async function loadMyLessons() {
       
       return '<div class="my-lesson-item">' +
         '<div class="my-lesson-info">' +
-          '<span class="my-lesson-icon">📄</span>' +
+          '<span class="my-lesson-icon">' + icon('file-text') + '</span>' +
           '<div class="my-lesson-text">' +
             '<h4>' + escapeHtml(lesson.title) + '</h4>' +
-            '<p>📅 ' + escapeHtml(date) + ' · 💾 ' + formatSize(lesson.size) + ' · 📚 ' + escapeHtml(lesson.subject) + '</p>' +
+            '<p>' +
+              '<span>' + icon('calendar') + ' ' + escapeHtml(date) + '</span>' +
+              '<span>' + icon('hard-drive') + ' ' + formatSize(lesson.size) + '</span>' +
+              '<span>' + icon('library') + ' ' + escapeHtml(lesson.subject) + '</span>' +
+            '</p>' +
           '</div>' +
         '</div>' +
         '<div class="my-lesson-actions">' +
-          '<a href="' + escapeHtml(lesson.url) + '" target="_blank" class="my-lesson-btn view" title="فتح">👁️</a>' +
-          '<button type="button" class="my-lesson-btn delete" onclick="deleteMyLesson(\'' + escapeHtml(lesson.id) + '\', \'' + escapeHtml(lesson.title).replace(/'/g, "\\'") + '\')" title="حذف">🗑️</button>' +
+          '<a href="' + escapeHtml(lesson.url) + '" target="_blank" class="my-lesson-btn view" title="فتح" aria-label="فتح">' + icon('eye') + '</a>' +
+          '<button type="button" class="my-lesson-btn delete" onclick="deleteMyLesson(\'' + escapeHtml(lesson.id) + '\', \'' + escapeHtml(lesson.title).replace(/'/g, "\\'") + '\')" title="حذف" aria-label="حذف">' + icon('trash-2') + '</button>' +
         '</div>' +
       '</div>';
     }).join('');
     
   } catch (err) {
     console.error('خطأ:', err);
-    list.innerHTML = '<div class="my-lessons-empty">❌ خطأ في الاتصال</div>';
+    list.innerHTML = '<div class="my-lessons-empty">' + icon('circle-x') + ' خطأ في الاتصال</div>';
   }
 }
 
 // 🗑️ حذف درس
 async function deleteMyLesson(id, title) {
-  if (!confirm('⚠️ هل أنت متأكد من حذف هذا الدرس؟\n\n' + title + '\n\nلا يمكن التراجع!')) {
+  if (!confirm('هل أنت متأكد من حذف هذا الدرس؟\n\n' + title + '\n\nلا يمكن التراجع!')) {
     return;
   }
   
@@ -492,14 +546,14 @@ async function deleteMyLesson(id, title) {
     });
     
     if (res.ok) {
-      showToast('✅ تم حذف الدرس');
+      showToast('تم حذف الدرس', 'circle-check');
       loadMyLessons();
     } else {
       const data = await res.json();
-      showToast('❌ ' + (data.error || 'فشل الحذف'));
+      showToast(data.error || 'فشل الحذف', 'circle-x');
     }
   } catch (err) {
-    showToast('❌ خطأ في الاتصال');
+    showToast('خطأ في الاتصال', 'circle-x');
     console.error('خطأ:', err);
   }
 }
