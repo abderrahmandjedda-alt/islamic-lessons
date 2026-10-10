@@ -22,7 +22,7 @@ if (!process.env.MONGODB_URI) {
 }
 
 // ═══════════════════════════════════════════════
-// 🔐 Google OAuth (يبقى كخطة بديلة)
+// 🔐 Google OAuth (اختياري)
 // ═══════════════════════════════════════════════
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -39,26 +39,10 @@ function getRoleAndName(email) {
     .split(',').map(x => x.trim().toLowerCase()).filter(Boolean);
   if (admins.includes(e)) return { role: 'admin', name: null };
 
-  const raw = process.env.TEACHER_EMAILS || '';
-  try {
-    const parsed = JSON.parse(raw);
-    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-      const keys = Object.keys(parsed);
-      const isEmailMap = keys.some(k => k.includes('@'));
-      if (isEmailMap) {
-        for (const k of keys) {
-          if (k.toLowerCase() === e) {
-            return { role: 'teacher', name: parsed[k] || null };
-          }
-        }
-        return null;
-      }
-      return null;
-    }
-  } catch (err) { /* ليس JSON */ }
+  // الأساتذة من TEACHERS_JSON (الصيغة الجديدة)
+  const t = TEACHERS[e];
+  if (t) return { role: 'teacher', name: t.name || null };
 
-  const teachers = raw.split(',').map(x => x.trim().toLowerCase()).filter(Boolean);
-  if (teachers.includes(e)) return { role: 'teacher', name: null };
   return null;
 }
 
@@ -90,13 +74,49 @@ if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR);
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'jeddah2025';
 const REVIEW_PASSWORD = process.env.REVIEW_PASSWORD || 'Review2025!Jeddah';
 
+// ═══════════════════════════════════════════════
+// 👨‍🏫 قائمة الأساتذة: { email: { name, password } }
+// ═══════════════════════════════════════════════
 let TEACHERS = {};
+let TEACHERS_BY_PWD = {};
+
 try {
-  TEACHERS = JSON.parse(process.env.TEACHERS_JSON || '{}');
+  const raw = JSON.parse(process.env.TEACHERS_JSON || '{}');
+  Object.keys(raw).forEach(function (key) {
+    const val = raw[key];
+    if (typeof val === 'string') {
+      // صيغة قديمة: { name: password }
+      TEACHERS_BY_PWD[val] = key;
+    } else if (val && typeof val === 'object' && val.password) {
+      // صيغة جديدة: { email: { name, password } }
+      const email = key.toLowerCase().trim();
+      TEACHERS[email] = {
+        name: val.name || key,
+        password: val.password
+      };
+      TEACHERS_BY_PWD[val.password] = val.name || key;
+    }
+  });
   console.log(`👨‍🏫 عدد الأساتذة المسجلين: ${Object.keys(TEACHERS).length}`);
 } catch (err) {
   console.error('❌ خطأ في قراءة TEACHERS_JSON:', err.message);
   TEACHERS = {};
+  TEACHERS_BY_PWD = {};
+}
+
+function findTeacherByEmail(email, password) {
+  if (!email || !password) return null;
+  const t = TEACHERS[email.toLowerCase().trim()];
+  if (!t) return null;
+  if (t.password !== password) return null;
+  return t;
+}
+
+function findTeacherByPassword(password) {
+  if (!password) return null;
+  const name = TEACHERS_BY_PWD[password];
+  if (!name) return null;
+  return { name };
 }
 
 // ═══════════════════════════════════════════════
@@ -161,8 +181,8 @@ const checkTeacher = (req, res, next) => {
     return next();
   }
   const pwd = req.headers['x-teacher-password'];
-  const teacherName = Object.keys(TEACHERS).find(name => TEACHERS[name] === pwd);
-  if (teacherName) { req.teacher = teacherName; return next(); }
+  const t = findTeacherByPassword(pwd);
+  if (t) { req.teacher = t.name; return next(); }
   res.status(401).json({ error: 'غير مصرح' });
 };
 
@@ -214,7 +234,7 @@ async function uploadFile(file) {
 }
 
 // ═══════════════════════════════════════════════
-// 🔵 مسارات Google OAuth (اختيارية)
+// 🔵 Google OAuth
 // ═══════════════════════════════════════════════
 app.get('/auth/google', (req, res) => {
   if (!process.env.GOOGLE_CLIENT_ID) return res.status(500).send('Google OAuth غير مضبوط');
@@ -274,7 +294,7 @@ app.post('/auth/logout', (req, res) => {
 });
 
 // ═══════════════════════════════════════════════
-// 🔐 تسجيل الدخول (بريد + كلمة سر)
+// 🔐 تسجيل الدخول (المدير)
 // ═══════════════════════════════════════════════
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
@@ -282,7 +302,6 @@ app.post('/api/login', (req, res) => {
     return res.status(401).json({ error: 'البريد وكلمة السر مطلوبان' });
   }
 
-  // ═══ المدير ═══
   if (password === ADMIN_PASSWORD) {
     if (email && process.env.ADMIN_EMAILS) {
       const admins = process.env.ADMIN_EMAILS.split(',')
@@ -299,25 +318,45 @@ app.post('/api/login', (req, res) => {
     return res.json({ success: true, role: 'admin' });
   }
 
-  // ═══ الأساتذة ═══
-  const teacherName = Object.keys(TEACHERS).find(name => TEACHERS[name] === password);
-  if (teacherName) {
-    req.session.user = {
-      email: (email || '').trim().toLowerCase(),
-      name: teacherName,
-      role: 'teacher'
-    };
-    return res.json({ success: true, role: 'teacher', name: teacherName });
-  }
-
   res.status(401).json({ error: 'البريد أو كلمة السر غير صحيحة' });
 });
 
+// ═══════════════════════════════════════════════
+// 🔐 تسجيل الدخول (الأستاذ)
+// ═══════════════════════════════════════════════
 app.post('/api/teacher-login', (req, res) => {
-  const { password } = req.body;
-  const teacherName = Object.keys(TEACHERS).find(name => TEACHERS[name] === password);
-  if (teacherName) res.json({ success: true, role: 'teacher', name: teacherName });
-  else res.status(401).json({ error: 'كلمة السر غير صحيحة' });
+  const { email, password } = req.body;
+
+  if (!password) {
+    return res.status(401).json({ error: 'البريد وكلمة السر مطلوبان' });
+  }
+
+  // الصيغة الجديدة: بريد + كلمة سر
+  if (email) {
+    const t = findTeacherByEmail(email, password);
+    if (t) {
+      req.session.user = {
+        email: email.toLowerCase().trim(),
+        name: t.name,
+        role: 'teacher'
+      };
+      return res.json({ success: true, role: 'teacher', name: t.name });
+    }
+    return res.status(401).json({ error: 'البريد أو كلمة السر غير صحيحة' });
+  }
+
+  // الصيغة القديمة: كلمة سر فقط
+  const t = findTeacherByPassword(password);
+  if (t) {
+    req.session.user = {
+      email: '',
+      name: t.name,
+      role: 'teacher'
+    };
+    return res.json({ success: true, role: 'teacher', name: t.name });
+  }
+
+  res.status(401).json({ error: 'كلمة السر غير صحيحة' });
 });
 
 app.post('/api/review-login', (req, res) => {

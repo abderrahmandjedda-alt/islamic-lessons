@@ -8,6 +8,85 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  /* ── حقول الدخول ─────────── */
+  .login-fields {
+    display: flex; flex-direction: column; gap: 14px;
+    text-align: right; margin-top: 12px;
+  }
+  .login-fields label {
+    font-size: 13px; color: var(--text-light, #888);
+    margin-bottom: 6px; display: block;
+  }
+  .login-fields input[type="email"],
+  .login-fields input[type="password"] {
+    width: 100%; padding: 14px 16px;
+    border-radius: 10px; border: 1px solid #ddd;
+    font-family: inherit; font-size: 15px;
+    background: #fff; color: #222;
+    box-sizing: border-box;
+  }
+  [data-theme="dark"] .login-fields input[type="email"],
+  [data-theme="dark"] .login-fields input[type="password"] {
+    background: #2a2a2a; color: #eee; border-color: #444;
+  }
+  .login-fields input[type="email"] { direction: ltr; text-align: left; padding-left: 42px; }
+
+  /* ── قائمة الحسابات المحفوظة ─────────── */
+  .email-field-wrap { position: relative; width: 100%; }
+  .email-drop-toggle {
+    position: absolute; left: 8px; top: 50%;
+    transform: translateY(-50%);
+    background: transparent; border: none;
+    cursor: pointer; color: #888;
+    padding: 6px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .email-drop-toggle:hover { background: rgba(0,0,0,.05); }
+  [data-theme="dark"] .email-drop-toggle:hover { background: rgba(255,255,255,.08); }
+
+  .email-dropdown {
+    position: absolute; top: calc(100% + 6px);
+    right: 0; left: 0;
+    background: #fff; border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.12);
+    z-index: 100; max-height: 240px;
+    overflow-y: auto; padding: 6px;
+    text-align: right;
+  }
+  [data-theme="dark"] .email-dropdown { background: #2a2a2a; border-color: #444; }
+  .email-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 8px;
+    cursor: pointer; font-size: 14px;
+    color: inherit; transition: background .12s;
+  }
+  .email-item:hover { background: rgba(0,0,0,.05); }
+  [data-theme="dark"] .email-item:hover { background: rgba(255,255,255,.08); }
+  .email-item .avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: #e8f0ea; color: var(--emerald, #0d5a3a);
+    font-weight: 700; font-size: 14px; flex-shrink: 0;
+  }
+  [data-theme="dark"] .email-item .avatar { background: #1f3a2b; }
+  .email-item .info { flex: 1; min-width: 0; }
+  .email-item .info .email {
+    display: block; font-weight: 700; font-size: 13px;
+    direction: ltr; text-align: left;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .email-item .info .role {
+    display: block; font-size: 12px; color: #888;
+  }
+  .email-item .remove-btn {
+    background: transparent; border: none; cursor: pointer;
+    color: #888; padding: 4px; border-radius: 6px;
+  }
+  .email-item .remove-btn:hover { color: #b42318; background: rgba(180,35,24,.08); }
+  .email-empty { padding: 14px; text-align: center; color: #888; font-size: 13px; }
+</style>
 </head>
 <body>
 
@@ -61,24 +140,46 @@
   <div class="login-box">
     <div class="login-icon"><i data-lucide="lock-keyhole"></i></div>
     <h3>الدخول إلى بوابة الأساتذة</h3>
-    <p>أدخل كلمة السر الخاصة بك للوصول إلى لوحة الرفع</p>
-    
-    <div class="login-input-group">
-      <input 
-        type="password" 
-        id="passwordInput" 
-        placeholder="كلمة السر"
-        autocomplete="current-password"
-        autofocus
-      >
-    </div>
-    
-    <button id="loginBtn" class="btn-primary">
-      <i data-lucide="log-in"></i> دخول
-    </button>
-    
-    <p id="loginError" class="error" role="alert"></p>
-    
+    <p>أدخل بريدك الإلكتروني وكلمة السر</p>
+
+    <form id="loginForm" autocomplete="on" class="login-fields">
+      <div>
+        <label for="emailInput">البريد الإلكتروني</label>
+        <div class="email-field-wrap">
+          <input
+            type="email"
+            id="emailInput"
+            name="email"
+            placeholder="example@gmail.com"
+            autocomplete="username email"
+            required
+          >
+          <button type="button" id="emailDropdownToggle" class="email-drop-toggle" aria-label="عرض الحسابات المحفوظة">
+            <i data-lucide="chevron-down"></i>
+          </button>
+          <div id="emailDropdown" class="email-dropdown" style="display:none;"></div>
+        </div>
+      </div>
+
+      <div>
+        <label for="passwordInput">كلمة السر</label>
+        <input
+          type="password"
+          id="passwordInput"
+          name="password"
+          placeholder="••••••••"
+          autocomplete="current-password"
+          required
+        >
+      </div>
+
+      <button id="loginBtn" class="btn-primary" type="submit">
+        <i data-lucide="log-in"></i> دخول
+      </button>
+
+      <p id="loginError" class="error" role="alert"></p>
+    </form>
+
     <div class="login-note">
       <i data-lucide="lightbulb"></i>
       <span>إذا نسيت كلمة السر، تواصل مع إدارة المنصة</span>
@@ -91,14 +192,9 @@
 <!-- ═══════════════════════════════════════════════ -->
 <div id="teacherPanel" class="container section" style="display:none;">
 
-  <!-- 👋 ترحيب -->
-  <div id="welcomeTeacher" style="display:none;" class="teacher-welcome">
-    <!-- يُملأ بواسطة JavaScript -->
-  </div>
+  <div id="welcomeTeacher" style="display:none;" class="teacher-welcome"></div>
 
-  <!-- بطاقة الرفع -->
   <div class="upload-card teacher-upload-card">
-    
     <div class="upload-card-header">
       <div class="upload-card-title">
         <span class="upload-card-icon"><i data-lucide="upload"></i></span>
@@ -110,14 +206,13 @@
     </div>
 
     <form id="uploadForm" enctype="multipart/form-data">
-      
-      <!-- القسم الأول: معلومات الدرس -->
+
       <div class="form-section">
         <h4 class="form-section-title">
           <span><i data-lucide="clipboard-list"></i></span>
           <span>معلومات الدرس</span>
         </h4>
-        
+
         <div class="form-row">
           <div class="form-group">
             <label for="yearSelect">
@@ -128,7 +223,7 @@
               <option value="">— اختر السنة —</option>
             </select>
           </div>
-          
+
           <div class="form-group">
             <label for="specializationSelect">
               <i data-lucide="graduation-cap"></i> التخصص
@@ -153,7 +248,6 @@
         </div>
       </div>
 
-      <!-- القسم الثاني: الملفات -->
       <div class="form-section">
         <h4 class="form-section-title">
           <span><i data-lucide="file-text"></i></span>
@@ -191,7 +285,6 @@
     </form>
   </div>
 
-  <!-- نتائج الرفع -->
   <div id="uploadResults" class="upload-results" style="display:none;">
     <div class="results-header">
       <span class="results-icon"><i data-lucide="clipboard-check"></i></span>
@@ -200,7 +293,6 @@
     <div id="resultsContent"></div>
   </div>
 
-  <!-- 📚 قسم دروسي المرفوعة -->
   <div class="my-lessons-section">
     <div class="my-lessons-header">
       <div class="my-lessons-title">
@@ -217,9 +309,7 @@
       </button>
     </div>
 
-    <div id="myLessonsList" class="my-lessons-list">
-      <!-- تُملأ بواسطة JavaScript -->
-    </div>
+    <div id="myLessonsList" class="my-lessons-list"></div>
   </div>
 
 </div>
@@ -236,7 +326,6 @@
   </div>
 </footer>
 
-<!-- ✏️ جديد: مكتبة الأيقونات (قبل teacher.js) -->
 <script src="lucide.min.js"></script>
 <script src="data.js"></script>
 <script src="teacher.js"></script>
