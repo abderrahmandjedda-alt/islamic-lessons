@@ -13,7 +13,6 @@ let resultsTimer = null;
 // ═══════════════════════════════════════════════
 // 🎨 نظام الأيقونات (Lucide)
 // ═══════════════════════════════════════════════
-// icon('star') يرجع كود أيقونة، وتتحول تلقائياً إلى رسمة SVG
 function icon(name, cls) {
   return '<i data-lucide="' + name + '"' + (cls ? ' class="' + cls + '"' : '') + '></i>';
 }
@@ -22,7 +21,6 @@ function refreshIcons() {
   if (window.lucide) window.lucide.createIcons();
 }
 
-// مراقب: كلما أُضيف محتوى جديد للصفحة يحوّل أيقوناته تلقائياً
 (function watchIcons() {
   if (!window.lucide) return;
   let scheduled = false;
@@ -37,7 +35,6 @@ function refreshIcons() {
   refreshIcons();
 })();
 
-// رسالة نصية بجانبها أيقونة (النص يُضاف كنص عادي فلا خطر عليه)
 function setMsg(el, msg, iconName) {
   if (!el) return;
   el.innerHTML = '';
@@ -75,17 +72,16 @@ function setStatus(msg, color, iconName) {
   status.style.color = color || '';
 }
 
-// iconName اختياري: اسم أيقونة تظهر بجانب الرسالة
 function showToast(msg, iconName) {
   const existing = document.querySelector('.toast-notification');
   if (existing) existing.remove();
-  
+
   const toast = document.createElement('div');
   toast.className = 'toast-notification';
   toast.innerHTML = (iconName && window.lucide ? icon(iconName) : '') + '<span></span>';
   toast.querySelector('span').textContent = msg;
   document.body.appendChild(toast);
-  
+
   setTimeout(function() {
     toast.classList.add('toast-hide');
     setTimeout(function() { toast.remove(); }, 300);
@@ -93,33 +89,42 @@ function showToast(msg, iconName) {
 }
 
 // ═══════════════════════════════════════════════
-// 🌙 الوضع الليلي
+// 🌙 الوضع الليلي (نسخة مُحسّنة)
 // ═══════════════════════════════════════════════
-(function initTheme() {
-  const themeToggle = $('themeToggle');
-  if (!themeToggle) return;
-  
-  // أيقونة الزر: قمر نهاراً، شمس ليلاً
+document.addEventListener('DOMContentLoaded', function() {
+  const themeToggle = document.getElementById('themeToggle');
+  if (!themeToggle) {
+    console.warn('⚠️ زر الوضع الليلي (#themeToggle) غير موجود');
+    return;
+  }
+
+  const html = document.documentElement;
+
   function setThemeIcon(theme) {
+    const iconName = theme === 'dark' ? 'sun' : 'moon';
     if (window.lucide) {
-      themeToggle.innerHTML = icon(theme === 'dark' ? 'sun' : 'moon');
+      themeToggle.innerHTML = icon(iconName);
       refreshIcons();
     } else {
       themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
     }
   }
-  
+
+  // استرجاع الوضع المحفوظ
   const savedTheme = localStorage.getItem('theme') || 'light';
-  document.documentElement.setAttribute('data-theme', savedTheme);
+  html.setAttribute('data-theme', savedTheme);
   setThemeIcon(savedTheme);
-  
+
+  // التبديل
   themeToggle.addEventListener('click', function() {
-    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
     localStorage.setItem('theme', next);
     setThemeIcon(next);
+    console.log('🌗 الوضع الجديد:', next);
   });
-})();
+});
 
 // ═══════════════════════════════════════════════
 // 📋 ملء القوائم
@@ -127,12 +132,12 @@ function showToast(msg, iconName) {
 function fillYears() {
   const sel = $('yearSelect');
   if (!sel || sel.options.length > 1) return;
-  
+
   if (typeof YEARS === 'undefined') {
     console.error('YEARS غير معرّف');
     return;
   }
-  
+
   YEARS.forEach(function(y) {
     const opt = document.createElement('option');
     opt.value = y.id;
@@ -145,10 +150,10 @@ function updateSpecializations() {
   const yearId = $('yearSelect').value;
   const specSel = $('specializationSelect');
   const subSel = $('subjectSelect');
-  
+
   specSel.innerHTML = '<option value="">— اختر التخصص —</option>';
   subSel.innerHTML = '<option value="">— اختر السنة أولاً —</option>';
-  
+
   if (yearId && typeof SPECIALIZATIONS !== 'undefined' && SPECIALIZATIONS[yearId]) {
     SPECIALIZATIONS[yearId].forEach(function(spec) {
       const opt = document.createElement('option');
@@ -163,9 +168,9 @@ function updateSubjects() {
   const yearId = $('yearSelect').value;
   const spec = $('specializationSelect').value;
   const subSel = $('subjectSelect');
-  
+
   subSel.innerHTML = '<option value="">— اختر المادة —</option>';
-  
+
   if (yearId && spec && typeof SUBJECTS !== 'undefined' && SUBJECTS[yearId] && SUBJECTS[yearId][spec]) {
     SUBJECTS[yearId][spec].forEach(function(sub) {
       const subName = typeof sub === 'string' ? sub : sub.name;
@@ -188,22 +193,22 @@ function addFileInput() {
     alert('الحد الأقصى ' + MAX_FILES + ' ملفات');
     return;
   }
-  
+
   fileCounter++;
   const container = $('filesContainer');
   if (!container) return;
-  
+
   const div = document.createElement('div');
   div.className = 'file-input-item';
-  
-  div.innerHTML = 
+
+  div.innerHTML =
     '<div class="file-input-header">' +
       '<span class="file-number">' + icon('file-text') + ' ملف</span>' +
       '<button type="button" class="file-remove-btn" title="حذف" aria-label="حذف">' + icon('x') + '</button>' +
     '</div>' +
     '<input type="file" name="files" accept=".pdf,.doc,.docx" class="file-input">' +
     '<input type="text" name="titles" placeholder="عنوان الدرس (اختياري)" class="file-title-input" maxlength="200">';
-  
+
   container.appendChild(div);
   updateFilesCount();
 }
@@ -214,7 +219,7 @@ function updateFilesCount() {
     const num = item.querySelector('.file-number');
     if (num) num.innerHTML = icon('file-text') + ' ملف ' + (i + 1);
   });
-  
+
   const countEl = $('filesCount');
   if (countEl) {
     countEl.textContent = items.length + ' من ' + MAX_FILES;
@@ -228,29 +233,28 @@ window.addFileInput = addFileInput;
 // ═══════════════════════════════════════════════
 async function handleSubmit(e) {
   e.preventDefault();
-  
+
   const studentName = $('studentName').value.trim();
   const studentEmail = $('studentEmail').value.trim();
   const year = $('yearSelect').value;
   const specialization = $('specializationSelect').value;
   const subject = $('subjectSelect').value;
   const note = $('noteInput') ? $('noteInput').value.trim() : '';
-  
-  // التحقق من البيانات
+
   if (!studentName) {
     setStatus('يجب كتابة اسمك', 'red', 'circle-x');
     $('studentName').focus();
     return;
   }
-  
+
   if (!year || !specialization || !subject) {
     setStatus('يجب اختيار السنة والتخصص والمادة', 'red', 'circle-x');
     return;
   }
-  
+
   const files = [];
   const titles = [];
-  
+
   document.querySelectorAll('.file-input-item').forEach(function(item) {
     const fileInput = item.querySelector('.file-input');
     const titleInput = item.querySelector('.file-title-input');
@@ -259,13 +263,12 @@ async function handleSubmit(e) {
       titles.push(titleInput ? titleInput.value.trim() : '');
     }
   });
-  
+
   if (files.length === 0) {
     setStatus('اختر ملفاً واحداً على الأقل', 'red', 'circle-x');
     return;
   }
-  
-  // التحقق من حجم الملفات
+
   const oversized = [];
   for (let i = 0; i < files.length; i++) {
     if (files[i].size > MAX_FILE_SIZE) {
@@ -273,26 +276,25 @@ async function handleSubmit(e) {
       oversized.push(files[i].name + ' (' + sizeMB + ' MB)');
     }
   }
-  
+
   if (oversized.length > 0) {
     setStatus('ملفات كبيرة (الحد 10 MB)', 'red', 'circle-x');
     alert(
-      'الملفات التالية كبيرة جداً:\n\n' + 
-      oversized.join('\n') + 
+      'الملفات التالية كبيرة جداً:\n\n' +
+      oversized.join('\n') +
       '\n\nالحد الأقصى: 10 MB لكل ملف\n\n' +
       'نصيحة: استخدم ilovepdf.com للضغط'
     );
     return;
   }
-  
-  // تأكيد
+
   const confirmed = confirm(
     'هل تريد إرسال ' + files.length + ' ملف للمراجعة؟\n\n' +
     'سيتم مراجعتها من قبل الإدارة قبل النشر.'
   );
-  
+
   if (!confirmed) return;
-  
+
   const formData = new FormData();
   formData.append('studentName', studentName);
   formData.append('studentEmail', studentEmail);
@@ -302,24 +304,24 @@ async function handleSubmit(e) {
   formData.append('note', note);
   files.forEach(function(f) { formData.append('files', f); });
   titles.forEach(function(t) { formData.append('titles', t); });
-  
+
   const submitBtn = $('uploadForm').querySelector('[type="submit"]');
   if (submitBtn) submitBtn.disabled = true;
-  
+
   setStatus('جارٍ إرسال ' + files.length + ' ملف...', 'var(--emerald)', 'loader-circle');
-  
+
   try {
     const res = await fetch(API + '/student/submit', {
       method: 'POST',
       body: formData
     });
-    
+
     const data = await res.json();
-    
+
     if (res.ok && data.success) {
       setStatus('تم إرسال ' + data.submitted + ' ملف للمراجعة!', 'green', 'circle-check');
       showResults(data);
-      
+
       clearTimeout(resetTimer);
       resetTimer = setTimeout(resetForm, 3000);
     } else {
@@ -339,15 +341,15 @@ function showResults(data) {
   const results = $('uploadResults');
   const content = $('resultsContent');
   if (!results || !content) return;
-  
-  let html = 
+
+  let html =
     '<div class="result-summary">' +
       '<p>' + icon('circle-check') + ' تم الإرسال: <strong>' + (Number(data.submitted) || 0) + '</strong></p>' +
       (data.failed > 0 ? '<p>' + icon('circle-x') + ' فشل: <strong>' + Number(data.failed) + '</strong></p>' : '') +
       '<p class="result-note">' + icon('mail-check') + ' سيتم مراجعة دروسك ونشرها قريباً</p>' +
       '<p class="result-thanks">شكراً لمساهمتك! ' + icon('hand-heart') + '</p>' +
     '</div>';
-  
+
   if (Array.isArray(data.errors) && data.errors.length > 0) {
     html += '<div class="result-errors"><h4>أخطاء:</h4><ul>';
     data.errors.forEach(function(err) {
@@ -355,10 +357,10 @@ function showResults(data) {
     });
     html += '</ul></div>';
   }
-  
+
   content.innerHTML = html;
   results.style.display = 'block';
-  
+
   clearTimeout(resultsTimer);
   resultsTimer = setTimeout(function() {
     results.style.display = 'none';
@@ -370,10 +372,10 @@ function resetForm() {
   if (container) container.innerHTML = '';
   fileCounter = 0;
   addFileInput();
-  
+
   const noteInput = $('noteInput');
   if (noteInput) noteInput.value = '';
-  
+
   setStatus('', '');
 }
 
@@ -381,30 +383,24 @@ function resetForm() {
 // 🎯 ربط الأحداث
 // ═══════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', function() {
-  // ملء السنوات
   fillYears();
-  
-  // إضافة حقل ملف أول
   addFileInput();
-  
-  // زر إضافة ملف
+
   const addFileBtn = $('addFileBtn');
   if (addFileBtn) {
     addFileBtn.addEventListener('click', addFileInput);
   }
-  
-  // ربط القوائم
+
   const yearSelect = $('yearSelect');
   if (yearSelect) {
     yearSelect.addEventListener('change', updateSpecializations);
   }
-  
+
   const specSelect = $('specializationSelect');
   if (specSelect) {
     specSelect.addEventListener('change', updateSubjects);
   }
-  
-  // حذف ملفات
+
   const container = $('filesContainer');
   if (container) {
     container.addEventListener('click', function(e) {
@@ -417,8 +413,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
-  
-  // النموذج
+
   const form = $('uploadForm');
   if (form) {
     form.addEventListener('submit', handleSubmit);

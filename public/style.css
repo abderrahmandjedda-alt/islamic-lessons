@@ -29,7 +29,7 @@
 }
 
 /* الوضع الليلي */
-[data-theme="dark"] {
+html[data-theme="dark"] {
   --bg: #0a1f18;
   --bg-alt: #0f2a20;
   --card: #14342a;
@@ -64,7 +64,7 @@ body::before {
   content: '';
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background-image: 
+  background-image:
     radial-gradient(circle at 20% 20%, rgba(212, 165, 116, 0.05) 0%, transparent 50%),
     radial-gradient(circle at 80% 80%, rgba(13, 95, 74, 0.05) 0%, transparent 50%),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='none' stroke='%23d4a574' stroke-width='0.5' stroke-opacity='0.08'%3E%3Cpath d='M40 0L50 20L70 30L50 40L40 60L30 40L10 30L30 20Z'/%3E%3Cpath d='M40 10L47 25L62 30L47 35L40 50L33 35L18 30L33 25Z'/%3E%3C/g%3E%3C/svg%3E");
@@ -106,7 +106,7 @@ h1, h2, h3, h4 {
   border-bottom: 1px solid var(--border-gold);
 }
 
-[data-theme="dark"] .navbar {
+html[data-theme="dark"] .navbar {
   background: rgba(20, 52, 42, 0.95);
 }
 
@@ -143,7 +143,7 @@ h1, h2, h3, h4 {
   line-height: 1.2;
 }
 
-[data-theme="dark"] .logo h1 {
+html[data-theme="dark"] .logo h1 {
   color: var(--gold);
 }
 
@@ -177,7 +177,7 @@ nav a:hover {
   color: var(--emerald);
 }
 
-[data-theme="dark"] nav a:hover {
+html[data-theme="dark"] nav a:hover {
   color: var(--gold);
 }
 
@@ -320,7 +320,7 @@ nav a:hover {
   color: var(--gold-dark);
 }
 
-[data-theme="dark"] .crumb-link {
+html[data-theme="dark"] .crumb-link {
   color: var(--gold);
 }
 
@@ -341,7 +341,7 @@ nav a:hover {
   padding-bottom: 20px;
 }
 
-[data-theme="dark"] .section-title { color: var(--gold); }
+html[data-theme="dark"] .section-title { color: var(--gold); }
 
 .section-title::after {
   content: '';
@@ -368,7 +368,7 @@ nav a:hover {
 }
 
 /* ═══════════════════════════════════════════════ */
-/* Back button - مُعدّل */
+/* Back button */
 /* ═══════════════════════════════════════════════ */
 .back-btn {
   background: rgba(255, 255, 255, 0.9);
@@ -388,7 +388,7 @@ nav a:hover {
   gap: 8px;
 }
 
-[data-theme="dark"] .back-btn {
+html[data-theme="dark"] .back-btn {
   background: rgba(20, 52, 42, 0.9);
   color: var(--gold);
 }
@@ -401,7 +401,7 @@ nav a:hover {
 }
 
 /* ═══════════════════════════════════════════════ */
-/* Years Grid - مُعدّل */
+/* Years Grid */
 /* ═══════════════════════════════════════════════ */
 .years-grid {
   display: grid;
@@ -487,7 +487,7 @@ nav a:hover {
 }
 
 /* ═══════════════════════════════════════════════ */
-/* Specializations Grid - مُعدّل (الأهم) */
+/* Specializations Grid */
 /* ═══════════════════════════════════════════════ */
 .specializations-grid {
   display: grid;
@@ -565,7 +565,7 @@ nav a:hover {
 }
 
 /* ═══════════════════════════════════════════════ */
-/* Subjects Grid - مُعدّل */
+/* Subjects Grid */
 /* ═══════════════════════════════════════════════ */
 .subjects-grid {
   display: grid;
@@ -629,7 +629,7 @@ nav a:hover {
 }
 
 /* ═══════════════════════════════════════════════ */
-/* Lessons Grid - مُعدّل */
+/* Lessons Grid */
 /* ═══════════════════════════════════════════════ */
 .lessons-grid {
   display: grid;
@@ -819,7 +819,7 @@ nav a:hover {
   padding-bottom: 2px;
 }
 
-[data-theme="dark"] .empty a { color: var(--gold); }
+html[data-theme="dark"] .empty a { color: var(--gold); }
 
 /* ═══════════════════════════════════════════════ */
 /* Login Box */
@@ -837,15 +837,13 @@ nav a:hover {
   overflow: hidden;
 }
 
-
-
 .login-box h3 {
   margin-bottom: 12px;
   color: var(--emerald);
   font-size: 1.6rem;
 }
 
-[data-theme="dark"] .login-box h3 { color: var(--gold); }
+html[data-theme="dark"] .login-box h3 { color: var(--gold); }
 
 .login-box > p {
   color: var(--text-light);
@@ -931,8 +929,8 @@ nav a:hover {
   gap: 12px;
 }
 
-[data-theme="dark"] .upload-card h3,
-[data-theme="dark"] .manage-card h3 { color: var(--gold); }
+html[data-theme="dark"] .upload-card h3,
+html[data-theme="dark"] .manage-card h3 { color: var(--gold); }
 
 .upload-card label {
   display: block;
@@ -969,7 +967,7 @@ nav a:hover {
 .upload-card .btn-primary { margin-top: 24px; }
 
 /* ═══════════════════════════════════════════════ */
-/* Admin lesson item - مُعدّل */
+/* Admin lesson item */
 /* ═══════════════════════════════════════════════ */
 .admin-lesson-item {
   display: flex;
@@ -1056,7 +1054,7 @@ footer::before {
 .footer-author::before { left: 0; }
 .footer-author::after { right: 0; }
 
-[data-theme="dark"] .footer-author { color: var(--gold-light); }
+html[data-theme="dark"] .footer-author { color: var(--gold-light); }
 
 /* ═══════════════════════════════════════════════ */
 /* Animations */
@@ -1092,32 +1090,32 @@ footer::before {
   .hero h2 { font-size: 1.8rem; }
   .hero > .container > p { font-size: 1rem; }
   .search-hero input { padding: 16px 50px 16px 20px; font-size: 0.95rem; }
-  
+
   .container { padding: 0 16px; }
   .section { padding: 40px 16px; }
   .section-title { font-size: 1.5rem; margin-bottom: 30px; }
-  
+
   nav { width: 100%; justify-content: center; gap: 6px; }
   nav a { font-size: 0.85rem; padding: 8px 12px; }
   .logo h1 { font-size: 1.1rem; }
   .logo-img { width: 42px; height: 42px; }
-  
+
   .years-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
   .year-card { padding: 24px 14px; }
   .year-icon { font-size: 2.5rem; margin-bottom: 12px; }
   .year-card h4 { font-size: 1rem; }
-  
+
   .specializations-grid { grid-template-columns: 1fr; gap: 16px; }
   .specialization-card { padding: 22px; }
-  
+
   .subjects-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 14px; }
   .subject-card { padding: 20px 12px; }
   .subject-card .icon { font-size: 2.2rem; }
   .subject-card h4 { font-size: 0.9rem; }
-  
+
   .lessons-grid { grid-template-columns: 1fr; gap: 16px; }
   .lesson-card { padding: 22px; }
-  
+
   .login-box { padding: 32px 24px; margin: 40px auto; }
   .upload-card, .manage-card { padding: 24px 20px; }
 }
@@ -1196,7 +1194,6 @@ footer::before {
   transform: translateY(0);
 }
 
-/* Menu item - مُعدّل */
 .menu-item {
   display: flex !important;
   align-items: center;
@@ -1217,7 +1214,7 @@ footer::before {
   box-shadow: none !important;
 }
 
-[data-theme="dark"] .menu-item:hover { color: var(--gold) !important; }
+html[data-theme="dark"] .menu-item:hover { color: var(--gold) !important; }
 
 .menu-icon {
   font-size: 1.2rem;
@@ -1319,7 +1316,7 @@ footer::before {
   margin-bottom: 16px;
 }
 
-[data-theme="dark"] .coming-soon-box h2 { color: var(--gold); }
+html[data-theme="dark"] .coming-soon-box h2 { color: var(--gold); }
 
 .coming-soon-box p {
   color: var(--text-light);
@@ -1400,7 +1397,6 @@ footer::before {
   margin: 0 auto;
 }
 
-/* contact-card - مُعدّل */
 .contact-card {
   background: var(--card);
   border-radius: 20px;
@@ -1460,7 +1456,7 @@ footer::before {
   margin-bottom: 4px;
 }
 
-[data-theme="dark"] .contact-card h3 { color: var(--gold); }
+html[data-theme="dark"] .contact-card h3 { color: var(--gold); }
 
 .contact-subtitle {
   font-size: 0.85rem;
@@ -1570,7 +1566,7 @@ footer::before {
   gap: 10px;
 }
 
-[data-theme="dark"] .tips-card h3 { color: var(--gold); }
+html[data-theme="dark"] .tips-card h3 { color: var(--gold); }
 
 .tips-card ul { list-style: none; padding: 0; margin: 0; }
 
@@ -1597,7 +1593,7 @@ footer::before {
 }
 
 .tips-card li strong { color: var(--emerald); font-weight: 700; }
-[data-theme="dark"] .tips-card li strong { color: var(--gold); }
+html[data-theme="dark"] .tips-card li strong { color: var(--gold); }
 
 .contact-back { text-align: center; margin-top: 40px; }
 
@@ -1656,12 +1652,12 @@ footer::before {
   .contact-hero-icon { font-size: 2.8rem; }
   .contact-hero h1 { font-size: 1.6rem; }
   .contact-hero p { font-size: 0.95rem; }
-  
+
   .contact-section { padding: 30px 16px; }
   .contact-card { padding: 22px 18px; }
   .contact-card-icon { font-size: 2rem; width: 50px; height: 50px; }
   .contact-card h3 { font-size: 1.15rem; }
-  
+
   .contact-value { flex-direction: column; align-items: stretch; padding: 14px 16px; }
   .contact-btns { width: 100%; }
   .copy-btn, .whatsapp-btn { flex: 1; justify-content: center; padding: 12px 16px; }
@@ -1733,12 +1729,12 @@ footer::before {
 
 .spec-header { cursor: pointer; }
 
-[data-theme="dark"] .fav-btn {
+html[data-theme="dark"] .fav-btn {
   background: var(--bg);
   border-color: var(--border);
 }
 
-[data-theme="dark"] .fav-btn.active {
+html[data-theme="dark"] .fav-btn.active {
   background: linear-gradient(135deg, var(--gold), var(--gold-dark));
   border-color: var(--gold-light);
 }
@@ -1774,7 +1770,7 @@ footer::before {
   gap: 12px;
 }
 
-[data-theme="dark"] .fav-section-title { color: var(--gold); }
+html[data-theme="dark"] .fav-section-title { color: var(--gold); }
 
 .fav-count {
   font-size: 1rem;
@@ -1792,7 +1788,6 @@ footer::before {
   gap: 14px;
 }
 
-/* fav-card - مُعدّل (المُبلَّغ عنه) */
 .fav-card {
   background: var(--card);
   padding: 20px 24px;
@@ -1918,7 +1913,7 @@ footer::before {
   padding-bottom: 2px;
 }
 
-[data-theme="dark"] .fav-empty a { color: var(--gold); }
+html[data-theme="dark"] .fav-empty a { color: var(--gold); }
 
 @media (max-width: 768px) {
   .fav-card { flex-direction: column; align-items: stretch; }
@@ -1929,7 +1924,7 @@ footer::before {
 }
 
 /* ═══════════════════════════════════════════════ */
-/* 📱 زر تثبيت التطبيق - مُعدّل */
+/* 📱 زر تثبيت التطبيق */
 /* ═══════════════════════════════════════════════ */
 .install-btn {
   background: linear-gradient(135deg, #d4a574, #b8935a) !important;
@@ -2007,7 +2002,6 @@ footer::before {
   margin-top: 10px;
 }
 
-/* file-input-item - مُعدّل */
 .file-input-item {
   background: var(--bg-alt);
   border: 2px solid var(--border);
@@ -2036,7 +2030,7 @@ footer::before {
   font-size: 0.95rem;
 }
 
-[data-theme="dark"] .file-number { color: var(--gold); }
+html[data-theme="dark"] .file-number { color: var(--gold); }
 
 .file-remove-btn {
   background: linear-gradient(135deg, #fee2e2, #fecaca);
@@ -2104,7 +2098,7 @@ footer::before {
   margin-bottom: 20px;
 }
 
-[data-theme="dark"] .upload-results h3 { color: var(--gold); }
+html[data-theme="dark"] .upload-results h3 { color: var(--gold); }
 
 .result-summary {
   padding: 16px;
@@ -2135,7 +2129,7 @@ footer::before {
 }
 
 /* ═══════════════════════════════════════════════ */
-/* 🚪 زر الخروج - مُعدّل */
+/* 🚪 زر الخروج */
 /* ═══════════════════════════════════════════════ */
 .btn-logout {
   background: linear-gradient(135deg, #fee2e2, #fecaca);
@@ -2362,7 +2356,7 @@ footer::before {
   border-bottom: 2px solid var(--border-gold);
 }
 
-[data-theme="dark"] .form-section-title { color: var(--gold); }
+html[data-theme="dark"] .form-section-title { color: var(--gold); }
 .form-section-title span:first-child { font-size: 1.4rem; }
 
 .form-row {
@@ -2422,7 +2416,7 @@ footer::before {
   color: var(--emerald);
 }
 
-[data-theme="dark"] .files-count { color: var(--gold); }
+html[data-theme="dark"] .files-count { color: var(--gold); }
 
 .btn-add-file {
   background: var(--gradient-gold);
@@ -2522,7 +2516,7 @@ footer::before {
   margin: 0;
 }
 
-[data-theme="dark"] .upload-results h3 { color: var(--gold); }
+html[data-theme="dark"] .upload-results h3 { color: var(--gold); }
 
 .result-summary {
   padding: 20px;
@@ -2548,7 +2542,7 @@ footer::before {
   font-size: 1.2rem;
 }
 
-[data-theme="dark"] .result-summary strong { color: var(--gold); }
+html[data-theme="dark"] .result-summary strong { color: var(--gold); }
 
 .result-errors {
   background: linear-gradient(135deg, #fef2f2, #fee2e2);
@@ -2624,7 +2618,7 @@ button:disabled {
   animation: fadeInUp 0.5s ease;
 }
 
-[data-theme="dark"] .teacher-welcome {
+html[data-theme="dark"] .teacher-welcome {
   background: linear-gradient(135deg, #0d5f4a, #084636);
 }
 
@@ -2711,7 +2705,7 @@ button:disabled {
   animation: fadeInUp 0.5s ease;
 }
 
-[data-theme="dark"] .student-notice {
+html[data-theme="dark"] .student-notice {
   background: linear-gradient(135deg, #0c4a6e, #075985);
   border-color: #0ea5e9;
 }
@@ -2727,7 +2721,7 @@ button:disabled {
   margin-bottom: 4px;
 }
 
-[data-theme="dark"] .notice-text strong { color: #7dd3fc; }
+html[data-theme="dark"] .notice-text strong { color: #7dd3fc; }
 
 .notice-text p {
   color: #075985;
@@ -2736,7 +2730,7 @@ button:disabled {
   margin: 0;
 }
 
-[data-theme="dark"] .notice-text p { color: #bae6fd; }
+html[data-theme="dark"] .notice-text p { color: #bae6fd; }
 
 .student-upload-card { border: 2px solid #7dd3fc !important; }
 
@@ -2753,7 +2747,7 @@ button:disabled {
 }
 
 .student-upload-card .form-section-title { color: #0369a1; }
-[data-theme="dark"] .student-upload-card .form-section-title { color: #7dd3fc; }
+html[data-theme="dark"] .student-upload-card .form-section-title { color: #7dd3fc; }
 
 .result-note {
   padding: 12px 16px;
@@ -2818,7 +2812,7 @@ button:disabled {
   align-items: center;
   gap: 14px;
   z-index: 2147483647;
-  box-shadow: 
+  box-shadow:
     0 10px 40px rgba(0, 0, 0, 0.4),
     0 0 30px rgba(212, 165, 116, 0.3);
   opacity: 0;
@@ -2972,7 +2966,7 @@ button:disabled {
   margin-bottom: 4px;
 }
 
-[data-theme="dark"] .review-title h3 { color: var(--gold); }
+html[data-theme="dark"] .review-title h3 { color: var(--gold); }
 
 .review-subtitle {
   font-family: 'Tajawal', sans-serif;
@@ -2986,7 +2980,7 @@ button:disabled {
   font-size: 1rem;
 }
 
-[data-theme="dark"] .review-subtitle span { color: var(--gold); }
+html[data-theme="dark"] .review-subtitle span { color: var(--gold); }
 
 .review-login { padding: 20px 0; }
 
@@ -3009,7 +3003,7 @@ button:disabled {
   margin-bottom: 8px;
 }
 
-[data-theme="dark"] .review-login-box h4 { color: var(--gold); }
+html[data-theme="dark"] .review-login-box h4 { color: var(--gold); }
 
 .review-login-box p {
   font-family: 'Tajawal', sans-serif;
@@ -3055,7 +3049,6 @@ button:disabled {
   opacity: 0.6;
 }
 
-/* pending-item - مُعدّل */
 .pending-item {
   background: var(--bg-alt);
   border: 2px solid var(--border);
@@ -3113,7 +3106,7 @@ button:disabled {
 }
 
 .pending-meta strong { color: var(--emerald); }
-[data-theme="dark"] .pending-meta strong { color: var(--gold); }
+html[data-theme="dark"] .pending-meta strong { color: var(--gold); }
 
 .pending-note {
   padding: 10px 14px;
@@ -3231,7 +3224,7 @@ button:disabled {
   margin-bottom: 4px;
 }
 
-[data-theme="dark"] .my-lessons-title h3 { color: var(--gold); }
+html[data-theme="dark"] .my-lessons-title h3 { color: var(--gold); }
 
 .my-lessons-subtitle {
   font-family: 'Tajawal', sans-serif;
@@ -3245,7 +3238,7 @@ button:disabled {
   font-size: 1rem;
 }
 
-[data-theme="dark"] .my-lessons-subtitle span { color: var(--gold); }
+html[data-theme="dark"] .my-lessons-subtitle span { color: var(--gold); }
 
 .btn-refresh {
   background: var(--bg-alt);
@@ -3272,7 +3265,6 @@ button:disabled {
 
 .my-lessons-list { display: flex; flex-direction: column; gap: 12px; }
 
-/* my-lesson-item - مُعدّل */
 .my-lesson-item {
   display: flex;
   justify-content: space-between;
@@ -3398,8 +3390,9 @@ button:disabled {
 }
 
 .admin-hidden { display: none !important; }
+
 /* ═══════════════════════════════════════════════ */
-/* 🛠️ إصلاح اهتزاز بطاقة المفضلة عند تمرير الفأرة */
+/* 🛠️ إصلاح اهتزاز بطاقة المفضلة */
 /* ═══════════════════════════════════════════════ */
 .fav-card,
 .fav-card:hover {
@@ -3410,6 +3403,7 @@ button:disabled {
 .fav-card {
   transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
 }
+
 /* ═══════════════════════════════════════════════ */
 /* 🎨 الأيقونات (Lucide) */
 /* ═══════════════════════════════════════════════ */
@@ -3449,11 +3443,11 @@ nav a,
 .year-icon svg { width: 56px; height: 56px; stroke-width: 1.5; color: var(--emerald); }
 .spec-icon svg { width: 34px; height: 34px; stroke-width: 1.75; color: var(--emerald); }
 .subject-card .icon svg { width: 42px; height: 42px; stroke-width: 1.5; color: var(--emerald); }
-[data-theme="dark"] .year-icon svg,
-[data-theme="dark"] .spec-icon svg,
-[data-theme="dark"] .subject-card .icon svg { color: var(--gold); }
+html[data-theme="dark"] .year-icon svg,
+html[data-theme="dark"] .spec-icon svg,
+html[data-theme="dark"] .subject-card .icon svg { color: var(--gold); }
 
-/* المفضلة: الأيقونة تمتلئ عند التفعيل */
+/* المفضلة */
 .fav-btn svg { width: 18px; height: 18px; }
 .lesson-fav svg { width: 16px; height: 16px; }
 .fav-btn.active svg { fill: currentColor; }
@@ -3479,19 +3473,18 @@ nav a,
   .year-icon svg { width: 40px; height: 40px; }
   .subject-card .icon svg { width: 34px; height: 34px; }
 }
+
 /* ═══════════════════════════════════════════════ */
 /* 👆 تحسين الضغط على الأزرار والأيقونات */
 /* ═══════════════════════════════════════════════ */
-
-/* الأيقونة لا تلتقط الضغطة، فتذهب مباشرة للزر أو الرابط */
 svg.lucide { pointer-events: none; }
 
-/* إزالة تأخير الضغط على الجوال */
 a, button, .year-card, .specialization-card, .subject-card,
 .lesson-card, .menu-item, .logo {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
+
 /* ═══════════════════════════════════════════════ */
 /* ⭐ أيقونات صفحة المفضلة */
 /* ═══════════════════════════════════════════════ */
@@ -3505,7 +3498,7 @@ a, button, .year-card, .specialization-card, .subject-card,
 .fav-section-title svg { width: 28px; height: 28px; stroke-width: 1.75; }
 
 .fav-card-icon svg { width: 24px; height: 24px; stroke-width: 1.75; color: var(--emerald); }
-[data-theme="dark"] .fav-card-icon svg { color: var(--gold); }
+html[data-theme="dark"] .fav-card-icon svg { color: var(--gold); }
 
 .fav-card-content p {
   display: flex;
@@ -3520,11 +3513,12 @@ a, button, .year-card, .specialization-card, .subject-card,
   height: 48px;
   stroke-width: 1.25;
 }
+
 /* ═══════════════════════════════════════════════ */
 /* 📞 أيقونات صفحة التواصل وإشعار الذكر */
 /* ═══════════════════════════════════════════════ */
 .contact-card-icon svg { width: 30px; height: 30px; stroke-width: 1.75; color: var(--emerald); }
-[data-theme="dark"] .contact-card-icon svg { color: var(--gold); }
+html[data-theme="dark"] .contact-card-icon svg { color: var(--gold); }
 
 .copy-btn svg,
 .whatsapp-btn svg { width: 16px; height: 16px; }
@@ -3535,6 +3529,7 @@ a, button, .year-card, .specialization-card, .subject-card,
 /* إشعار الذكر */
 .adhkar-notify-icon svg { width: 30px; height: 30px; stroke-width: 1.5; color: var(--gold-light); }
 .adhkar-notify-close svg { width: 14px; height: 14px; }
+
 /* ═══════════════════════════════════════════════ */
 /* 👨‍🏫 أيقونات بوابة الأساتذة */
 /* ═══════════════════════════════════════════════ */
@@ -3583,24 +3578,25 @@ a, button, .year-card, .specialization-card, .subject-card,
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* الوضع الليلي */
-[data-theme="dark"] .login-icon svg,
-[data-theme="dark"] .form-group label svg,
-[data-theme="dark"] .files-info-icon svg,
-[data-theme="dark"] .results-icon svg,
-[data-theme="dark"] .my-lessons-icon svg,
-[data-theme="dark"] .my-lesson-icon svg { color: var(--gold); }
+html[data-theme="dark"] .login-icon svg,
+html[data-theme="dark"] .form-group label svg,
+html[data-theme="dark"] .files-info-icon svg,
+html[data-theme="dark"] .results-icon svg,
+html[data-theme="dark"] .my-lessons-icon svg,
+html[data-theme="dark"] .my-lesson-icon svg { color: var(--gold); }
+
 /* ═══════════════════════════════════════════════ */
 /* 👨‍🎓 أيقونات بوابة التلاميذ */
 /* ═══════════════════════════════════════════════ */
 .student-hero-icon svg { width: 64px; height: 64px; stroke-width: 1.25; color: #fff; }
 
 .notice-icon svg { width: 32px; height: 32px; stroke-width: 1.5; color: #0369a1; }
-[data-theme="dark"] .notice-icon svg { color: #7dd3fc; }
+html[data-theme="dark"] .notice-icon svg { color: #7dd3fc; }
 
 .student-upload-card .form-group label svg,
 .student-upload-card .form-section-title svg { color: #0369a1; }
-[data-theme="dark"] .student-upload-card .form-group label svg,
-[data-theme="dark"] .student-upload-card .form-section-title svg { color: #7dd3fc; }
+html[data-theme="dark"] .student-upload-card .form-group label svg,
+html[data-theme="dark"] .student-upload-card .form-section-title svg { color: #7dd3fc; }
 
 .result-note { display: flex; align-items: center; gap: 8px; }
 .result-note svg { width: 20px; height: 20px; }
