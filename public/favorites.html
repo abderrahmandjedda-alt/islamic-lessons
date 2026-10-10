@@ -77,6 +77,45 @@
 
 (function() {
   'use strict';
+
+  // ✏️ جديد: متغيرات خاصة بجلب الدروس
+  let serverLessons = [];
+  let lessonsLoaded = false;
+  let loadFailed = false;
+  let loadAttempts = 0;
+
+  // ✏️ جديد: جلب الدروس وتنظيف المفضلة من الدروس المحذوفة
+  async function loadLessons() {
+    loadAttempts++;
+    try {
+      const res = await fetch('/api/lessons');
+      if (!res.ok) throw new Error('استجابة غير صالحة');
+      const data = await res.json();
+      if (!Array.isArray(data)) throw new Error('بيانات غير صالحة');
+
+      serverLessons = data;
+      lessonsLoaded = true;
+      loadFailed = false;
+
+      // حذف الدروس المفضلة التي لم تعد موجودة على السيرفر
+      const favs = getFavorites();
+      const existingIds = serverLessons.map(l => l.id);
+      const cleaned = favs.lessons.filter(id => existingIds.includes(id));
+      if (cleaned.length !== favs.lessons.length) {
+        favs.lessons = cleaned;
+        saveFavorites(favs);
+      }
+    } catch (err) {
+      console.error('تعذر جلب الدروس:', err);
+      // لا نحذف أي شيء من المفضلة عند فشل الاتصال، ونعيد المحاولة
+      if (loadAttempts < 5) {
+        setTimeout(loadLessons, 3000);
+      } else {
+        loadFailed = true; // بعد 5 محاولات نعرض رسالة بدل الانتظار الأبدي
+      }
+    }
+    renderFavorites();
+  }
   
   // ═══════════════════════════════════════════════
   // عرض المفضلة
@@ -156,19 +195,25 @@
           </div>
         `;
       } else {
-        // التحقق من تحميل الدروس
-        const allLessonsData = (typeof allLessons !== 'undefined' && Array.isArray(allLessons)) ? allLessons : [];
+        // ✏️ معدّل: نستخدم الدروس التي جلبناها بأنفسنا
+        const allLessonsData = serverLessons;
         
-        if (!allLessonsData.length) {
-          // الدروس لم تُحمّل بعد - نعيد المحاولة
-          lessonsList.innerHTML = `
-            <div class="fav-empty">
-              <span>⏳</span>
-              <p>جارٍ تحميل الدروس...</p>
-            </div>
-          `;
-          // إعادة المحاولة بعد 500ms
-          setTimeout(renderFavorites, 500);
+        // ✏️ معدّل: نفرّق بين "لم يُحمَّل بعد" و"محمَّل وفارغ"
+        if (!lessonsLoaded) {
+          lessonsList.innerHTML = loadFailed
+            ? `
+              <div class="fav-empty">
+                <span>⚠️</span>
+                <p>تعذر تحميل الدروس الآن. أعد تحميل الصفحة بعد قليل.</p>
+              </div>
+            `
+            : `
+              <div class="fav-empty">
+                <span>⏳</span>
+                <p>جارٍ تحميل الدروس...</p>
+              </div>
+            `;
+          // (لا حاجة لإعادة المحاولة هنا، تُعرض القائمة بعد انتهاء الجلب)
           return;
         }
         
@@ -237,11 +282,8 @@
   // تشغيل عند التحميل
   // ═══════════════════════════════════════════════
   function init() {
+    loadLessons(); // ✏️ جديد
     renderFavorites();
-    
-    // إعادة المحاولة بعد تحميل الدروس (لضمان عرض الدروس المُعجَبة)
-    setTimeout(renderFavorites, 800);
-    setTimeout(renderFavorites, 1500);
   }
   
   if (document.readyState === 'complete') {
