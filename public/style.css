@@ -3415,3 +3415,85 @@ button:disabled {
 .fav-card {
   transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
 }
+/* ═══════════════════════════════════════════════ */
+/* 🎨 الأيقونات (Lucide) */
+/* ═══════════════════════════════════════════════ */
+svg.lucide {
+  width: 1.1em;
+  height: 1.1em;
+  stroke-width: 2;
+  flex-shrink: 0;
+  vertical-align: -0.15em;
+}
+
+nav a,
+.crumb-link,
+.btn-admin {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.theme-btn svg { width: 20px; height: 20px; }
+.menu-icon svg { width: 20px; height: 20px; }
+
+/* البحث */
+.search-hero::after { content: none; }
+.search-ico {
+  position: absolute;
+  left: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  color: var(--emerald);
+  pointer-events: none;
+}
+
+/* السنوات والتخصصات والمواد */
+.year-icon svg { width: 56px; height: 56px; stroke-width: 1.5; color: var(--emerald); }
+.spec-icon svg { width: 34px; height: 34px; stroke-width: 1.75; color: var(--emerald); }
+.subject-card .icon svg { width: 42px; height: 42px; stroke-width: 1.5; color: var(--emerald); }
+[data-theme="dark"] .year-icon svg,
+[data-theme="dark"] .spec-icon svg,
+[data-theme="dark"] .subject-card .icon svg { color: var(--gold); }
+
+/* المفضلة: الأيقونة تمتلئ عند التفعيل */
+.fav-btn svg { width: 18px; height: 18px; }
+.lesson-fav svg { width: 16px; height: 16px; }
+.fav-btn.active svg { fill: currentColor; }
+
+/* الدروس */
+.lesson-meta span { display: inline-flex; align-items: center; gap: 6px; }
+
+/* الحالة الفارغة */
+.empty::before { content: none; }
+.empty-ico {
+  display: block;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 16px;
+  stroke-width: 1.25;
+  opacity: 0.5;
+}
+
+/* الإشعار */
+.toast-notification { display: flex; align-items: center; gap: 8px; }
+
+@media (max-width: 768px) {
+  .year-icon svg { width: 40px; height: 40px; }
+  .subject-card .icon svg { width: 34px; height: 34px; }
+}
+/* ═══════════════════════════════════════════════ */
+/* 👆 تحسين الضغط على الأزرار والأيقونات */
+/* ═══════════════════════════════════════════════ */
+
+/* الأيقونة لا تلتقط الضغطة، فتذهب مباشرة للزر أو الرابط */
+svg.lucide { pointer-events: none; }
+
+/* إزالة تأخير الضغط على الجوال */
+a, button, .year-card, .specialization-card, .subject-card,
+.lesson-card, .menu-item, .logo {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}

@@ -88,41 +88,40 @@
       </div>
     </div>
     <nav>
-      <a href="#" id="homeBtn">🏠 الرئيسية</a>
-      <!-- ✏️ تم التعديل: أضفنا admin-hidden لإخفاء الزر افتراضياً -->
-      <a href="admin.html" class="btn-admin admin-hidden" id="adminBtn">👨‍🎓 لوحة التحكم</a>
-      <button id="themeToggle" class="theme-btn">🌙</button>
-      <button id="menuToggle" class="theme-btn menu-toggle" aria-label="القائمة">☰</button>
+      <a href="#" id="homeBtn"><i data-lucide="house"></i> الرئيسية</a>
+      <a href="admin.html" class="btn-admin admin-hidden" id="adminBtn"><i data-lucide="shield-check"></i> لوحة التحكم</a>
+      <button id="themeToggle" class="theme-btn" aria-label="تبديل الوضع"></button>
+      <button id="menuToggle" class="theme-btn menu-toggle" aria-label="القائمة"><i data-lucide="menu"></i></button>
 
       <!-- القائمة المنسدلة -->
       <div id="menuDropdown" class="menu-dropdown">
         <a href="favorites.html" class="menu-item">
-          <span class="menu-icon">⭐</span>
+          <span class="menu-icon"><i data-lucide="star"></i></span>
           <span>مفضلتي</span>
         </a>
         <div class="menu-divider"></div>
         <div class="menu-group-title">
-          <span class="menu-icon">🚪</span>
+          <span class="menu-icon"><i data-lucide="upload"></i></span>
           <span>رفع الدروس</span>
         </div>
         <a href="teacher.html" class="menu-item menu-sub">
-          <span class="menu-icon">👨‍🏫</span>
+          <span class="menu-icon"><i data-lucide="presentation"></i></span>
           <span>بوابة الأساتذة</span>
         </a>
         <a href="student.html" class="menu-item menu-sub">
-          <span class="menu-icon">👨‍🎓</span>
-          <span>بوابة الطلبة</span>
+          <span class="menu-icon"><i data-lucide="graduation-cap"></i></span>
+          <span>بوابة التلاميذ</span>
         </a>
         <div class="menu-divider"></div>
         <a href="contact.html" class="menu-item">
-          <span class="menu-icon">📞</span>
+          <span class="menu-icon"><i data-lucide="phone"></i></span>
           <span>تواصل مع الإدارة</span>
         </a>
 
         <!-- زر تثبيت التطبيق -->
         <div class="menu-divider"></div>
         <button id="installAppBtn" class="menu-item install-btn" style="display:none;">
-          <span class="menu-icon">📱</span>
+          <span class="menu-icon"><i data-lucide="smartphone"></i></span>
           <span>تثبيت التطبيق</span>
         </button>
       </div>
@@ -137,6 +136,7 @@
     <p>اختر السنة → التخصص → المادة → تصفّح الدروس</p>
     <div class="search-hero">
       <input type="text" id="searchInput" placeholder="ابحث عن درس، مادة، أو ملف...">
+      <i data-lucide="search" class="search-ico"></i>
     </div>
   </div>
 </section>
@@ -167,6 +167,7 @@
   <h2 class="section-title" id="lessonsTitle">الدروس</h2>
   <div id="lessonsGrid" class="lessons-grid"></div>
   <div id="emptyMsg" class="empty" style="display:none;">
+    <i data-lucide="book-open" class="empty-ico"></i>
     لا توجد دروس في هذه المادة بعد.
   </div>
 </section>
@@ -176,6 +177,7 @@
   <h2 class="section-title">نتائج البحث</h2>
   <div id="searchResultsGrid" class="lessons-grid"></div>
   <div id="searchEmptyMsg" class="empty" style="display:none;">
+    <i data-lucide="search-x" class="empty-ico"></i>
     لا توجد نتائج مطابقة لبحثك.
   </div>
 </section>
@@ -248,6 +250,8 @@ window.addEventListener('appinstalled', () => {
 });
 </script>
 
+<!-- ✏️ جديد: مكتبة الأيقونات (يجب أن تكون قبل app.js) -->
+<script src="lucide.min.js"></script>
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script src="adhkar.js"></script>

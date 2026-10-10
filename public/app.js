@@ -6,6 +6,42 @@ const API = '/api';
 let allLessons = [];
 
 // ═══════════════════════════════════════════════
+// 🎨 نظام الأيقونات (Lucide)
+// ═══════════════════════════════════════════════
+// icon('star') يرجع كود أيقونة، وتتحول تلقائياً إلى رسمة SVG
+function icon(name, cls) {
+  return `<i data-lucide="${name}"${cls ? ` class="${cls}"` : ''}></i>`;
+}
+
+function refreshIcons() {
+  if (window.lucide) window.lucide.createIcons();
+}
+
+// مراقب: كلما أُضيف محتوى جديد للصفحة (دروس، بطاقات...) يحوّل أيقوناته تلقائياً
+(function watchIcons() {
+  if (!window.lucide) return;
+  let scheduled = false;
+  new MutationObserver(() => {
+    if (scheduled) return;
+    scheduled = true;
+    requestAnimationFrame(() => {
+      scheduled = false;
+      refreshIcons();
+    });
+  }).observe(document.body, { childList: true, subtree: true });
+  refreshIcons();
+})();
+
+// أيقونة كل سنة دراسية (بدل الإيموجي القديمة في data.js)
+const YEAR_ICONS = {
+  L1: 'sprout',
+  L2: 'book-open',
+  L3: 'library',
+  M1: 'graduation-cap',
+  M2: 'award'
+};
+
+// ═══════════════════════════════════════════════
 // ⭐ نظام المفضلة (localStorage)
 // ═══════════════════════════════════════════════
 const FAVORITES_KEY = 'islamic_lessons_favorites';
@@ -39,10 +75,10 @@ function toggleFavoriteSpecialization(yearId, spec) {
   
   if (index >= 0) {
     favs.specializations.splice(index, 1);
-    showToast('🗑️ تمت الإزالة من المفضلة');
+    showToast('تمت الإزالة من المفضلة', 'trash-2');
   } else {
     favs.specializations.push({ year: yearId, spec });
-    showToast('⭐ تمت الإضافة للمفضلة');
+    showToast('تمت الإضافة للمفضلة', 'star');
   }
   
   saveFavorites(favs);
@@ -56,10 +92,10 @@ function toggleFavoriteLesson(lessonId) {
   
   if (index >= 0) {
     favs.lessons.splice(index, 1);
-    showToast('🗑️ تمت الإزالة من المفضلة');
+    showToast('تمت الإزالة من المفضلة', 'trash-2');
   } else {
     favs.lessons.push(lessonId);
-    showToast('❤️ تمت الإضافة للمفضلة');
+    showToast('تمت الإضافة للمفضلة', 'heart');
   }
   
   saveFavorites(favs);
@@ -84,14 +120,25 @@ function isLessonFavorite(lessonId) {
 const themeToggle = document.getElementById('themeToggle');
 const savedTheme = localStorage.getItem('theme') || 'light';
 document.documentElement.setAttribute('data-theme', savedTheme);
-themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+// أيقونة الزر: قمر في الوضع النهاري، شمس في الوضع الليلي
+// (إن لم تُحمَّل مكتبة الأيقونات في الصفحة نستعمل الإيموجي القديمة مؤقتاً)
+function setThemeIcon(theme) {
+  if (window.lucide) {
+    themeToggle.innerHTML = icon(theme === 'dark' ? 'sun' : 'moon');
+    refreshIcons();
+  } else {
+    themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+  }
+}
+setThemeIcon(savedTheme);
 
 themeToggle.addEventListener('click', () => {
   const current = document.documentElement.getAttribute('data-theme');
   const next = current === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
   localStorage.setItem('theme', next);
-  themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
+  setThemeIcon(next);
 });
 
 // ═══════════════════════════════════════════════
@@ -134,7 +181,7 @@ function renderYears() {
     const specs = SPECIALIZATIONS[y.id] || [];
     return `
       <div class="year-card" onclick="selectYear('${y.id}')">
-        <span class="year-icon">${y.icon}</span>
+        <span class="year-icon">${icon(YEAR_ICONS[y.id] || 'book-open')}</span>
         <h4>${y.name}</h4>
         <span class="count">${specs.length} تخصص</span>
       </div>
@@ -157,7 +204,7 @@ function selectYear(yearId) {
   const yearObj = YEARS.find(y => y.id === yearId);
   document.getElementById('specTitle').textContent = `تخصصات ${yearObj.name}`;
   document.getElementById('breadcrumb').innerHTML = `
-    <span onclick="goHome()" class="crumb-link">🏛️ الرئيسية</span>
+    <span onclick="goHome()" class="crumb-link">${icon('landmark')} الرئيسية</span>
     <span class="crumb-sep">›</span>
     <span class="crumb-current">${yearObj.name}</span>
   `;
@@ -187,16 +234,16 @@ function renderSpecializations(yearId) {
     return `
       <div class="specialization-card">
         <div class="spec-header" onclick="selectSpecialization('${specEscaped}')">
-          <span class="spec-icon">🎓</span>
+          <span class="spec-icon">${icon('graduation-cap')}</span>
           <h4>${spec}</h4>
         </div>
         <div class="spec-meta">
-          <span>📚 ${subjects.length} مادة</span>
-          <span>📄 ${lessonsCount} درس</span>
+          <span>${icon('library')} ${subjects.length} مادة</span>
+          <span>${icon('file-text')} ${lessonsCount} درس</span>
           <button class="fav-btn ${isFav ? 'active' : ''}" 
                   onclick="handleSpecFavorite(event, '${yearId}', '${specEscaped}')"
                   title="${isFav ? 'إزالة من المفضلة' : 'أضف للمفضلة'}">
-            ${isFav ? '⭐' : '☆'}
+            ${icon('star')}
           </button>
         </div>
       </div>
@@ -209,10 +256,9 @@ function handleSpecFavorite(event, yearId, spec) {
   event.stopPropagation();
   const added = toggleFavoriteSpecialization(yearId, spec);
   
-  // تحديث الزر مباشرة
+  // تحديث الزر مباشرة (النجمة تمتلئ عند التفعيل عبر CSS)
   const btn = event.currentTarget;
   btn.classList.toggle('active', added);
-  btn.textContent = added ? '⭐' : '☆';
   btn.title = added ? 'إزالة من المفضلة' : 'أضف للمفضلة';
 }
 
@@ -227,7 +273,7 @@ function selectSpecialization(spec) {
   const yearObj = YEARS.find(y => y.id === currentYear);
   document.getElementById('subjectTitle').textContent = `مواد ${spec}`;
   document.getElementById('breadcrumb').innerHTML = `
-    <span onclick="goHome()" class="crumb-link">🏛️ الرئيسية</span>
+    <span onclick="goHome()" class="crumb-link">${icon('landmark')} الرئيسية</span>
     <span class="crumb-sep">›</span>
     <span onclick="selectYear('${currentYear}')" class="crumb-link">${yearObj.name}</span>
     <span class="crumb-sep">›</span>
@@ -249,7 +295,6 @@ function renderSubjects() {
   
   grid.innerHTML = subjects.map(sub => {
     const subName = typeof sub === 'string' ? sub : sub.name;
-    const subIcon = typeof sub === 'string' ? '📖' : sub.icon;
     
     const lessonsCount = allLessons.filter(l => 
       l.year === currentYear && 
@@ -259,7 +304,7 @@ function renderSubjects() {
     
     return `
       <div class="subject-card" onclick="selectSubject('${subName.replace(/'/g, "\\'")}')">
-        <span class="icon">${subIcon}</span>
+        <span class="icon">${icon('book-open')}</span>
         <h4>${subName}</h4>
         <span class="count">${lessonsCount} درس</span>
       </div>
@@ -278,7 +323,7 @@ function selectSubject(subName) {
   const yearObj = YEARS.find(y => y.id === currentYear);
   document.getElementById('lessonsTitle').textContent = `دروس ${subName}`;
   document.getElementById('breadcrumb').innerHTML = `
-    <span onclick="goHome()" class="crumb-link">🏛️ الرئيسية</span>
+    <span onclick="goHome()" class="crumb-link">${icon('landmark')} الرئيسية</span>
     <span class="crumb-sep">›</span>
     <span onclick="selectYear('${currentYear}')" class="crumb-link">${yearObj.name}</span>
     <span class="crumb-sep">›</span>
@@ -345,18 +390,18 @@ function renderLessons(lessons, gridId, emptyId) {
             <button class="fav-btn lesson-fav ${isFav ? 'active' : ''}" 
                     onclick="handleLessonFavorite(event, '${l.id}')"
                     title="${isFav ? 'إزالة الإعجاب' : 'أعجبني'}">
-              ${isFav ? '❤️' : '🤍'}
+              ${icon('heart')}
             </button>
           </div>
         </div>
         ${l.description ? `<p class="lesson-desc">${escapeHtml(l.description)}</p>` : ''}
         <div class="lesson-meta">
-          <span>📅 ${formatDate(l.date)}</span>
-          <span>💾 ${formatSize(l.size)}</span>
+          <span>${icon('calendar')} ${formatDate(l.date)}</span>
+          <span>${icon('hard-drive')} ${formatSize(l.size)}</span>
         </div>
         <div class="lesson-actions">
-          <a href="${l.url}" target="_blank" class="btn btn-view">👁️ فتح</a>
-          <a href="${l.url}" download="${escapeHtml(l.filename)}" class="btn btn-download">📥 تحميل</a>
+          <a href="${l.url}" target="_blank" class="btn btn-view">${icon('eye')} فتح</a>
+          <a href="${l.url}" download="${escapeHtml(l.filename)}" class="btn btn-download">${icon('download')} تحميل</a>
         </div>
       </div>
     `;
@@ -368,9 +413,9 @@ function handleLessonFavorite(event, lessonId) {
   event.stopPropagation();
   const added = toggleFavoriteLesson(lessonId);
   
+  // (القلب يمتلئ عند التفعيل عبر CSS)
   const btn = event.currentTarget;
   btn.classList.toggle('active', added);
-  btn.textContent = added ? '❤️' : '🤍';
   btn.title = added ? 'إزالة الإعجاب' : 'أعجبني';
 }
 
@@ -396,7 +441,7 @@ if (searchInput) {
     hideAllSections();
     document.getElementById('searchResultsSection').style.display = 'block';
     document.getElementById('breadcrumb').innerHTML = `
-      <span onclick="goHome()" class="crumb-link">🏛️ الرئيسية</span>
+      <span onclick="goHome()" class="crumb-link">${icon('landmark')} الرئيسية</span>
       <span class="crumb-sep">›</span>
       <span class="crumb-current">نتائج البحث</span>
     `;
@@ -430,13 +475,15 @@ if (homeBtn) {
 // ═══════════════════════════════════════════════
 // 💬 إشعار Toast
 // ═══════════════════════════════════════════════
-function showToast(message) {
+// iconName اختياري: اسم أيقونة تظهر بجانب الرسالة
+function showToast(message, iconName) {
   const existing = document.querySelector('.toast-notification');
   if (existing) existing.remove();
   
   const toast = document.createElement('div');
   toast.className = 'toast-notification';
-  toast.textContent = message;
+  toast.innerHTML = (iconName && window.lucide ? icon(iconName) : '') + '<span></span>';
+  toast.querySelector('span').textContent = message;
   document.body.appendChild(toast);
   
   setTimeout(() => {
@@ -517,7 +564,7 @@ function showToast(message) {
     
     document.getElementById('subjectTitle').textContent = `مواد ${gotoSpec}`;
     document.getElementById('breadcrumb').innerHTML = `
-      <span onclick="goHome()" class="crumb-link">🏛️ الرئيسية</span>
+      <span onclick="goHome()" class="crumb-link">${icon('landmark')} الرئيسية</span>
       <span class="crumb-sep">›</span>
       <span onclick="selectYear('${gotoYear}')" class="crumb-link">${yearName}</span>
       <span class="crumb-sep">›</span>
@@ -536,7 +583,6 @@ function showToast(message) {
 
 // ═══════════════════════════════════════════════
 // 🔐 إظهار لوحة التحكم بعد الضغط على الشعار 5 مرات
-// (✏️ كود جديد - أُضيف في آخر الملف)
 // ═══════════════════════════════════════════════
 (function () {
   const logo = document.getElementById('secretLogo');
