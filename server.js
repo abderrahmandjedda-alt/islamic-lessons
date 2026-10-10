@@ -5,10 +5,62 @@ const path = require('path');
 const fs = require('fs');
 const cloudinary = require('cloudinary').v2;
 const mongoose = require('mongoose');
+const session = require('express-session');
+const { MongoStore } = require('connect-mongo');
+const { OAuth2Client } = require('google-auth-library');
 const Lesson = require('./models/Lesson');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// ═══════════════════════════════════════════════
+// 🔴 حماية: MONGODB_URI مطلوب
+// ═══════════════════════════════════════════════
+if (!process.env.MONGODB_URI) {
+  console.error('❌ MONGODB_URI غير موجود');
+  process.exit(1);
+}
+
+// ═══════════════════════════════════════════════
+// 🔐 Google OAuth (يبقى كخطة بديلة)
+// ═══════════════════════════════════════════════
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI ||
+  (process.env.NODE_ENV === 'production'
+    ? 'https://islamic-lessons.onrender.com/auth/google/callback'
+    : 'http://localhost:3000/auth/google/callback');
+
+function getRoleAndName(email) {
+  const e = (email || '').toLowerCase().trim();
+  if (!e) return null;
+
+  const admins = (process.env.ADMIN_EMAILS || '')
+    .split(',').map(x => x.trim().toLowerCase()).filter(Boolean);
+  if (admins.includes(e)) return { role: 'admin', name: null };
+
+  const raw = process.env.TEACHER_EMAILS || '';
+  try {
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      const keys = Object.keys(parsed);
+      const isEmailMap = keys.some(k => k.includes('@'));
+      if (isEmailMap) {
+        for (const k of keys) {
+          if (k.toLowerCase() === e) {
+            return { role: 'teacher', name: parsed[k] || null };
+          }
+        }
+        return null;
+      }
+      return null;
+    }
+  } catch (err) { /* ليس JSON */ }
+
+  const teachers = raw.split(',').map(x => x.trim().toLowerCase()).filter(Boolean);
+  if (teachers.includes(e)) return { role: 'teacher', name: null };
+  return null;
+}
 
 // ═══════════════════════════════════════════════
 // ☁️ Cloudinary
@@ -23,11 +75,8 @@ const useCloudinary = !!(process.env.CLOUDINARY_CLOUD_NAME &&
                           process.env.CLOUDINARY_API_KEY &&
                           process.env.CLOUDINARY_API_SECRET);
 
-if (useCloudinary) {
-  console.log('☁️ Cloudinary مفعّل');
-} else {
-  console.log('📁 Cloudinary غير مفعّل - تخزين محلي');
-}
+if (useCloudinary) console.log('☁️ Cloudinary مفعّل');
+else console.log('📁 Cloudinary غير مفعّل - تخزين محلي');
 
 // ═══════════════════════════════════════════════
 // 📁 مجلد الرفع
@@ -41,28 +90,39 @@ if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR);
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'jeddah2025';
 const REVIEW_PASSWORD = process.env.REVIEW_PASSWORD || 'Review2025!Jeddah';
 
-// ═══════════════════════════════════════════════
-// 👨‍🏫 قائمة الأساتذة (اسم → كلمة سر)
-// ═══════════════════════════════════════════════
 let TEACHERS = {};
 try {
   TEACHERS = JSON.parse(process.env.TEACHERS_JSON || '{}');
-  const count = Object.keys(TEACHERS).length;
-  console.log(`👨‍🏫 عدد الأساتذة المسجلين: ${count}`);
+  console.log(`👨‍🏫 عدد الأساتذة المسجلين: ${Object.keys(TEACHERS).length}`);
 } catch (err) {
   console.error('❌ خطأ في قراءة TEACHERS_JSON:', err.message);
   TEACHERS = {};
 }
 
-console.log('🔑 كلمات السر:');
-console.log('   - الأدمن:', ADMIN_PASSWORD ? 'موجودة ✅' : 'مفقودة ❌');
-console.log('   - المراجعة:', REVIEW_PASSWORD ? 'موجودة ✅' : 'مفقودة ❌');
-
 // ═══════════════════════════════════════════════
 // ⚙️ Express
 // ═══════════════════════════════════════════════
+app.set('trust proxy', 1);
 app.use(cors());
 app.use(express.json({ limit: '200mb' }));
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'change-me-please',
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI,
+    collectionName: 'sessions',
+    ttl: 7 * 24 * 60 * 60
+  }),
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000
+  }
+}));
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(UPLOAD_DIR));
 
@@ -74,7 +134,6 @@ app.get('/', (req, res) => {
 // 📤 multer
 // ═══════════════════════════════════════════════
 const storage = multer.memoryStorage();
-
 const upload = multer({
   storage,
   limits: { fileSize: 50 * 1024 * 1024, files: 10 },
@@ -90,25 +149,21 @@ const upload = multer({
 // 🔒 Middlewares
 // ═══════════════════════════════════════════════
 const checkAdmin = (req, res, next) => {
+  if (req.session && req.session.user && req.session.user.role === 'admin') return next();
   const pwd = req.headers['x-admin-password'];
   if (pwd === ADMIN_PASSWORD) return next();
-  res.status(401).json({ error: 'كلمة سر الأدمن غير صحيحة' });
+  res.status(401).json({ error: 'غير مصرح' });
 };
 
 const checkTeacher = (req, res, next) => {
-  const pwd = req.headers['x-teacher-password'];
-  
-  // ابحث عن الأستاذ بكلمة السر
-  const teacherName = Object.keys(TEACHERS).find(
-    name => TEACHERS[name] === pwd
-  );
-  
-  if (teacherName) {
-    req.teacher = teacherName;
+  if (req.session && req.session.user && req.session.user.role === 'teacher') {
+    req.teacher = req.session.user.name || req.session.user.email;
     return next();
   }
-  
-  res.status(401).json({ error: 'كلمة سر الأستاذ غير صحيحة' });
+  const pwd = req.headers['x-teacher-password'];
+  const teacherName = Object.keys(TEACHERS).find(name => TEACHERS[name] === pwd);
+  if (teacherName) { req.teacher = teacherName; return next(); }
+  res.status(401).json({ error: 'غير مصرح' });
 };
 
 const checkReview = (req, res, next) => {
@@ -121,11 +176,8 @@ const checkReview = (req, res, next) => {
 // 🔤 إصلاح ترميز الأسماء العربية
 // ═══════════════════════════════════════════════
 function fixEncoding(str) {
-  try {
-    return Buffer.from(str, 'latin1').toString('utf8');
-  } catch (err) {
-    return str;
-  }
+  try { return Buffer.from(str, 'latin1').toString('utf8'); }
+  catch (err) { return str; }
 }
 
 // ═══════════════════════════════════════════════
@@ -141,10 +193,7 @@ function uploadToCloudinary(buffer, originalName) {
         use_filename: false,
         unique_filename: true
       },
-      (error, result) => {
-        if (error) reject(error);
-        else resolve(result);
-      }
+      (error, result) => { if (error) reject(error); else resolve(result); }
     );
     uploadStream.end(buffer);
   });
@@ -153,65 +202,131 @@ function uploadToCloudinary(buffer, originalName) {
 async function uploadFile(file) {
   if (useCloudinary) {
     const result = await uploadToCloudinary(file.buffer, file.originalname);
-    return {
-      url: result.secure_url,
-      storedName: result.public_id,
-      storage: 'cloudinary'
-    };
+    return { url: result.secure_url, storedName: result.public_id, storage: 'cloudinary' };
   } else {
     const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
     const ext = path.extname(file.originalname);
     const storedName = unique + ext;
     const filePath = path.join(UPLOAD_DIR, storedName);
     fs.writeFileSync(filePath, file.buffer);
-    return {
-      url: `/uploads/${storedName}`,
-      storedName,
-      storage: 'local'
-    };
+    return { url: `/uploads/${storedName}`, storedName, storage: 'local' };
   }
 }
 
 // ═══════════════════════════════════════════════
-// 🔐 تسجيل الدخول
+// 🔵 مسارات Google OAuth (اختيارية)
+// ═══════════════════════════════════════════════
+app.get('/auth/google', (req, res) => {
+  if (!process.env.GOOGLE_CLIENT_ID) return res.status(500).send('Google OAuth غير مضبوط');
+  const url = googleClient.generateAuthUrl({
+    access_type: 'online',
+    scope: ['openid', 'email', 'profile'],
+    prompt: 'select_account',
+    redirect_uri: GOOGLE_REDIRECT_URI
+  });
+  res.redirect(url);
+});
+
+app.get('/auth/google/callback', async (req, res) => {
+  try {
+    const { code, error } = req.query;
+    if (error) return res.redirect('/admin.html?error=google_denied');
+    if (!code) return res.redirect('/admin.html?error=no_code');
+
+    const { tokens } = await googleClient.getToken({ code, redirect_uri: GOOGLE_REDIRECT_URI });
+    googleClient.setCredentials(tokens);
+    const ticket = await googleClient.verifyIdToken({
+      idToken: tokens.id_token,
+      audience: process.env.GOOGLE_CLIENT_ID
+    });
+    const payload = ticket.getPayload();
+    const email = (payload.email || '').toLowerCase();
+    const info = getRoleAndName(email);
+    if (!info) return res.redirect('/admin.html?error=unauthorized');
+
+    req.session.user = {
+      email,
+      name: info.name || payload.name || email,
+      picture: payload.picture || '',
+      role: info.role
+    };
+    if (info.role === 'admin') return res.redirect('/admin.html');
+    if (info.role === 'teacher') return res.redirect('/teacher.html');
+    res.redirect('/');
+  } catch (err) {
+    console.error('خطأ في Google callback:', err);
+    res.redirect('/admin.html?error=google_failed');
+  }
+});
+
+app.get('/api/me', (req, res) => {
+  if (req.session && req.session.user) return res.json(req.session.user);
+  res.status(401).json({ error: 'not_logged_in' });
+});
+
+app.post('/auth/logout', (req, res) => {
+  if (req.session) {
+    req.session.destroy(() => {
+      res.clearCookie('connect.sid');
+      res.json({ ok: true });
+    });
+  } else res.json({ ok: true });
+});
+
+// ═══════════════════════════════════════════════
+// 🔐 تسجيل الدخول (بريد + كلمة سر)
 // ═══════════════════════════════════════════════
 app.post('/api/login', (req, res) => {
-  if (req.body.password === ADMIN_PASSWORD) {
-    res.json({ success: true, role: 'admin' });
-  } else {
-    res.status(401).json({ error: 'كلمة السر خاطئة' });
+  const { email, password } = req.body;
+  if (!password) {
+    return res.status(401).json({ error: 'البريد وكلمة السر مطلوبان' });
   }
+
+  // ═══ المدير ═══
+  if (password === ADMIN_PASSWORD) {
+    if (email && process.env.ADMIN_EMAILS) {
+      const admins = process.env.ADMIN_EMAILS.split(',')
+        .map(e => e.trim().toLowerCase()).filter(Boolean);
+      if (admins.length && !admins.includes(email.toLowerCase().trim())) {
+        return res.status(401).json({ error: 'هذا البريد ليس للمدير' });
+      }
+    }
+    req.session.user = {
+      email: (email || '').trim().toLowerCase() || 'admin',
+      name: 'المدير',
+      role: 'admin'
+    };
+    return res.json({ success: true, role: 'admin' });
+  }
+
+  // ═══ الأساتذة ═══
+  const teacherName = Object.keys(TEACHERS).find(name => TEACHERS[name] === password);
+  if (teacherName) {
+    req.session.user = {
+      email: (email || '').trim().toLowerCase(),
+      name: teacherName,
+      role: 'teacher'
+    };
+    return res.json({ success: true, role: 'teacher', name: teacherName });
+  }
+
+  res.status(401).json({ error: 'البريد أو كلمة السر غير صحيحة' });
 });
 
 app.post('/api/teacher-login', (req, res) => {
   const { password } = req.body;
-  
-  const teacherName = Object.keys(TEACHERS).find(
-    name => TEACHERS[name] === password
-  );
-  
-  if (teacherName) {
-    console.log(`✅ دخول الأستاذ: ${teacherName}`);
-    res.json({ 
-      success: true, 
-      role: 'teacher',
-      name: teacherName
-    });
-  } else {
-    res.status(401).json({ error: 'كلمة السر غير صحيحة' });
-  }
+  const teacherName = Object.keys(TEACHERS).find(name => TEACHERS[name] === password);
+  if (teacherName) res.json({ success: true, role: 'teacher', name: teacherName });
+  else res.status(401).json({ error: 'كلمة السر غير صحيحة' });
 });
 
 app.post('/api/review-login', (req, res) => {
-  if (req.body.password === REVIEW_PASSWORD) {
-    res.json({ success: true, role: 'reviewer' });
-  } else {
-    res.status(401).json({ error: 'كلمة سر المراجعة خاطئة' });
-  }
+  if (req.body.password === REVIEW_PASSWORD) res.json({ success: true, role: 'reviewer' });
+  else res.status(401).json({ error: 'كلمة سر المراجعة خاطئة' });
 });
 
 // ═══════════════════════════════════════════════
-// 📤 رفع درس واحد (الأدمن)
+// 📤 رفع درس (الأدمن)
 // ═══════════════════════════════════════════════
 app.post('/api/lessons', checkAdmin, upload.single('file'), async (req, res) => {
   try {
@@ -238,7 +353,6 @@ app.post('/api/lessons', checkAdmin, upload.single('file'), async (req, res) => 
       uploader: 'admin',
       date: new Date()
     });
-
     res.json({ success: true, lesson });
   } catch (err) {
     console.error('خطأ:', err);
@@ -247,23 +361,16 @@ app.post('/api/lessons', checkAdmin, upload.single('file'), async (req, res) => 
 });
 
 // ═══════════════════════════════════════════════
-// 👨‍🏫 رفع متعدد من الأستاذ (نشر فوري)
+// 👨‍🏫 رفع متعدد من الأستاذ
 // ═══════════════════════════════════════════════
 app.post('/api/teacher/batch', checkTeacher, upload.array('files', 10), async (req, res) => {
   try {
     const { year, specialization, subject } = req.body;
     const teacherName = req.teacher;
-
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ error: 'لم يتم إرسال ملفات' });
-    }
-
-    if (!year || !specialization || !subject) {
-      return res.status(400).json({ error: 'يجب اختيار السنة والتخصص والمادة' });
-    }
+    if (!req.files || req.files.length === 0) return res.status(400).json({ error: 'لم يتم إرسال ملفات' });
+    if (!year || !specialization || !subject) return res.status(400).json({ error: 'يجب اختيار السنة والتخصص والمادة' });
 
     const titles = Array.isArray(req.body.titles) ? req.body.titles : [req.body.titles].filter(Boolean);
-
     const uploaded = [];
     const errors = [];
 
@@ -272,16 +379,10 @@ app.post('/api/teacher/batch', checkTeacher, upload.array('files', 10), async (r
       try {
         const fileData = await uploadFile(file);
         const fixedName = fixEncoding(file.originalname);
-        
-        const title = (titles[i] && titles[i].trim()) 
-          || path.parse(fixedName).name;
-
+        const title = (titles[i] && titles[i].trim()) || path.parse(fixedName).name;
         const lesson = await Lesson.create({
           id: Date.now().toString() + '-' + i,
-          title: title,
-          year: year,
-          specialization: specialization,
-          subject: subject,
+          title, year, specialization, subject,
           description: '',
           filename: fixedName,
           storedName: fileData.storedName,
@@ -294,101 +395,47 @@ app.post('/api/teacher/batch', checkTeacher, upload.array('files', 10), async (r
           uploaderName: teacherName,
           date: new Date()
         });
-
         uploaded.push(lesson);
-        console.log(`☁️ [${teacherName}] رُفع: ${title}`);
       } catch (err) {
-        console.error(`خطأ في الملف ${file.originalname}:`, err);
         errors.push({ filename: file.originalname, error: err.message });
       }
     }
-
-    res.json({
-      success: true,
-      uploaded: uploaded.length,
-      failed: errors.length,
-      lessons: uploaded,
-      errors: errors
-    });
-  } catch (err) {
-    console.error('خطأ:', err);
-    res.status(500).json({ error: err.message });
-  }
+    res.json({ success: true, uploaded: uploaded.length, failed: errors.length, lessons: uploaded, errors });
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// ═══════════════════════════════════════════════
-// 📚 دروس الأستاذ (خاصة به)
-// ═══════════════════════════════════════════════
 app.get('/api/teacher/my-lessons', checkTeacher, async (req, res) => {
   try {
-    const lessons = await Lesson.find({ 
-      uploader: 'teacher',
-      uploaderName: req.teacher
-    }).sort({ date: -1 });
-    
+    const lessons = await Lesson.find({ uploader: 'teacher', uploaderName: req.teacher }).sort({ date: -1 });
     res.json(lessons);
-  } catch (err) {
-    console.error('خطأ:', err);
-    res.status(500).json({ error: 'تعذر جلب الدروس' });
-  }
+  } catch (err) { res.status(500).json({ error: 'تعذر جلب الدروس' }); }
 });
 
-// ═══════════════════════════════════════════════
-// 🗑️ حذف درس (الأستاذ - فقط دروسه)
-// ═══════════════════════════════════════════════
 app.delete('/api/teacher/lessons/:id', checkTeacher, async (req, res) => {
   try {
-    const lesson = await Lesson.findOne({ 
-      id: req.params.id, 
-      uploader: 'teacher',
-      uploaderName: req.teacher
-    });
-    
-    if (!lesson) {
-      return res.status(403).json({ 
-        error: '❌ لا يمكنك حذف دروس أستاذ آخر' 
-      });
-    }
+    const lesson = await Lesson.findOne({ id: req.params.id, uploader: 'teacher', uploaderName: req.teacher });
+    if (!lesson) return res.status(403).json({ error: '❌ لا يمكنك حذف دروس أستاذ آخر' });
 
     if (lesson.storage === 'cloudinary' && lesson.storedName) {
-      try {
-        await cloudinary.uploader.destroy(lesson.storedName, { resource_type: 'raw' });
-        console.log('☁️ تم حذف الملف من Cloudinary');
-      } catch (err) {
-        console.error('خطأ في حذف Cloudinary:', err);
-      }
+      try { await cloudinary.uploader.destroy(lesson.storedName, { resource_type: 'raw' }); } catch (err) {}
     } else if (lesson.storedName) {
       const filePath = path.join(UPLOAD_DIR, lesson.storedName);
       if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
     }
-
     await Lesson.deleteOne({ id: req.params.id });
-    console.log(`🗑️ [${req.teacher}] حذف: ${lesson.title}`);
     res.json({ success: true });
-  } catch (err) {
-    console.error('خطأ:', err);
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 // ═══════════════════════════════════════════════
-// 👨‍🎓 رفع من الطالب (للمراجعة)
+// 👨‍🎓 رفع من الطالب
 // ═══════════════════════════════════════════════
 app.post('/api/student/submit', upload.array('files', 5), async (req, res) => {
   try {
     const { year, specialization, subject, studentName, studentEmail, note } = req.body;
-
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ error: 'لم يتم إرسال ملفات' });
-    }
-
-    if (!year || !specialization || !subject) {
-      return res.status(400).json({ error: 'يجب اختيار السنة والتخصص والمادة' });
-    }
-
-    if (!studentName || !studentName.trim()) {
-      return res.status(400).json({ error: 'يجب كتابة اسمك' });
-    }
+    if (!req.files || req.files.length === 0) return res.status(400).json({ error: 'لم يتم إرسال ملفات' });
+    if (!year || !specialization || !subject) return res.status(400).json({ error: 'يجب اختيار السنة والتخصص والمادة' });
+    if (!studentName || !studentName.trim()) return res.status(400).json({ error: 'يجب كتابة اسمك' });
 
     const titles = Array.isArray(req.body.titles) ? req.body.titles : [req.body.titles].filter(Boolean);
     const uploaded = [];
@@ -399,16 +446,10 @@ app.post('/api/student/submit', upload.array('files', 5), async (req, res) => {
       try {
         const fileData = await uploadFile(file);
         const fixedName = fixEncoding(file.originalname);
-
-        const title = (titles[i] && titles[i].trim()) 
-          || path.parse(fixedName).name;
-
+        const title = (titles[i] && titles[i].trim()) || path.parse(fixedName).name;
         const lesson = await Lesson.create({
           id: Date.now().toString() + '-S' + i,
-          title: title,
-          year: year,
-          specialization: specialization,
-          subject: subject,
+          title, year, specialization, subject,
           description: note || '',
           filename: fixedName,
           storedName: fileData.storedName,
@@ -422,150 +463,88 @@ app.post('/api/student/submit', upload.array('files', 5), async (req, res) => {
           uploaderEmail: studentEmail || '',
           date: new Date()
         });
-
         uploaded.push(lesson);
-        console.log(`⏳ [طالب] ${title} - ${studentName}`);
       } catch (err) {
-        console.error(`خطأ:`, err);
         errors.push({ filename: file.originalname, error: err.message });
       }
     }
-
-    res.json({
-      success: true,
-      submitted: uploaded.length,
-      failed: errors.length,
-      errors: errors
-    });
-  } catch (err) {
-    console.error('خطأ:', err);
-    res.status(500).json({ error: err.message });
-  }
+    res.json({ success: true, submitted: uploaded.length, failed: errors.length, errors });
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 // ═══════════════════════════════════════════════
-// 📚 الدروس المعتمدة (للطلاب والزوار)
+// 📚 الدروس المعتمدة
 // ═══════════════════════════════════════════════
 app.get('/api/lessons', async (req, res) => {
   try {
-    const lessons = await Lesson.find({ 
-      $or: [
-        { status: 'approved' },
-        { status: { $exists: false } },
-        { status: null }
-      ]
+    const lessons = await Lesson.find({
+      $or: [{ status: 'approved' }, { status: { $exists: false } }, { status: null }]
     }).sort({ date: -1 });
     res.json(lessons);
-  } catch (err) {
-    console.error('خطأ:', err);
-    res.status(500).json({ error: 'تعذر جلب الدروس' });
-  }
+  } catch (err) { res.status(500).json({ error: 'تعذر جلب الدروس' }); }
 });
 
-// ═══════════════════════════════════════════════
-// 📥 الدروس المعلّقة (للمراجعة)
-// ═══════════════════════════════════════════════
 app.get('/api/pending', checkReview, async (req, res) => {
   try {
     const pending = await Lesson.find({ status: 'pending' }).sort({ date: -1 });
     res.json(pending);
-  } catch (err) {
-    res.status(500).json({ error: 'تعذر جلب المعلّقة' });
-  }
+  } catch (err) { res.status(500).json({ error: 'تعذر جلب المعلّقة' }); }
 });
 
-// ═══════════════════════════════════════════════
-// ✅ الموافقة على درس
-// ═══════════════════════════════════════════════
 app.post('/api/pending/:id/approve', checkReview, async (req, res) => {
   try {
     const lesson = await Lesson.findOne({ id: req.params.id, status: 'pending' });
     if (!lesson) return res.status(404).json({ error: 'غير موجود' });
-
     lesson.status = 'approved';
     lesson.reviewedAt = new Date();
     lesson.reviewNote = req.body.note || 'تمت الموافقة';
     await lesson.save();
-
-    console.log(`✅ تمت الموافقة: ${lesson.title}`);
     res.json({ success: true, lesson });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// ═══════════════════════════════════════════════
-// ❌ رفض درس
-// ═══════════════════════════════════════════════
 app.post('/api/pending/:id/reject', checkReview, async (req, res) => {
   try {
     const lesson = await Lesson.findOne({ id: req.params.id, status: 'pending' });
     if (!lesson) return res.status(404).json({ error: 'غير موجود' });
-
     if (lesson.storage === 'cloudinary' && lesson.storedName) {
-      try {
-        await cloudinary.uploader.destroy(lesson.storedName, { resource_type: 'raw' });
-      } catch (err) {}
+      try { await cloudinary.uploader.destroy(lesson.storedName, { resource_type: 'raw' }); } catch (err) {}
     }
-
     await Lesson.deleteOne({ id: req.params.id });
-    console.log(`❌ تم رفض: ${lesson.title}`);
     res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// ═══════════════════════════════════════════════
-// 🗑️ حذف درس (الأدمن - أي درس)
-// ═══════════════════════════════════════════════
 app.delete('/api/lessons/:id', checkAdmin, async (req, res) => {
   try {
     const lesson = await Lesson.findOne({ id: req.params.id });
     if (!lesson) return res.status(404).json({ error: 'غير موجود' });
-
     if (lesson.storage === 'cloudinary' && lesson.storedName) {
-      try {
-        await cloudinary.uploader.destroy(lesson.storedName, { resource_type: 'raw' });
-      } catch (err) {}
+      try { await cloudinary.uploader.destroy(lesson.storedName, { resource_type: 'raw' }); } catch (err) {}
     } else if (lesson.storedName) {
       const filePath = path.join(UPLOAD_DIR, lesson.storedName);
       if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
     }
-
     await Lesson.deleteOne({ id: req.params.id });
     res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 // ═══════════════════════════════════════════════
-// 🚀 الاتصال + Migration
+// 🚀 الاتصال + التشغيل
 // ═══════════════════════════════════════════════
-if (!process.env.MONGODB_URI) {
-  console.error('❌ MONGODB_URI غير موجود');
-  process.exit(1);
-}
-
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(async () => {
     console.log('🍃 متصل بـ MongoDB');
-    
     try {
       const result = await Lesson.updateMany(
         { status: { $exists: false } },
         { $set: { status: 'approved', uploader: 'admin' } }
       );
-      
-      if (result.modifiedCount > 0) {
-        console.log(`🔄 تم تحديث ${result.modifiedCount} درس قديم`);
-      }
-    } catch (err) {
-      console.error('خطأ Migration:', err);
-    }
-    
+      if (result.modifiedCount > 0) console.log(`🔄 تم تحديث ${result.modifiedCount} درس قديم`);
+    } catch (err) { console.error('خطأ Migration:', err); }
+
     app.listen(PORT, () => {
       console.log(`✅ الموقع يعمل على http://localhost:${PORT}`);
     });

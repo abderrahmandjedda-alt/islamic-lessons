@@ -1952,7 +1952,7 @@ html[data-theme="dark"] .fav-empty a { color: var(--gold); }
 }
 
 /* ═══════════════════════════════════════════════ */
-/* 👨‍🏫 بوابة الأساتذة / التلاميذ */
+/* 👨‍🏫 بوابة الأساتذة / الطلبة */
 /* ═══════════════════════════════════════════════ */
 .teacher-files-info {
   display: flex;
@@ -2623,7 +2623,7 @@ html[data-theme="dark"] .teacher-welcome {
 }
 
 /* ═══════════════════════════════════════════════ */
-/* 👨‍🎓 بوابة التلاميذ */
+/* 👨‍🎓 بوابة الطلبة */
 /* ═══════════════════════════════════════════════ */
 .student-hero {
   background: linear-gradient(135deg, #1a5f8a, #2a7da3, #0d3d5c);
@@ -3586,7 +3586,7 @@ html[data-theme="dark"] .my-lessons-icon svg,
 html[data-theme="dark"] .my-lesson-icon svg { color: var(--gold); }
 
 /* ═══════════════════════════════════════════════ */
-/* 👨‍🎓 أيقونات بوابة التلاميذ */
+/* 👨‍🎓 أيقونات بوابة الطلبة */
 /* ═══════════════════════════════════════════════ */
 .student-hero-icon svg { width: 64px; height: 64px; stroke-width: 1.25; color: #fff; }
 
@@ -3603,3 +3603,75 @@ html[data-theme="dark"] .student-upload-card .form-section-title svg { color: #7
 
 .result-thanks { display: flex; align-items: center; justify-content: center; gap: 8px; }
 .result-thanks svg { width: 22px; height: 22px; }
+    /* ── قائمة الحسابات المحفوظة ─────────── */
+    .email-field-wrap { position: relative; }
+    .email-field-wrap input { margin-bottom: 14px; padding-left: 42px; }
+    .email-drop-toggle {
+      position: absolute;
+      left: 8px;
+      top: 6px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: var(--text-light);
+      padding: 6px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .email-drop-toggle:hover { background: rgba(0,0,0,.05); }
+    [data-theme="dark"] .email-drop-toggle:hover { background: rgba(255,255,255,.08); }
+
+    .email-dropdown {
+      position: absolute;
+      top: calc(100% - 10px);
+      right: 0;
+      left: 0;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.12);
+      z-index: 100;
+      max-height: 240px;
+      overflow-y: auto;
+      padding: 6px;
+      text-align: right;
+    }
+    [data-theme="dark"] .email-dropdown {
+      background: #2a2a2a; border-color: #444;
+    }
+    .email-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 8px;
+      cursor: pointer; font-size: 14px;
+      color: var(--text);
+      transition: background .12s;
+    }
+    .email-item:hover { background: rgba(0,0,0,.05); }
+    [data-theme="dark"] .email-item:hover { background: rgba(255,255,255,.08); }
+    .email-item .avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: #e8f0ea; color: var(--emerald);
+      font-weight: 700; font-size: 14px; flex-shrink: 0;
+    }
+    [data-theme="dark"] .email-item .avatar { background: #1f3a2b; }
+    .email-item .info { flex: 1; min-width: 0; }
+    .email-item .info .email {
+      display: block; font-weight: 700; font-size: 13px;
+      direction: ltr; text-align: left;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .email-item .info .role {
+      display: block; font-size: 12px; color: var(--text-light);
+    }
+    .email-item .remove-btn {
+      background: transparent; border: none; cursor: pointer;
+      color: var(--text-light); padding: 4px; border-radius: 6px;
+    }
+    .email-item .remove-btn:hover { color: #b42318; background: rgba(180,35,24,.08); }
+    .email-empty {
+      padding: 14px; text-align: center;
+      color: var(--text-light); font-size: 13px;
+    }

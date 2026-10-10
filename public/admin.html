@@ -22,6 +22,21 @@
     [data-theme="dark"] .review-title > i,
     [data-theme="dark"] .upload-card h3 svg,
     [data-theme="dark"] .manage-card h3 svg { color: var(--gold); }
+
+    .user-chip {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 10px; border-radius: 999px;
+      background: rgba(0,0,0,.05); font-size: 14px; margin-inline-start: 8px;
+    }
+    [data-theme="dark"] .user-chip { background: rgba(255,255,255,.08); }
+    .user-name { font-weight: 700; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .user-chip .btn-refresh { padding: 4px 10px; font-size: 13px; cursor: pointer; }
+
+    .login-field-label {
+      display: block; text-align: right; margin-bottom: 6px;
+      font-size: 13px; color: var(--text-light);
+    }
+    #loginForm input { margin-bottom: 14px; }
   </style>
 </head>
 <body>
@@ -34,6 +49,12 @@
     </div>
     <nav>
       <a href="index.html"><i data-lucide="house" class="admin-icon"></i> الرئيسية</a>
+      <div id="userChip" class="user-chip" style="display:none;">
+        <span id="userNameLabel" class="user-name"></span>
+        <button id="logoutBtn" class="btn-refresh" type="button">
+          <i data-lucide="log-out" class="admin-icon"></i> خروج
+        </button>
+      </div>
       <button id="themeToggle" class="theme-btn" type="button" aria-label="تبديل الوضع الليلي">
         <i data-lucide="moon" class="admin-icon"></i>
       </button>
@@ -45,17 +66,47 @@
 <div id="loginScreen" class="container section">
   <div class="login-box">
     <h3><i data-lucide="shield-check" class="admin-icon"></i> الدخول إلى لوحة التحكم</h3>
-    <p>أدخل كلمة السر الخاصة بك</p>
-    <input type="password" id="passwordInput" placeholder="كلمة السر" autocomplete="current-password">
-    <button id="loginBtn" class="btn-primary" type="button"><i data-lucide="log-in" class="admin-icon"></i> دخول</button>
-    <p id="loginError" class="error"></p>
+    <p>أدخل بريدك وكلمة السر</p>
+
+    <form id="loginForm" autocomplete="on">
+      <label class="login-field-label" for="emailInput">البريد الإلكتروني</label>
+      <div class="email-field-wrap">
+        <input
+          type="email"
+          id="emailInput"
+          name="email"
+          placeholder="example@gmail.com"
+          autocomplete="username email"
+          dir="ltr"
+          required
+        >
+        <button type="button" id="emailDropdownToggle" class="email-drop-toggle" aria-label="عرض الحسابات المحفوظة">
+          <i data-lucide="chevron-down" class="admin-icon"></i>
+        </button>
+        <div id="emailDropdown" class="email-dropdown" style="display:none;"></div>
+      </div>
+
+      <label class="login-field-label" for="passwordInput">كلمة السر</label>
+      <input
+        type="password"
+        id="passwordInput"
+        name="password"
+        placeholder="••••••••"
+        autocomplete="current-password"
+        required
+      >
+
+      <button id="loginBtn" class="btn-primary" type="submit">
+        <i data-lucide="log-in" class="admin-icon"></i> دخول
+      </button>
+      <p id="loginError" class="error"></p>
+    </form>
   </div>
 </div>
 
-<!-- لوحة الأدمن -->
+<!-- لوحة التحكم -->
 <div id="adminPanel" class="container section" style="display:none;">
 
-  <!-- قسم المراجعة -->
   <div class="review-card">
     <div class="review-header">
       <div class="review-title">
@@ -70,40 +121,33 @@
       </button>
     </div>
 
-    <!-- شاشة دخول المراجعة -->
     <div id="reviewLoginScreen" class="review-login">
       <div class="review-login-box">
         <i data-lucide="lock-keyhole" class="admin-icon"></i>
         <h4>الدخول إلى قسم المراجعة</h4>
         <p>أدخل كلمة سر المراجعة</p>
         <input type="password" id="reviewPasswordInput" placeholder="كلمة سر المراجعة" autocomplete="current-password">
-        <button id="reviewLoginBtn" class="btn-primary" type="button"><i data-lucide="log-in" class="admin-icon"></i> دخول</button>
+        <button id="reviewLoginBtn" class="btn-primary" type="button">
+          <i data-lucide="log-in" class="admin-icon"></i> دخول
+        </button>
         <p id="reviewLoginError" class="error"></p>
       </div>
     </div>
 
-    <!-- قائمة الدروس -->
     <div id="pendingList" class="pending-list" style="display:none;"></div>
   </div>
 
-  <!-- رفع درس جديد -->
   <div class="upload-card">
     <h3><i data-lucide="cloud-upload" class="admin-icon"></i> رفع درس جديد</h3>
     <form id="uploadForm">
       <label for="yearSelect">السنة الدراسية</label>
-      <select name="year" id="yearSelect" required>
-        <option value="">اختر السنة</option>
-      </select>
+      <select name="year" id="yearSelect" required><option value="">اختر السنة</option></select>
 
       <label for="specializationSelect">التخصص</label>
-      <select name="specialization" id="specializationSelect" required>
-        <option value="">اختر السنة أولاً</option>
-      </select>
+      <select name="specialization" id="specializationSelect" required><option value="">اختر السنة أولاً</option></select>
 
       <label for="subjectSelect">المادة</label>
-      <select name="subject" id="subjectSelect" required>
-        <option value="">اختر التخصص أولاً</option>
-      </select>
+      <select name="subject" id="subjectSelect" required><option value="">اختر التخصص أولاً</option></select>
 
       <label for="lessonTitle">عنوان الدرس</label>
       <input id="lessonTitle" type="text" name="title" required placeholder="مثال: المدخل إلى الحضارة الإسلامية">
@@ -114,12 +158,13 @@
       <label for="lessonFile">الملف (PDF أو Word)</label>
       <input id="lessonFile" type="file" name="file" accept=".pdf,.doc,.docx" required>
 
-      <button type="submit" class="btn-primary"><i data-lucide="upload" class="admin-icon"></i> رفع الدرس</button>
+      <button type="submit" class="btn-primary">
+        <i data-lucide="upload" class="admin-icon"></i> رفع الدرس
+      </button>
       <p id="uploadStatus" class="status" aria-live="polite"></p>
     </form>
   </div>
 
-  <!-- إدارة الدروس -->
   <div class="manage-card">
     <h3><i data-lucide="library-big" class="admin-icon"></i> إدارة الدروس المرفوعة</h3>
     <div id="adminLessons"></div>
