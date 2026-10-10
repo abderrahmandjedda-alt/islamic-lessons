@@ -5,33 +5,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;900&display=swap');
 
 :root {
-  /* الألوان الأساسية */
   --emerald: #0d5f4a;
   --emerald-dark: #084636;
   --emerald-light: #1a7d63;
   --gold: #d4a574;
   --gold-dark: #b8935a;
   --gold-light: #e8c9a0;
-  
-  /* الخلفيات */
   --bg: #faf6f0;
   --bg-alt: #f3ede3;
   --card: #ffffff;
   --card-hover: #fefcf8;
-  
-  /* النصوص */
   --text: #1e3a2f;
   --text-light: #5a7268;
   --text-muted: #8a9a91;
-  
-  /* الحدود والظلال */
   --border: #e5dbd0;
   --border-gold: rgba(212, 165, 116, 0.3);
   --shadow: 0 4px 24px rgba(13, 95, 74, 0.08);
   --shadow-lg: 0 12px 48px rgba(13, 95, 74, 0.15);
   --shadow-gold: 0 8px 32px rgba(212, 165, 116, 0.25);
-  
-  /* التدرجات */
   --gradient-emerald: linear-gradient(135deg, #0d5f4a, #1a7d63);
   --gradient-gold: linear-gradient(135deg, #d4a574, #b8935a);
   --gradient-hero: linear-gradient(135deg, #0d5f4a 0%, #1a7d63 50%, #084636 100%);
@@ -57,7 +48,6 @@
 /* الأساسيات */
 /* ═══════════════════════════════════════════════ */
 * { margin: 0; padding: 0; box-sizing: border-box; }
-
 html { scroll-behavior: smooth; }
 
 body {
@@ -70,7 +60,6 @@ body {
   overflow-x: hidden;
 }
 
-/* نقش إسلامي خفيف في الخلفية */
 body::before {
   content: '';
   position: fixed;
@@ -135,7 +124,6 @@ h1, h2, h3, h4 {
   gap: 16px;
 }
 
-/* 🐆 شعار الفهد */
 .logo-img {
   width: 55px;
   height: 55px;
@@ -187,7 +175,6 @@ nav a {
 nav a:hover {
   background: rgba(212, 165, 116, 0.15);
   color: var(--emerald);
-  transform: translateY(-2px);
 }
 
 [data-theme="dark"] nav a:hover {
@@ -201,7 +188,6 @@ nav a:hover {
 }
 
 .btn-admin:hover {
-  transform: translateY(-2px);
   box-shadow: 0 6px 24px rgba(13, 95, 74, 0.35) !important;
 }
 
@@ -294,7 +280,6 @@ nav a:hover {
 .search-hero input:focus {
   border-color: var(--gold);
   box-shadow: 0 16px 60px rgba(212, 165, 116, 0.4);
-  transform: translateY(-2px);
 }
 
 .search-hero::after {
@@ -339,15 +324,8 @@ nav a:hover {
   color: var(--gold);
 }
 
-.crumb-sep {
-  opacity: 0.4;
-  font-size: 0.8rem;
-}
-
-.crumb-current {
-  color: var(--text);
-  font-weight: 700;
-}
+.crumb-sep { opacity: 0.4; font-size: 0.8rem; }
+.crumb-current { color: var(--text); font-weight: 700; }
 
 /* ═══════════════════════════════════════════════ */
 /* Sections */
@@ -363,9 +341,7 @@ nav a:hover {
   padding-bottom: 20px;
 }
 
-[data-theme="dark"] .section-title {
-  color: var(--gold);
-}
+[data-theme="dark"] .section-title { color: var(--gold); }
 
 .section-title::after {
   content: '';
@@ -392,7 +368,7 @@ nav a:hover {
 }
 
 /* ═══════════════════════════════════════════════ */
-/* Back button */
+/* Back button - مُعدّل */
 /* ═══════════════════════════════════════════════ */
 .back-btn {
   background: rgba(255, 255, 255, 0.9);
@@ -421,12 +397,11 @@ nav a:hover {
   background: var(--gradient-emerald);
   color: white;
   border-color: transparent;
-  transform: translateX(-4px);
   box-shadow: 0 8px 24px rgba(13, 95, 74, 0.3);
 }
 
 /* ═══════════════════════════════════════════════ */
-/* Years Grid */
+/* Years Grid - مُعدّل */
 /* ═══════════════════════════════════════════════ */
 .years-grid {
   display: grid;
@@ -440,7 +415,7 @@ nav a:hover {
   border-radius: 24px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   border: 2px solid transparent;
   box-shadow: var(--shadow);
   position: relative;
@@ -474,9 +449,9 @@ nav a:hover {
 .year-card:hover::after { opacity: 1; }
 
 .year-card:hover {
-  transform: translateY(-10px) scale(1.02);
   border-color: var(--gold);
   box-shadow: var(--shadow-lg), var(--shadow-gold);
+  background: var(--card-hover);
 }
 
 .year-icon {
@@ -512,7 +487,7 @@ nav a:hover {
 }
 
 /* ═══════════════════════════════════════════════ */
-/* Specializations Grid */
+/* Specializations Grid - مُعدّل (الأهم) */
 /* ═══════════════════════════════════════════════ */
 .specializations-grid {
   display: grid;
@@ -525,7 +500,7 @@ nav a:hover {
   padding: 32px;
   border-radius: 20px;
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   border: 2px solid var(--border);
   box-shadow: var(--shadow);
   position: relative;
@@ -549,7 +524,6 @@ nav a:hover {
 .specialization-card:hover::before { transform: scaleY(1); }
 
 .specialization-card:hover {
-  transform: translateX(-6px);
   border-color: var(--gold);
   box-shadow: var(--shadow-lg);
   background: var(--card-hover);
@@ -591,7 +565,7 @@ nav a:hover {
 }
 
 /* ═══════════════════════════════════════════════ */
-/* Subjects Grid */
+/* Subjects Grid - مُعدّل */
 /* ═══════════════════════════════════════════════ */
 .subjects-grid {
   display: grid;
@@ -605,7 +579,7 @@ nav a:hover {
   border-radius: 20px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   border: 2px solid transparent;
   box-shadow: var(--shadow);
   position: relative;
@@ -614,9 +588,9 @@ nav a:hover {
 }
 
 .subject-card:hover {
-  transform: translateY(-8px) scale(1.03);
   border-color: var(--gold);
   box-shadow: var(--shadow-lg), var(--shadow-gold);
+  background: var(--card-hover);
 }
 
 .subject-card .icon {
@@ -655,7 +629,7 @@ nav a:hover {
 }
 
 /* ═══════════════════════════════════════════════ */
-/* Lessons Grid */
+/* Lessons Grid - مُعدّل */
 /* ═══════════════════════════════════════════════ */
 .lessons-grid {
   display: grid;
@@ -668,7 +642,7 @@ nav a:hover {
   border-radius: 20px;
   padding: 28px;
   box-shadow: var(--shadow);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   border: 2px solid transparent;
   border-right: 5px solid var(--emerald);
   display: flex;
@@ -689,9 +663,9 @@ nav a:hover {
 }
 
 .lesson-card:hover {
-  transform: translateY(-6px);
   box-shadow: var(--shadow-lg);
   border-right-color: var(--gold);
+  background: var(--card-hover);
 }
 
 .lesson-header {
@@ -782,7 +756,6 @@ nav a:hover {
 }
 
 .btn-view:hover {
-  transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(13, 95, 74, 0.35);
 }
 
@@ -796,7 +769,6 @@ nav a:hover {
   background: var(--gradient-gold);
   color: white;
   border-color: transparent;
-  transform: translateY(-2px);
 }
 
 .btn-delete {
@@ -814,7 +786,6 @@ nav a:hover {
 .btn-delete:hover {
   background: #dc2626;
   color: white;
-  transform: scale(1.05);
 }
 
 /* ═══════════════════════════════════════════════ */
@@ -848,9 +819,7 @@ nav a:hover {
   padding-bottom: 2px;
 }
 
-[data-theme="dark"] .empty a {
-  color: var(--gold);
-}
+[data-theme="dark"] .empty a { color: var(--gold); }
 
 /* ═══════════════════════════════════════════════ */
 /* Login Box */
@@ -881,9 +850,7 @@ nav a:hover {
   font-size: 1.6rem;
 }
 
-[data-theme="dark"] .login-box h3 {
-  color: var(--gold);
-}
+[data-theme="dark"] .login-box h3 { color: var(--gold); }
 
 .login-box > p {
   color: var(--text-light);
@@ -929,7 +896,6 @@ nav a:hover {
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
   box-shadow: 0 10px 32px rgba(13, 95, 74, 0.35);
 }
 
@@ -971,9 +937,7 @@ nav a:hover {
 }
 
 [data-theme="dark"] .upload-card h3,
-[data-theme="dark"] .manage-card h3 {
-  color: var(--gold);
-}
+[data-theme="dark"] .manage-card h3 { color: var(--gold); }
 
 .upload-card label {
   display: block;
@@ -1009,6 +973,9 @@ nav a:hover {
 
 .upload-card .btn-primary { margin-top: 24px; }
 
+/* ═══════════════════════════════════════════════ */
+/* Admin lesson item - مُعدّل */
+/* ═══════════════════════════════════════════════ */
 .admin-lesson-item {
   display: flex;
   justify-content: space-between;
@@ -1063,11 +1030,7 @@ footer::before {
   opacity: 0.6;
 }
 
-.footer-line {
-  font-size: 0.95rem;
-  opacity: 0.85;
-  margin-bottom: 8px;
-}
+.footer-line { font-size: 0.95rem; opacity: 0.85; margin-bottom: 8px; }
 
 .footer-author {
   font-family: 'Amiri', serif;
@@ -1098,22 +1061,14 @@ footer::before {
 .footer-author::before { left: 0; }
 .footer-author::after { right: 0; }
 
-[data-theme="dark"] .footer-author {
-  color: var(--gold-light);
-}
+[data-theme="dark"] .footer-author { color: var(--gold-light); }
 
 /* ═══════════════════════════════════════════════ */
 /* Animations */
 /* ═══════════════════════════════════════════════ */
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .year-card:nth-child(1) { animation-delay: 0.05s; }
@@ -1186,27 +1141,14 @@ footer::before {
 /* ═══════════════════════════════════════════════ */
 /* Selection */
 /* ═══════════════════════════════════════════════ */
-::selection {
-  background: var(--gold);
-  color: white;
-}
+::selection { background: var(--gold); color: white; }
 
 /* ═══════════════════════════════════════════════ */
-/* 🔐 الشعار السري                                 */
+/* 🔐 الشعار السري */
 /* ═══════════════════════════════════════════════ */
-.logo {
-  cursor: pointer;
-  user-select: none;
-  transition: transform 0.2s ease;
-}
-
-.logo:active {
-  transform: scale(0.98);
-}
-
-.logo.pulse {
-  animation: pulse 0.4s ease;
-}
+.logo { cursor: pointer; user-select: none; transition: transform 0.2s ease; }
+.logo:active { transform: scale(0.98); }
+.logo.pulse { animation: pulse 0.4s ease; }
 
 @keyframes pulse {
   0% { transform: scale(1); }
@@ -1215,18 +1157,12 @@ footer::before {
 }
 
 @keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 /* ═══════════════════════════════════════════════ */
-/* ☰ قائمة المنيو المنسدلة                       */
+/* ☰ قائمة المنيو المنسدلة */
 /* ═══════════════════════════════════════════════ */
 .menu-toggle {
   font-weight: 900;
@@ -1265,6 +1201,7 @@ footer::before {
   transform: translateY(0);
 }
 
+/* Menu item - مُعدّل */
 .menu-item {
   display: flex !important;
   align-items: center;
@@ -1282,13 +1219,10 @@ footer::before {
 .menu-item:hover {
   background: rgba(212, 165, 116, 0.15) !important;
   color: var(--emerald) !important;
-  transform: translateX(-4px) !important;
   box-shadow: none !important;
 }
 
-[data-theme="dark"] .menu-item:hover {
-  color: var(--gold) !important;
-}
+[data-theme="dark"] .menu-item:hover { color: var(--gold) !important; }
 
 .menu-icon {
   font-size: 1.2rem;
@@ -1326,14 +1260,8 @@ footer::before {
 }
 
 @keyframes menuSlide {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @media (max-width: 768px) {
@@ -1343,12 +1271,11 @@ footer::before {
     min-width: auto;
     width: auto;
   }
-  
   .menu-toggle { order: 3; }
 }
 
 /* ═══════════════════════════════════════════════ */
-/* 📄 صفحات "قريباً"                              */
+/* 📄 صفحات "قريباً" */
 /* ═══════════════════════════════════════════════ */
 .coming-soon {
   min-height: 70vh;
@@ -1397,9 +1324,7 @@ footer::before {
   margin-bottom: 16px;
 }
 
-[data-theme="dark"] .coming-soon-box h2 {
-  color: var(--gold);
-}
+[data-theme="dark"] .coming-soon-box h2 { color: var(--gold); }
 
 .coming-soon-box p {
   color: var(--text-light);
@@ -1425,12 +1350,11 @@ footer::before {
 }
 
 .coming-soon-box .btn-back:hover {
-  transform: translateY(-2px);
   box-shadow: 0 10px 32px rgba(13, 95, 74, 0.35);
 }
 
 /* ═══════════════════════════════════════════════ */
-/* 📞 صفحة تواصل مع الإدارة                       */
+/* 📞 صفحة تواصل مع الإدارة */
 /* ═══════════════════════════════════════════════ */
 .contact-hero {
   background: var(--gradient-hero);
@@ -1451,10 +1375,7 @@ footer::before {
   pointer-events: none;
 }
 
-.contact-hero .container {
-  position: relative;
-  z-index: 1;
-}
+.contact-hero .container { position: relative; z-index: 1; }
 
 .contact-hero-icon {
   font-size: 3.5rem;
@@ -1484,6 +1405,7 @@ footer::before {
   margin: 0 auto;
 }
 
+/* contact-card - مُعدّل */
 .contact-card {
   background: var(--card);
   border-radius: 20px;
@@ -1508,9 +1430,9 @@ footer::before {
 }
 
 .contact-card:hover {
-  transform: translateY(-4px);
   border-color: var(--border-gold);
   box-shadow: var(--shadow-lg);
+  background: var(--card-hover);
 }
 
 .contact-card:nth-child(1) { animation-delay: 0.1s; }
@@ -1543,9 +1465,7 @@ footer::before {
   margin-bottom: 4px;
 }
 
-[data-theme="dark"] .contact-card h3 {
-  color: var(--gold);
-}
+[data-theme="dark"] .contact-card h3 { color: var(--gold); }
 
 .contact-subtitle {
   font-size: 0.85rem;
@@ -1578,11 +1498,7 @@ footer::before {
   user-select: all;
 }
 
-.contact-btns {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
+.contact-btns { display: flex; gap: 10px; flex-wrap: wrap; }
 
 .copy-btn {
   background: var(--gradient-emerald);
@@ -1602,13 +1518,10 @@ footer::before {
 }
 
 .copy-btn:hover {
-  transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(13, 95, 74, 0.35);
 }
 
-.copy-btn:active {
-  transform: translateY(0) scale(0.96);
-}
+.copy-btn:active { transform: translateY(0) scale(0.96); }
 
 .whatsapp-btn {
   background: linear-gradient(135deg, #25d366, #128c7e);
@@ -1629,7 +1542,6 @@ footer::before {
 }
 
 .whatsapp-btn:hover {
-  transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
 }
 
@@ -1663,15 +1575,9 @@ footer::before {
   gap: 10px;
 }
 
-[data-theme="dark"] .tips-card h3 {
-  color: var(--gold);
-}
+[data-theme="dark"] .tips-card h3 { color: var(--gold); }
 
-.tips-card ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
+.tips-card ul { list-style: none; padding: 0; margin: 0; }
 
 .tips-card li {
   padding: 12px 0;
@@ -1684,9 +1590,7 @@ footer::before {
   border-bottom: 1px dashed var(--border);
 }
 
-.tips-card li:last-child {
-  border-bottom: none;
-}
+.tips-card li:last-child { border-bottom: none; }
 
 .tips-card li::before {
   content: '✦';
@@ -1697,19 +1601,10 @@ footer::before {
   font-size: 1rem;
 }
 
-.tips-card li strong {
-  color: var(--emerald);
-  font-weight: 700;
-}
+.tips-card li strong { color: var(--emerald); font-weight: 700; }
+[data-theme="dark"] .tips-card li strong { color: var(--gold); }
 
-[data-theme="dark"] .tips-card li strong {
-  color: var(--gold);
-}
-
-.contact-back {
-  text-align: center;
-  margin-top: 40px;
-}
+.contact-back { text-align: center; margin-top: 40px; }
 
 .btn-back-large {
   display: inline-flex;
@@ -1728,7 +1623,6 @@ footer::before {
 }
 
 .btn-back-large:hover {
-  transform: translateY(-3px);
   box-shadow: 0 10px 32px rgba(13, 95, 74, 0.4);
 }
 
@@ -1758,14 +1652,8 @@ footer::before {
 }
 
 @keyframes toastSlideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
+  from { opacity: 0; transform: translateX(-50%) translateY(30px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
 @media (max-width: 768px) {
@@ -1779,32 +1667,17 @@ footer::before {
   .contact-card-icon { font-size: 2rem; width: 50px; height: 50px; }
   .contact-card h3 { font-size: 1.15rem; }
   
-  .contact-value {
-    flex-direction: column;
-    align-items: stretch;
-    padding: 14px 16px;
-  }
-  
+  .contact-value { flex-direction: column; align-items: stretch; padding: 14px 16px; }
   .contact-btns { width: 100%; }
-  
-  .copy-btn, .whatsapp-btn {
-    flex: 1;
-    justify-content: center;
-    padding: 12px 16px;
-  }
-  
+  .copy-btn, .whatsapp-btn { flex: 1; justify-content: center; padding: 12px 16px; }
   .tips-card { padding: 22px 18px; }
   .tips-card h3 { font-size: 1.15rem; }
   .tips-card li { font-size: 0.92rem; }
-  
-  .btn-back-large {
-    padding: 14px 28px;
-    font-size: 0.95rem;
-  }
+  .btn-back-large { padding: 14px 28px; font-size: 0.95rem; }
 }
 
 /* ═══════════════════════════════════════════════ */
-/* ⭐ زر المفضلة                                  */
+/* ⭐ زر المفضلة */
 /* ═══════════════════════════════════════════════ */
 .fav-btn {
   background: var(--bg-alt);
@@ -1842,11 +1715,7 @@ footer::before {
   transform: scale(1.15) rotate(10deg);
 }
 
-.lesson-fav {
-  width: 36px;
-  height: 36px;
-  font-size: 1rem;
-}
+.lesson-fav { width: 36px; height: 36px; font-size: 1rem; }
 
 .lesson-badges {
   display: flex;
@@ -1888,22 +1757,13 @@ footer::before {
 }
 
 @media (max-width: 768px) {
-  .fav-btn {
-    width: 36px;
-    height: 36px;
-    font-size: 1rem;
-  }
-  
-  .lesson-fav {
-    width: 32px;
-    height: 32px;
-  }
-  
+  .fav-btn { width: 36px; height: 36px; font-size: 1rem; }
+  .lesson-fav { width: 32px; height: 32px; }
   .lesson-badges { gap: 6px; }
 }
 
 /* ═══════════════════════════════════════════════ */
-/* ⭐ صفحة المفضلة                                */
+/* ⭐ صفحة المفضلة */
 /* ═══════════════════════════════════════════════ */
 .fav-section { margin-bottom: 50px; }
 
@@ -1919,9 +1779,7 @@ footer::before {
   gap: 12px;
 }
 
-[data-theme="dark"] .fav-section-title {
-  color: var(--gold);
-}
+[data-theme="dark"] .fav-section-title { color: var(--gold); }
 
 .fav-count {
   font-size: 1rem;
@@ -1939,6 +1797,7 @@ footer::before {
   gap: 14px;
 }
 
+/* fav-card - مُعدّل (المُبلَّغ عنه) */
 .fav-card {
   background: var(--card);
   padding: 20px 24px;
@@ -1955,7 +1814,7 @@ footer::before {
 .fav-card:hover {
   border-color: var(--gold);
   box-shadow: var(--shadow-lg);
-  transform: translateX(-4px);
+  background: var(--card-hover);
 }
 
 .fav-card-content {
@@ -1991,11 +1850,7 @@ footer::before {
   font-family: 'Tajawal', sans-serif;
 }
 
-.fav-card-actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
+.fav-card-actions { display: flex; gap: 8px; align-items: center; }
 
 .fav-go-btn {
   background: var(--gradient-emerald);
@@ -2016,7 +1871,6 @@ footer::before {
 }
 
 .fav-go-btn:hover {
-  transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(13, 95, 74, 0.35);
 }
 
@@ -2038,7 +1892,6 @@ footer::before {
 .fav-remove-btn:hover {
   background: #dc2626;
   color: white;
-  transform: scale(1.1);
 }
 
 .fav-empty {
@@ -2070,30 +1923,18 @@ footer::before {
   padding-bottom: 2px;
 }
 
-[data-theme="dark"] .fav-empty a {
-  color: var(--gold);
-}
+[data-theme="dark"] .fav-empty a { color: var(--gold); }
 
 @media (max-width: 768px) {
-  .fav-card {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
+  .fav-card { flex-direction: column; align-items: stretch; }
   .fav-card-actions { justify-content: stretch; }
-  
-  .fav-go-btn {
-    flex: 1;
-    justify-content: center;
-  }
-  
+  .fav-go-btn { flex: 1; justify-content: center; }
   .fav-remove-btn { flex: 0 0 42px; }
-  
   .fav-section-title { font-size: 1.3rem; }
 }
 
 /* ═══════════════════════════════════════════════ */
-/* 📱 زر تثبيت التطبيق                            */
+/* 📱 زر تثبيت التطبيق - مُعدّل */
 /* ═══════════════════════════════════════════════ */
 .install-btn {
   background: linear-gradient(135deg, #d4a574, #b8935a) !important;
@@ -2109,7 +1950,6 @@ footer::before {
 
 .install-btn:hover {
   background: linear-gradient(135deg, #b8935a, #a67d4a) !important;
-  transform: translateX(-4px);
 }
 
 .install-btn .menu-icon {
@@ -2120,10 +1960,10 @@ footer::before {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.15); }
 }
-/* ═══════════════════════════════════════════════ */
-/* 👨‍🏫 بوابة الأساتذة / التلاميذ                  */
-/* ═══════════════════════════════════════════════ */
 
+/* ═══════════════════════════════════════════════ */
+/* 👨‍🏫 بوابة الأساتذة / التلاميذ */
+/* ═══════════════════════════════════════════════ */
 .teacher-files-info {
   display: flex;
   justify-content: space-between;
@@ -2151,7 +1991,6 @@ footer::before {
 }
 
 .btn-add-file:hover {
-  transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(13, 95, 74, 0.35);
 }
 
@@ -2173,6 +2012,7 @@ footer::before {
   margin-top: 10px;
 }
 
+/* file-input-item - مُعدّل */
 .file-input-item {
   background: var(--bg-alt);
   border: 2px solid var(--border);
@@ -2184,6 +2024,7 @@ footer::before {
 
 .file-input-item:hover {
   border-color: var(--gold);
+  background: var(--card-hover);
 }
 
 .file-input-header {
@@ -2200,9 +2041,7 @@ footer::before {
   font-size: 0.95rem;
 }
 
-[data-theme="dark"] .file-number {
-  color: var(--gold);
-}
+[data-theme="dark"] .file-number { color: var(--gold); }
 
 .file-remove-btn {
   background: linear-gradient(135deg, #fee2e2, #fecaca);
@@ -2222,7 +2061,6 @@ footer::before {
 .file-remove-btn:hover {
   background: #dc2626;
   color: white;
-  transform: scale(1.1);
 }
 
 .file-input {
@@ -2271,9 +2109,7 @@ footer::before {
   margin-bottom: 20px;
 }
 
-[data-theme="dark"] .upload-results h3 {
-  color: var(--gold);
-}
+[data-theme="dark"] .upload-results h3 { color: var(--gold); }
 
 .result-summary {
   padding: 16px;
@@ -2283,10 +2119,7 @@ footer::before {
   font-family: 'Tajawal', sans-serif;
 }
 
-.result-summary p {
-  margin: 6px 0;
-  font-size: 1rem;
-}
+.result-summary p { margin: 6px 0; font-size: 1rem; }
 
 .result-errors {
   background: #fef2f2;
@@ -2295,43 +2128,19 @@ footer::before {
   padding: 16px;
 }
 
-.result-errors h4 {
-  color: #dc2626;
-  margin-bottom: 10px;
-}
+.result-errors h4 { color: #dc2626; margin-bottom: 10px; }
+.result-errors ul { list-style: none; padding: 0; }
+.result-errors li { padding: 6px 0; color: #991b1b; font-size: 0.9rem; }
 
-.result-errors ul {
-  list-style: none;
-  padding: 0;
-}
-
-.result-errors li {
-  padding: 6px 0;
-  color: #991b1b;
-  font-size: 0.9rem;
-}
-
-/* الجوال */
 @media (max-width: 768px) {
-  .teacher-files-info {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .btn-add-file {
-    width: 100%;
-  }
-  
-  .files-count {
-    text-align: center;
-  }
-  
-  .file-input-item {
-    padding: 12px;
-  }
+  .teacher-files-info { flex-direction: column; align-items: stretch; }
+  .btn-add-file { width: 100%; }
+  .files-count { text-align: center; }
+  .file-input-item { padding: 12px; }
 }
+
 /* ═══════════════════════════════════════════════ */
-/* 🚪 زر الخروج                                   */
+/* 🚪 زر الخروج - مُعدّل */
 /* ═══════════════════════════════════════════════ */
 .btn-logout {
   background: linear-gradient(135deg, #fee2e2, #fecaca);
@@ -2344,19 +2153,21 @@ footer::before {
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .btn-logout:hover {
   background: #dc2626;
   color: white;
-  transform: translateY(-2px);
+  border-color: #dc2626;
   box-shadow: 0 6px 20px rgba(220, 38, 38, 0.3);
 }
-/* ═══════════════════════════════════════════════ */
-/* 👨‍🏫 بوابة الأساتذة - نسخة احترافية              */
-/* ═══════════════════════════════════════════════ */
 
-/* Hero مخصص للأستاذ */
+/* ═══════════════════════════════════════════════ */
+/* 👨‍🏫 بوابة الأساتذة - نسخة احترافية */
+/* ═══════════════════════════════════════════════ */
 .teacher-hero {
   background: var(--gradient-hero);
   color: white;
@@ -2376,10 +2187,7 @@ footer::before {
   pointer-events: none;
 }
 
-.teacher-hero-content {
-  position: relative;
-  z-index: 1;
-}
+.teacher-hero-content { position: relative; z-index: 1; }
 
 .teacher-hero-icon {
   font-size: 4rem;
@@ -2431,10 +2239,8 @@ footer::before {
 
 .feature-chip:hover {
   background: rgba(255, 255, 255, 0.25);
-  transform: translateY(-2px);
 }
 
-/* صندوق الدخول المحسّن */
 .login-icon {
   font-size: 3rem;
   display: block;
@@ -2442,10 +2248,7 @@ footer::before {
   filter: drop-shadow(0 4px 12px rgba(13, 95, 74, 0.2));
 }
 
-.login-input-group {
-  position: relative;
-  margin-bottom: 20px;
-}
+.login-input-group { position: relative; margin-bottom: 20px; }
 
 .login-box input {
   width: 100%;
@@ -2465,7 +2268,6 @@ footer::before {
 .login-box input:focus {
   border-color: var(--gold);
   box-shadow: 0 0 0 6px rgba(212, 165, 116, 0.15);
-  transform: translateY(-2px);
 }
 
 .login-note {
@@ -2480,31 +2282,6 @@ footer::before {
   align-items: center;
   gap: 10px;
   justify-content: center;
-}
-
-/* زر تسجيل الخروج */
-.btn-logout {
-  background: linear-gradient(135deg, #fee2e2, #fecaca);
-  color: #dc2626;
-  border: 2px solid #fecaca;
-  padding: 10px 20px;
-  border-radius: 30px;
-  font-family: 'Tajawal', sans-serif;
-  font-size: 0.9rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.btn-logout:hover {
-  background: #dc2626;
-  color: white;
-  border-color: #dc2626;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.3);
 }
 
 /* بطاقة الرفع */
@@ -2568,22 +2345,15 @@ footer::before {
   font-family: 'Tajawal', sans-serif;
 }
 
-/* النموذج داخل بطاقة الرفع */
-.teacher-upload-card form {
-  padding: 36px;
-}
+.teacher-upload-card form { padding: 36px; }
 
-/* قسم النموذج */
 .form-section {
   margin-bottom: 32px;
   padding-bottom: 32px;
   border-bottom: 2px dashed var(--border);
 }
 
-.form-section:last-of-type {
-  border-bottom: none;
-  padding-bottom: 0;
-}
+.form-section:last-of-type { border-bottom: none; padding-bottom: 0; }
 
 .form-section-title {
   display: flex;
@@ -2597,15 +2367,9 @@ footer::before {
   border-bottom: 2px solid var(--border-gold);
 }
 
-[data-theme="dark"] .form-section-title {
-  color: var(--gold);
-}
+[data-theme="dark"] .form-section-title { color: var(--gold); }
+.form-section-title span:first-child { font-size: 1.4rem; }
 
-.form-section-title span:first-child {
-  font-size: 1.4rem;
-}
-
-/* صفوف النموذج */
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -2613,10 +2377,7 @@ footer::before {
   margin-bottom: 20px;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
+.form-group { display: flex; flex-direction: column; }
 
 .form-group label {
   display: flex;
@@ -2629,12 +2390,8 @@ footer::before {
   font-family: 'Tajawal', sans-serif;
 }
 
-.required {
-  color: #dc2626;
-  font-weight: 900;
-}
+.required { color: #dc2626; font-weight: 900; }
 
-/* قائمة اختيار محسّنة */
 .form-group select,
 .form-group input[type="text"] {
   width: 100%;
@@ -2651,9 +2408,7 @@ footer::before {
 }
 
 .form-group select:hover,
-.form-group input[type="text"]:hover {
-  border-color: var(--border-gold);
-}
+.form-group input[type="text"]:hover { border-color: var(--border-gold); }
 
 .form-group select:focus,
 .form-group input[type="text"]:focus {
@@ -2662,29 +2417,8 @@ footer::before {
   background: var(--card);
 }
 
-/* شريط الإحصائيات */
-.teacher-files-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  background: linear-gradient(135deg, var(--bg-alt), var(--card));
-  border-radius: 14px;
-  margin-bottom: 20px;
-  border: 2px solid var(--border);
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.files-info-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.files-info-icon {
-  font-size: 1.3rem;
-}
+.files-info-left { display: flex; align-items: center; gap: 10px; }
+.files-info-icon { font-size: 1.3rem; }
 
 .files-count {
   font-family: 'Tajawal', sans-serif;
@@ -2693,11 +2427,8 @@ footer::before {
   color: var(--emerald);
 }
 
-[data-theme="dark"] .files-count {
-  color: var(--gold);
-}
+[data-theme="dark"] .files-count { color: var(--gold); }
 
-/* زر إضافة ملف */
 .btn-add-file {
   background: var(--gradient-gold);
   color: white;
@@ -2716,127 +2447,10 @@ footer::before {
 }
 
 .btn-add-file:hover {
-  transform: translateY(-3px);
   box-shadow: 0 8px 24px rgba(212, 165, 116, 0.5);
 }
 
-.btn-add-file:active {
-  transform: translateY(0);
-}
-
-.btn-add-file span:first-child {
-  font-size: 1.2rem;
-  line-height: 1;
-}
-
-/* حاوية الملفات */
-.files-container {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-/* عنصر ملف */
-.file-input-item {
-  background: var(--bg-alt);
-  border: 2px solid var(--border);
-  border-radius: 16px;
-  padding: 20px;
-  transition: all 0.3s ease;
-  animation: slideInFromRight 0.4s ease backwards;
-  position: relative;
-}
-
-[data-theme="dark"] .file-input-item {
-  background: var(--bg);
-}
-
-.file-input-item:hover {
-  border-color: var(--gold);
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
-}
-
-@keyframes slideInFromRight {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.file-input-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 14px;
-}
-
-.file-number {
-  font-family: 'Tajawal', sans-serif;
-  font-weight: 700;
-  color: var(--emerald);
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-[data-theme="dark"] .file-number {
-  color: var(--gold);
-}
-
-.file-remove-btn {
-  background: linear-gradient(135deg, #fee2e2, #fecaca);
-  color: #dc2626;
-  border: none;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  flex-shrink: 0;
-}
-
-.file-remove-btn:hover {
-  background: #dc2626;
-  color: white;
-  transform: scale(1.1) rotate(90deg);
-}
-
-/* حقل الملف */
-.file-input {
-  width: 100%;
-  padding: 12px 16px;
-  border-radius: 12px;
-  border: 2px dashed var(--border-gold);
-  font-family: 'Tajawal', sans-serif;
-  font-size: 0.9rem;
-  background: var(--card);
-  color: var(--text);
-  margin-bottom: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.file-input:hover {
-  border-color: var(--gold);
-  background: var(--card-hover);
-}
-
-.file-input:focus {
-  outline: none;
-  border-style: solid;
-  border-color: var(--gold);
-  box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.15);
-}
+.btn-add-file span:first-child { font-size: 1.2rem; line-height: 1; }
 
 .file-input::file-selector-button {
   background: var(--gradient-emerald);
@@ -2852,27 +2466,7 @@ footer::before {
 }
 
 .file-input::file-selector-button:hover {
-  transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(13, 95, 74, 0.3);
-}
-
-/* حقل العنوان */
-.file-title-input {
-  width: 100%;
-  padding: 12px 16px;
-  border-radius: 12px;
-  border: 2px solid var(--border);
-  font-family: 'Tajawal', sans-serif;
-  font-size: 0.95rem;
-  background: var(--card);
-  color: var(--text);
-  outline: none;
-  transition: all 0.3s ease;
-}
-
-.file-title-input:focus {
-  border-color: var(--gold);
-  box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.15);
 }
 
 .file-title-input::placeholder {
@@ -2880,7 +2474,6 @@ footer::before {
   font-style: italic;
 }
 
-/* ملاحظة الملفات */
 .files-hint {
   margin-top: 16px;
   padding: 12px 18px;
@@ -2895,7 +2488,6 @@ footer::before {
   gap: 10px;
 }
 
-/* أزرار الإجراءات */
 .form-actions {
   margin-top: 32px;
   padding-top: 24px;
@@ -2915,29 +2507,6 @@ footer::before {
 .btn-upload-submit:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  transform: none !important;
-}
-
-/* النتائج */
-.upload-results {
-  background: var(--card);
-  padding: 28px 32px;
-  border-radius: 20px;
-  border: 2px solid var(--border-gold);
-  margin-top: 24px;
-  animation: slideInFromBottom 0.5s ease;
-  box-shadow: var(--shadow-lg);
-}
-
-@keyframes slideInFromBottom {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .results-header {
@@ -2949,9 +2518,7 @@ footer::before {
   border-bottom: 2px solid var(--border-gold);
 }
 
-.results-icon {
-  font-size: 2rem;
-}
+.results-icon { font-size: 2rem; }
 
 .upload-results h3 {
   font-family: 'Amiri', serif;
@@ -2960,9 +2527,7 @@ footer::before {
   margin: 0;
 }
 
-[data-theme="dark"] .upload-results h3 {
-  color: var(--gold);
-}
+[data-theme="dark"] .upload-results h3 { color: var(--gold); }
 
 .result-summary {
   padding: 20px;
@@ -2988,9 +2553,7 @@ footer::before {
   font-size: 1.2rem;
 }
 
-[data-theme="dark"] .result-summary strong {
-  color: var(--gold);
-}
+[data-theme="dark"] .result-summary strong { color: var(--gold); }
 
 .result-errors {
   background: linear-gradient(135deg, #fef2f2, #fee2e2);
@@ -3025,83 +2588,32 @@ footer::before {
   border-right: 3px solid #dc2626;
 }
 
-/* الجوال */
 @media (max-width: 768px) {
-  .teacher-hero {
-    padding: 50px 0 40px;
-  }
-
-  .teacher-hero-icon {
-    font-size: 3rem;
-  }
-
-  .teacher-hero h1 {
-    font-size: 1.8rem;
-  }
-
-  .teacher-hero-subtitle {
-    font-size: 1rem;
-  }
-
-  .feature-chip {
-    font-size: 0.8rem;
-    padding: 8px 14px;
-  }
-
-  .form-row {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .upload-card-header {
-    padding: 20px 22px;
-  }
-
-  .upload-card-icon {
-    width: 50px;
-    height: 50px;
-    font-size: 1.8rem;
-  }
-
-  .upload-card-title h3 {
-    font-size: 1.2rem;
-  }
-
-  .teacher-upload-card form {
-    padding: 22px;
-  }
-
-  .teacher-files-info {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .btn-add-file {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .files-info-left {
-    justify-content: center;
-  }
-
-  .file-input-item {
-    padding: 16px;
-  }
-
-  .upload-results {
-    padding: 22px 20px;
-  }
+  .teacher-hero { padding: 50px 0 40px; }
+  .teacher-hero-icon { font-size: 3rem; }
+  .teacher-hero h1 { font-size: 1.8rem; }
+  .teacher-hero-subtitle { font-size: 1rem; }
+  .feature-chip { font-size: 0.8rem; padding: 8px 14px; }
+  .form-row { grid-template-columns: 1fr; gap: 16px; }
+  .upload-card-header { padding: 20px 22px; }
+  .upload-card-icon { width: 50px; height: 50px; font-size: 1.8rem; }
+  .upload-card-title h3 { font-size: 1.2rem; }
+  .teacher-upload-card form { padding: 22px; }
+  .teacher-files-info { flex-direction: column; align-items: stretch; }
+  .btn-add-file { width: 100%; justify-content: center; }
+  .files-info-left { justify-content: center; }
+  .file-input-item { padding: 16px; }
+  .upload-results { padding: 22px 20px; }
 }
 
-/* حماية من الحوادث */
 [type="submit"]:disabled,
 button:disabled {
   pointer-events: none;
   opacity: 0.6;
 }
+
 /* ═══════════════════════════════════════════════ */
-/* 👋 ترحيب بالأستاذ                              */
+/* 👋 ترحيب بالأستاذ */
 /* ═══════════════════════════════════════════════ */
 .teacher-welcome {
   background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
@@ -3120,11 +2632,10 @@ button:disabled {
 [data-theme="dark"] .teacher-welcome {
   background: linear-gradient(135deg, #0d5f4a, #084636);
 }
-/* ═══════════════════════════════════════════════ */
-/* 👨‍🎓 بوابة التلاميذ                             */
-/* ═══════════════════════════════════════════════ */
 
-/* Hero الطالب - أزرق */
+/* ═══════════════════════════════════════════════ */
+/* 👨‍🎓 بوابة التلاميذ */
+/* ═══════════════════════════════════════════════ */
 .student-hero {
   background: linear-gradient(135deg, #1a5f8a, #2a7da3, #0d3d5c);
   color: white;
@@ -3144,10 +2655,7 @@ button:disabled {
   pointer-events: none;
 }
 
-.student-hero-content {
-  position: relative;
-  z-index: 1;
-}
+.student-hero-content { position: relative; z-index: 1; }
 
 .student-hero-icon {
   font-size: 4rem;
@@ -3196,7 +2704,6 @@ button:disabled {
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* تنبيه للطالب */
 .student-notice {
   display: flex;
   align-items: center;
@@ -3214,14 +2721,8 @@ button:disabled {
   border-color: #0ea5e9;
 }
 
-.notice-icon {
-  font-size: 2rem;
-  flex-shrink: 0;
-}
-
-.notice-text {
-  flex: 1;
-}
+.notice-icon { font-size: 2rem; flex-shrink: 0; }
+.notice-text { flex: 1; }
 
 .notice-text strong {
   display: block;
@@ -3231,9 +2732,7 @@ button:disabled {
   margin-bottom: 4px;
 }
 
-[data-theme="dark"] .notice-text strong {
-  color: #7dd3fc;
-}
+[data-theme="dark"] .notice-text strong { color: #7dd3fc; }
 
 .notice-text p {
   color: #075985;
@@ -3242,14 +2741,9 @@ button:disabled {
   margin: 0;
 }
 
-[data-theme="dark"] .notice-text p {
-  color: #bae6fd;
-}
+[data-theme="dark"] .notice-text p { color: #bae6fd; }
 
-/* بطاقة الطالب */
-.student-upload-card {
-  border: 2px solid #7dd3fc !important;
-}
+.student-upload-card { border: 2px solid #7dd3fc !important; }
 
 .student-header {
   background: linear-gradient(135deg, #1a5f8a, #2a7da3) !important;
@@ -3263,16 +2757,9 @@ button:disabled {
   background: linear-gradient(135deg, #0d3d5c, #1a5f8a) !important;
 }
 
-/* بطاقة الطالب - title sections بلون أزرق */
-.student-upload-card .form-section-title {
-  color: #0369a1;
-}
+.student-upload-card .form-section-title { color: #0369a1; }
+[data-theme="dark"] .student-upload-card .form-section-title { color: #7dd3fc; }
 
-[data-theme="dark"] .student-upload-card .form-section-title {
-  color: #7dd3fc;
-}
-
-/* ملاحظات النتائج */
 .result-note {
   padding: 12px 16px;
   background: linear-gradient(135deg, #fef3c7, #fde68a);
@@ -3290,7 +2777,6 @@ button:disabled {
   text-align: center;
 }
 
-/* textarea */
 .form-group textarea {
   width: 100%;
   padding: 14px 18px;
@@ -3312,37 +2798,18 @@ button:disabled {
   background: var(--card);
 }
 
-/* الجوال */
 @media (max-width: 768px) {
-  .student-hero {
-    padding: 50px 0 40px;
-  }
-
-  .student-hero-icon {
-    font-size: 3rem;
-  }
-
-  .student-hero h1 {
-    font-size: 1.8rem;
-  }
-
-  .student-hero-subtitle {
-    font-size: 1rem;
-  }
-
-  .student-notice {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .notice-icon {
-    font-size: 2.5rem;
-  }
+  .student-hero { padding: 50px 0 40px; }
+  .student-hero-icon { font-size: 3rem; }
+  .student-hero h1 { font-size: 1.8rem; }
+  .student-hero-subtitle { font-size: 1rem; }
+  .student-notice { flex-direction: column; text-align: center; }
+  .notice-icon { font-size: 2.5rem; }
 }
-/* ═══════════════════════════════════════════════ */
-/* 🤲 إشعار الذكر - يظهر 2 ثواني ويختفي          */
-/* ═══════════════════════════════════════════════ */
 
+/* ═══════════════════════════════════════════════ */
+/* 🤲 إشعار الذكر */
+/* ═══════════════════════════════════════════════ */
 .adhkar-notify {
   position: fixed;
   top: 90px;
@@ -3371,7 +2838,6 @@ button:disabled {
   pointer-events: auto;
 }
 
-/* الأيقونة */
 .adhkar-notify-icon {
   font-size: 1.8rem;
   flex-shrink: 0;
@@ -3384,7 +2850,6 @@ button:disabled {
   50% { transform: scale(1.1); }
 }
 
-/* المحتوى */
 .adhkar-notify-content {
   flex: 1;
   min-width: 0;
@@ -3414,7 +2879,6 @@ button:disabled {
   text-overflow: ellipsis;
 }
 
-/* زر الإغلاق */
 .adhkar-notify-close {
   background: rgba(255, 255, 255, 0.15);
   border: none;
@@ -3437,7 +2901,6 @@ button:disabled {
   transform: rotate(90deg);
 }
 
-/* الجوال */
 @media (max-width: 768px) {
   .adhkar-notify {
     top: 80px;
@@ -3453,22 +2916,490 @@ button:disabled {
     transform: translateX(0) translateY(0);
   }
 
-  .adhkar-notify-icon {
-    font-size: 1.5rem;
-  }
-
-  .adhkar-notify-text {
-    font-size: 0.95rem;
-  }
-
-  .adhkar-notify-source {
-    font-size: 0.7rem;
-  }
-
-  .adhkar-notify-close {
-    width: 24px;
-    height: 24px;
-    font-size: 0.65rem;
-  }
+  .adhkar-notify-icon { font-size: 1.5rem; }
+  .adhkar-notify-text { font-size: 0.95rem; }
+  .adhkar-notify-source { font-size: 0.7rem; }
+  .adhkar-notify-close { width: 24px; height: 24px; font-size: 0.65rem; }
 }
+
+/* ═══════════════════════════════════════════════ */
+/* 📥 قسم المراجعة (admin.html) */
+/* ═══════════════════════════════════════════════ */
+.review-card {
+  background: var(--card);
+  border-radius: 24px;
+  padding: 32px;
+  margin-bottom: 32px;
+  border: 2px solid var(--border-gold);
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.review-card::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(135deg, #d4a574, #b8935a);
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 2px dashed var(--border-gold);
+  flex-wrap: wrap;
+}
+
+.review-title { display: flex; align-items: center; gap: 14px; }
+
+.review-icon {
+  font-size: 2.2rem;
+  width: 55px;
+  height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-alt);
+  border-radius: 14px;
+  flex-shrink: 0;
+}
+
+.review-title h3 {
+  font-family: 'Amiri', serif;
+  font-size: 1.4rem;
+  color: var(--emerald);
+  margin-bottom: 4px;
+}
+
+[data-theme="dark"] .review-title h3 { color: var(--gold); }
+
+.review-subtitle {
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.9rem;
+  color: var(--text-light);
+}
+
+.review-subtitle span {
+  color: var(--emerald);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+[data-theme="dark"] .review-subtitle span { color: var(--gold); }
+
+.review-login { padding: 20px 0; }
+
+.review-login-box {
+  max-width: 400px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 32px 24px;
+  background: var(--bg-alt);
+  border-radius: 16px;
+  border: 2px dashed var(--border-gold);
+}
+
+.review-login-icon { font-size: 2.5rem; display: block; margin-bottom: 12px; }
+
+.review-login-box h4 {
+  font-family: 'Amiri', serif;
+  font-size: 1.2rem;
+  color: var(--emerald);
+  margin-bottom: 8px;
+}
+
+[data-theme="dark"] .review-login-box h4 { color: var(--gold); }
+
+.review-login-box p {
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.9rem;
+  color: var(--text-light);
+  margin-bottom: 16px;
+}
+
+.review-login-box input {
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 2px solid var(--border);
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.95rem;
+  background: var(--card);
+  color: var(--text);
+  margin-bottom: 12px;
+  outline: none;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.review-login-box input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.15);
+}
+
+.pending-list { display: flex; flex-direction: column; gap: 16px; }
+
+.pending-loading,
+.pending-empty {
+  text-align: center;
+  padding: 40px 24px;
+  color: var(--text-light);
+  font-family: 'Tajawal', sans-serif;
+}
+
+.pending-empty span {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 12px;
+  opacity: 0.6;
+}
+
+/* pending-item - مُعدّل */
+.pending-item {
+  background: var(--bg-alt);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  border-right: 4px solid var(--gold);
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.4s ease backwards;
+}
+
+.pending-item:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--gold);
+  background: var(--card-hover);
+}
+
+.pending-info { margin-bottom: 16px; }
+
+.pending-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.pending-file-type {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #92400e;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  font-family: 'Tajawal', sans-serif;
+}
+
+.pending-header h4 {
+  font-family: 'Amiri', serif;
+  font-size: 1.15rem;
+  color: var(--text);
+  flex: 1;
+  min-width: 200px;
+}
+
+.pending-meta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.85rem;
+  color: var(--text-light);
+  padding: 12px 0;
+  border-top: 1px dashed var(--border);
+  border-bottom: 1px dashed var(--border);
+}
+
+.pending-meta strong { color: var(--emerald); }
+[data-theme="dark"] .pending-meta strong { color: var(--gold); }
+
+.pending-note {
+  padding: 10px 14px;
+  background: linear-gradient(135deg, rgba(212, 165, 116, 0.1), rgba(212, 165, 116, 0.05));
+  border-radius: 10px;
+  margin-top: 12px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.9rem;
+  color: var(--text-light);
+  border-right: 3px solid var(--gold);
+}
+
+.pending-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.pending-btn {
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+  flex: 1;
+  min-width: 100px;
+}
+
+.pending-btn.view {
+  background: var(--gradient-emerald);
+  color: white;
+  box-shadow: 0 4px 12px rgba(13, 95, 74, 0.25);
+}
+
+.pending-btn.view:hover {
+  box-shadow: 0 6px 20px rgba(13, 95, 74, 0.4);
+}
+
+.pending-btn.approve {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.pending-btn.approve:hover {
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+}
+
+.pending-btn.reject {
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  color: #dc2626;
+}
+
+.pending-btn.reject:hover {
+  background: #dc2626;
+  color: white;
+}
+
+/* ═══════════════════════════════════════════════ */
+/* 📚 قسم دروسي المرفوعة (الأستاذ) */
+/* ═══════════════════════════════════════════════ */
+.my-lessons-section {
+  background: var(--card);
+  border-radius: 24px;
+  padding: 32px;
+  margin-top: 32px;
+  border: 2px solid var(--border);
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.my-lessons-section::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 100%;
+  height: 5px;
+  background: var(--gradient-emerald);
+}
+
+.my-lessons-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 2px dashed var(--border-gold);
+  flex-wrap: wrap;
+}
+
+.my-lessons-title { display: flex; align-items: center; gap: 14px; }
+
+.my-lessons-icon {
+  font-size: 2.2rem;
+  width: 55px;
+  height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-alt);
+  border-radius: 14px;
+  flex-shrink: 0;
+}
+
+.my-lessons-title h3 {
+  font-family: 'Amiri', serif;
+  font-size: 1.4rem;
+  color: var(--emerald);
+  margin-bottom: 4px;
+}
+
+[data-theme="dark"] .my-lessons-title h3 { color: var(--gold); }
+
+.my-lessons-subtitle {
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.9rem;
+  color: var(--text-light);
+}
+
+.my-lessons-subtitle span {
+  color: var(--emerald);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+[data-theme="dark"] .my-lessons-subtitle span { color: var(--gold); }
+
+.btn-refresh {
+  background: var(--bg-alt);
+  border: 2px solid var(--border);
+  color: var(--text);
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-refresh:hover {
+  background: var(--gradient-emerald);
+  color: white;
+  border-color: transparent;
+  transform: rotate(90deg) scale(1.05);
+}
+
+.my-lessons-list { display: flex; flex-direction: column; gap: 12px; }
+
+/* my-lesson-item - مُعدّل */
+.my-lesson-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--bg-alt);
+  border-radius: 14px;
+  border-right: 4px solid var(--emerald);
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.4s ease backwards;
+}
+
+.my-lesson-item:hover {
+  background: var(--card-hover);
+  box-shadow: var(--shadow-lg);
+}
+
+.my-lesson-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.my-lesson-icon {
+  font-size: 1.8rem;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card);
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.my-lesson-text { flex: 1; min-width: 0; }
+
+.my-lesson-text h4 {
+  font-family: 'Amiri', serif;
+  font-size: 1.05rem;
+  color: var(--text);
+  margin-bottom: 4px;
+  word-break: break-word;
+}
+
+.my-lesson-text p {
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.85rem;
+  color: var(--text-light);
+  word-break: break-word;
+}
+
+.my-lesson-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+.my-lesson-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.my-lesson-btn.view {
+  background: var(--gradient-emerald);
+  color: white;
+  box-shadow: 0 4px 12px rgba(13, 95, 74, 0.25);
+}
+
+.my-lesson-btn.view:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(13, 95, 74, 0.4);
+}
+
+.my-lesson-btn.delete {
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  color: #dc2626;
+}
+
+.my-lesson-btn.delete:hover {
+  background: #dc2626;
+  color: white;
+  transform: scale(1.1);
+}
+
+.my-lessons-loading,
+.my-lessons-empty {
+  text-align: center;
+  padding: 40px 24px;
+  color: var(--text-light);
+  font-family: 'Tajawal', sans-serif;
+  font-size: 1rem;
+}
+
+.my-lessons-empty .empty-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 12px;
+  opacity: 0.6;
+}
+
+@media (max-width: 768px) {
+  .my-lessons-section { padding: 22px; }
+  .my-lessons-header { flex-direction: column; align-items: stretch; }
+  .btn-refresh { width: 100%; justify-content: center; }
+  .my-lesson-item { flex-direction: column; align-items: stretch; }
+  .my-lesson-actions { justify-content: flex-end; }
+  .my-lesson-btn { flex: 1; max-width: 60px; }
+  .review-card { padding: 22px 18px; }
+  .review-header { flex-direction: column; align-items: stretch; }
+  .pending-item { padding: 16px; }
+  .pending-meta { flex-direction: column; gap: 8px; }
+  .pending-actions { flex-direction: column; }
+  .pending-btn { width: 100%; }
+}
+
 .admin-hidden { display: none !important; }
