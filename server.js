@@ -126,7 +126,6 @@ const checkAdmin = (req, res, next) => {
 
 const checkTeacher = async (req, res, next) => {
   if (req.session && req.session.user && req.session.user.role === 'teacher') {
-    // تحقق من أن الحساب لا يزال نشطاً (إن كان مربوطاً بـ Teacher._id)
     if (req.session.user.id) {
       try {
         const t = await Teacher.findById(req.session.user.id).lean();
@@ -144,7 +143,6 @@ const checkTeacher = async (req, res, next) => {
         // في حال خطأ في القراءة، نكمل بالبيانات القديمة
       }
     }
-    // حساب قديم (بدون _id) — للتوافق فقط
     req.teacher = req.session.user.name;
     req.teacherId = null;
     req.teacherEmail = req.session.user.email || '';
@@ -205,20 +203,33 @@ async function uploadFile(file) {
 // ═══════════════════════════════════════════════
 app.get('/auth/google', (req, res) => {
   if (!process.env.GOOGLE_CLIENT_ID) return res.status(500).send('Google OAuth غير مضبوط');
+  const from = req.query.from === 'teacher' ? 'teacher' : 'admin';
+  const state = Buffer.from(JSON.stringify({ from })).toString('base64');
   const url = googleClient.generateAuthUrl({
     access_type: 'online',
     scope: ['openid', 'email', 'profile'],
     prompt: 'select_account',
-    redirect_uri: GOOGLE_REDIRECT_URI
+    redirect_uri: GOOGLE_REDIRECT_URI,
+    state: state
   });
   res.redirect(url);
 });
 
 app.get('/auth/google/callback', async (req, res) => {
   try {
-    const { code, error } = req.query;
-    if (error) return res.redirect('/admin.html?error=google_denied');
-    if (!code) return res.redirect('/admin.html?error=no_code');
+    const { code, error, state } = req.query;
+    let from = 'admin';
+    try {
+      const parsed = JSON.parse(Buffer.from(state || '', 'base64').toString('utf8'));
+      if (parsed.from === 'teacher') from = 'teacher';
+    } catch (e) { /* نبقى على admin */ }
+
+    if (error) {
+      return res.redirect((from === 'teacher' ? '/teacher.html' : '/admin.html') + '?error=google_denied');
+    }
+    if (!code) {
+      return res.redirect((from === 'teacher' ? '/teacher.html' : '/admin.html') + '?error=no_code');
+    }
 
     const { tokens } = await googleClient.getToken({ code, redirect_uri: GOOGLE_REDIRECT_URI });
     const ticket = await googleClient.verifyIdToken({
@@ -233,6 +244,9 @@ app.get('/auth/google/callback', async (req, res) => {
     const admins = (process.env.ADMIN_EMAILS || '')
       .split(',').map(x => x.trim().toLowerCase()).filter(Boolean);
     if (admins.includes(email)) {
+      if (from === 'teacher') {
+        return res.redirect('/teacher.html?error=wrong_role');
+      }
       req.session.user = {
         email,
         name: 'المدير',
@@ -246,6 +260,9 @@ app.get('/auth/google/callback', async (req, res) => {
     // ═══ 2) هل هو أستاذ في قاعدة البيانات؟ ═══
     const teacher = await Teacher.findOne({ email, active: true });
     if (teacher) {
+      if (from === 'admin') {
+        return res.redirect('/admin.html?error=wrong_role');
+      }
       teacher.lastLogin = new Date();
       await teacher.save();
 
@@ -262,7 +279,7 @@ app.get('/auth/google/callback', async (req, res) => {
 
     // ═══ 3) غير مصرح ═══
     console.warn('⛔ بريد غير مصرح:', email);
-    return res.redirect('/admin.html?error=unauthorized');
+    return res.redirect((from === 'teacher' ? '/teacher.html' : '/admin.html') + '?error=unauthorized');
   } catch (err) {
     console.error('خطأ في Google callback:', err);
     res.redirect('/admin.html?error=google_failed');
@@ -360,13 +377,10 @@ app.post('/api/review-login', (req, res) => {
 // ═══════════════════════════════════════════════
 // 👥 إدارة الأساتذة (للمدير فقط)
 // ═══════════════════════════════════════════════
-
-// قائمة الأساتذة مع عدد الدروس
 app.get('/api/admin/teachers', checkAdmin, async (req, res) => {
   try {
     const teachers = await Teacher.find().sort({ createdAt: -1 }).lean();
 
-    // احسب عدد الدروس لكل أستاذ
     const counts = await Lesson.aggregate([
       { $match: { uploader: 'teacher', uploaderId: { $ne: null } } },
       { $group: { _id: '$uploaderId', count: { $sum: 1 } } }
@@ -390,7 +404,6 @@ app.get('/api/admin/teachers', checkAdmin, async (req, res) => {
   }
 });
 
-// إضافة أستاذ جديد
 app.post('/api/admin/teachers', checkAdmin, async (req, res) => {
   try {
     const { email, name, password } = req.body;
@@ -437,7 +450,6 @@ app.post('/api/admin/teachers', checkAdmin, async (req, res) => {
   }
 });
 
-// تعديل أستاذ (الاسم / كلمة السر)
 app.put('/api/admin/teachers/:id', checkAdmin, async (req, res) => {
   try {
     const { name, password } = req.body;
@@ -463,7 +475,6 @@ app.put('/api/admin/teachers/:id', checkAdmin, async (req, res) => {
   }
 });
 
-// تعطيل أستاذ (Soft Delete)
 app.post('/api/admin/teachers/:id/disable', checkAdmin, async (req, res) => {
   try {
     const teacher = await Teacher.findByIdAndUpdate(
@@ -487,7 +498,6 @@ app.post('/api/admin/teachers/:id/disable', checkAdmin, async (req, res) => {
   }
 });
 
-// إعادة تفعيل أستاذ
 app.post('/api/admin/teachers/:id/activate', checkAdmin, async (req, res) => {
   try {
     const teacher = await Teacher.findByIdAndUpdate(
@@ -505,7 +515,6 @@ app.post('/api/admin/teachers/:id/activate', checkAdmin, async (req, res) => {
   }
 });
 
-// حذف أستاذ نهائياً (فقط إن لم يكن لديه دروس)
 app.delete('/api/admin/teachers/:id', checkAdmin, async (req, res) => {
   try {
     const teacher = await Teacher.findById(req.params.id);
@@ -775,7 +784,7 @@ app.delete('/api/lessons/:id', checkAdmin, async (req, res) => {
 });
 
 // ═══════════════════════════════════════════════
-// 🔄 Migration: نقل الأساتذة من TEACHERS_JSON إلى MongoDB
+// 🔄 Migration: نقل الأساتذة من TEACHERS_JSON
 // ═══════════════════════════════════════════════
 async function migrateTeachers() {
   try {
@@ -792,7 +801,6 @@ async function migrateTeachers() {
     let migrated = 0;
     for (const key of Object.keys(parsed)) {
       const val = parsed[key];
-      // الصيغة الجديدة فقط: { email: { name, password } }
       if (val && typeof val === 'object' && val.password && key.includes('@')) {
         const hash = await bcrypt.hash(val.password, 10);
         try {
@@ -815,7 +823,6 @@ async function migrateTeachers() {
 
     if (migrated > 0) {
       console.log(`🔄 تم ترحيل ${migrated} أستاذ من TEACHERS_JSON إلى قاعدة البيانات`);
-      console.log('ℹ️ يمكنك الآن حذف TEACHERS_JSON من .env إن أردت');
     } else {
       console.log('ℹ️ لا يوجد أساتذة لترحيلهم');
     }
@@ -842,7 +849,6 @@ async function migrateLessonOwners() {
     console.log(`🔄 ترحيل ${orphans} درس قديم (بدون uploaderId)...`);
     const teachers = await Teacher.find().lean();
     let linked = 0;
-    let unlinked = 0;
 
     for (const t of teachers) {
       const result = await Lesson.updateMany(
@@ -856,8 +862,7 @@ async function migrateLessonOwners() {
       linked += result.modifiedCount;
     }
 
-    // احسب المتبقي
-    unlinked = await Lesson.countDocuments({
+    const unlinked = await Lesson.countDocuments({
       uploader: 'teacher',
       $or: [{ uploaderId: { $exists: false } }, { uploaderId: null }]
     });
@@ -879,12 +884,9 @@ mongoose
   .then(async () => {
     console.log('🍃 متصل بـ MongoDB');
 
-    // ترحيل الأساتذة
     await migrateTeachers();
-    // ربط الدروس
     await migrateLessonOwners();
 
-    // ترحيل قديم للدروس بدون status
     try {
       const result = await Lesson.updateMany(
         { status: { $exists: false } },

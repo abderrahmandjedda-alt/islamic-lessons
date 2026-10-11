@@ -62,7 +62,12 @@ async function checkSession() {
   try {
     const res = await fetch(API + '/me', { credentials: 'same-origin' });
     if (res.ok) {
-      currentUser = await res.json();
+      const user = await res.json();
+      // ⚠️ لا تعرض لوحة المدير لغير المدير
+      if (user.role !== 'admin') {
+        return false;
+      }
+      currentUser = user;
       showPanel();
       return true;
     }
@@ -686,10 +691,11 @@ document.addEventListener('DOMContentLoaded', async function () {
   const googleError = new URLSearchParams(location.search).get('error');
   if (googleError && $('loginError')) {
     const messages = {
-      unauthorized: 'هذا الحساب غير مصرّح له بالدخول',
-      google_denied: 'تم إلغاء الدخول بجوجل',
-      google_failed: 'تعذر الدخول بجوجل، حاول مرة أخرى'
-    };
+  unauthorized: 'هذا الحساب غير مصرّح له بالدخول',
+  google_denied: 'تم إلغاء الدخول بجوجل',
+  google_failed: 'تعذر الدخول بجوجل، حاول مرة أخرى',
+  wrong_role: 'هذا الحساب أستاذ. ادخل من بوابة الأساتذة بدلاً من هنا.'
+};
     $('loginError').textContent = messages[googleError] || 'تعذر الدخول بجوجل';
     history.replaceState(null, '', location.pathname);
   }

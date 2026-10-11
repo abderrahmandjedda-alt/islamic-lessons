@@ -247,13 +247,40 @@ window.doLogin = doLogin;
 // ✅ التحقق التلقائي من الجلسة
 // ═══════════════════════════════════════════════
 async function verifyAndShow() {
+  // اقرأ رسالة الخطأ من رابط Google إن وُجدت
+  const params = new URLSearchParams(location.search);
+  const err = params.get('error');
+  if (err) {
+    const errEl = $('loginError');
+    const messages = {
+      unauthorized: 'هذا الحساب غير مصرح له بالدخول. تواصل مع إدارة المنصة.',
+      google_denied: 'تم إلغاء الدخول من Google.',
+      google_failed: 'فشل الدخول بحساب Google. حاول مجدداً.',
+      no_code: 'لم يتم استلام بيانات من Google.',
+      wrong_role: 'هذا الحساب مدير. ادخل من لوحة التحكم بدلاً من هنا.'
+    };
+    if (errEl) {
+      setMsg(errEl, messages[err] || 'حدث خطأ في الدخول.', 'circle-x');
+      errEl.style.color = 'red';
+    }
+    history.replaceState({}, '', location.pathname);
+  }
+
   try {
     const res = await fetch(API + '/me', { credentials: 'same-origin' });
     if (res.ok) {
       const user = await res.json();
+
+      // ⚠️ إن كان الحساب مديراً، احوّله للوحة التحكم
+      if (user.role === 'admin') {
+        window.location.href = '/admin.html';
+        return;
+      }
+
       if (user.role === 'teacher') {
         teacherName = user.name || teacherName;
         sessionStorage.setItem('teacherName', teacherName);
+        if (user.email) saveAccount(user.email, 'teacher', teacherName);
         showPanel();
       }
     } else {
