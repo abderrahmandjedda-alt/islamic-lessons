@@ -139,9 +139,7 @@ const checkTeacher = async (req, res, next) => {
         req.teacherId = String(t._id);
         req.teacherEmail = t.email;
         return next();
-      } catch (e) {
-        // في حال خطأ في القراءة، نكمل بالبيانات القديمة
-      }
+      } catch (e) { /* fall through */ }
     }
     req.teacher = req.session.user.name;
     req.teacherId = null;
@@ -222,7 +220,7 @@ app.get('/auth/google/callback', async (req, res) => {
     try {
       const parsed = JSON.parse(Buffer.from(state || '', 'base64').toString('utf8'));
       if (parsed.from === 'teacher') from = 'teacher';
-    } catch (e) { /* نبقى على admin */ }
+    } catch (e) {}
 
     if (error) {
       return res.redirect((from === 'teacher' ? '/teacher.html' : '/admin.html') + '?error=google_denied');
@@ -475,6 +473,7 @@ app.put('/api/admin/teachers/:id', checkAdmin, async (req, res) => {
   }
 });
 
+// تعطيل أستاذ (Soft Delete)
 app.post('/api/admin/teachers/:id/disable', checkAdmin, async (req, res) => {
   try {
     const teacher = await Teacher.findByIdAndUpdate(
@@ -498,6 +497,7 @@ app.post('/api/admin/teachers/:id/disable', checkAdmin, async (req, res) => {
   }
 });
 
+// تفعيل أستاذ
 app.post('/api/admin/teachers/:id/activate', checkAdmin, async (req, res) => {
   try {
     const teacher = await Teacher.findByIdAndUpdate(
@@ -515,21 +515,51 @@ app.post('/api/admin/teachers/:id/activate', checkAdmin, async (req, res) => {
   }
 });
 
+// 🗑️ حذف أستاذ نهائياً + كل دروسه + ملفاته
 app.delete('/api/admin/teachers/:id', checkAdmin, async (req, res) => {
   try {
     const teacher = await Teacher.findById(req.params.id);
     if (!teacher) return res.status(404).json({ error: 'الأستاذ غير موجود' });
 
-    const count = await Lesson.countDocuments({ uploaderId: teacher._id });
-    if (count > 0) {
-      return res.status(400).json({
-        error: `لا يمكن الحذف. للأستاذ ${count} درس. استخدم "تعطيل" بدلاً من ذلك.`
-      });
+    // 1) اجلب كل دروس الأستاذ
+    const lessons = await Lesson.find({ uploaderId: teacher._id });
+    const lessonsCount = lessons.length;
+
+    // 2) احذف الملفات من Cloudinary أو محلي
+    let filesDeleted = 0;
+    for (const lesson of lessons) {
+      if (lesson.storage === 'cloudinary' && lesson.storedName) {
+        try {
+          await cloudinary.uploader.destroy(lesson.storedName, { resource_type: 'raw' });
+          filesDeleted++;
+        } catch (err) {
+          console.error('خطأ في حذف Cloudinary:', lesson.storedName, err.message);
+        }
+      } else if (lesson.storedName) {
+        const filePath = path.join(UPLOAD_DIR, lesson.storedName);
+        if (fs.existsSync(filePath)) {
+          try { fs.unlinkSync(filePath); filesDeleted++; }
+          catch (err) { console.error('خطأ في حذف الملف:', filePath, err.message); }
+        }
+      }
     }
 
+    // 3) احذف كل الدروس من قاعدة البيانات
+    if (lessonsCount > 0) {
+      await Lesson.deleteMany({ uploaderId: teacher._id });
+    }
+
+    // 4) احذف الأستاذ
     await Teacher.deleteOne({ _id: teacher._id });
-    console.log(`🗑️ حذف الأستاذ: ${teacher.name}`);
-    res.json({ success: true });
+
+    console.log(`🗑️ حذف الأستاذ: ${teacher.name} — ${lessonsCount} درس — ${filesDeleted} ملف`);
+
+    res.json({
+      success: true,
+      deletedLessons: lessonsCount,
+      deletedFiles: filesDeleted,
+      message: `تم حذف ${teacher.name} و ${lessonsCount} درس`
+    });
   } catch (err) {
     console.error('خطأ في حذف الأستاذ:', err);
     res.status(500).json({ error: err.message });
@@ -869,7 +899,7 @@ async function migrateLessonOwners() {
 
     console.log(`✅ تم ربط ${linked} درس بالأستاذ الصحيح`);
     if (unlinked > 0) {
-      console.log(`⚠️ ${unlinked} درس لم نجد له أستاذاً مطابقاً (سيظهر للمدير فقط)`);
+      console.log(`⚠️ ${unlinked} درس لم نجد له أستاذاً مطابقاً`);
     }
   } catch (err) {
     console.error('خطأ في ربط الدروس:', err.message);

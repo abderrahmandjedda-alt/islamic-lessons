@@ -1,11 +1,15 @@
 // ═══════════════════════════════════════════════
-// 👨‍💼 لوحة تحكم الأدمن — دخول بالبريد وكلمة السر
+// 👨‍💼 لوحة تحكم الأدمن
 // ═══════════════════════════════════════════════
 
 const API = '/api';
 let reviewPassword = sessionStorage.getItem('reviewPwd') || '';
 let currentUser = null;
+let teachersCache = [];
 
+// ═══════════════════════════════════════════════
+// 🛠️ أدوات
+// ═══════════════════════════════════════════════
 function $(id) { return document.getElementById(id); }
 
 function escapeHtml(str) {
@@ -36,7 +40,9 @@ function showToast(msg) {
   setTimeout(() => { toast.classList.add('toast-hide'); setTimeout(() => toast.remove(), 300); }, 2500);
 }
 
+// ═══════════════════════════════════════════════
 // 🌙 الوضع الليلي
+// ═══════════════════════════════════════════════
 (function initTheme() {
   const themeToggle = $('themeToggle');
   if (!themeToggle) return;
@@ -57,16 +63,16 @@ function showToast(msg) {
   });
 })();
 
+// ═══════════════════════════════════════════════
 // 🔵 فحص الجلسة
+// ═══════════════════════════════════════════════
 async function checkSession() {
   try {
     const res = await fetch(API + '/me', { credentials: 'same-origin' });
     if (res.ok) {
       const user = await res.json();
       // ⚠️ لا تعرض لوحة المدير لغير المدير
-      if (user.role !== 'admin') {
-        return false;
-      }
+      if (user.role !== 'admin') return false;
       currentUser = user;
       showPanel();
       return true;
@@ -75,7 +81,6 @@ async function checkSession() {
   return false;
 }
 
-// 👤 عرض اسم المستخدم في الأعلى
 function showUserChip() {
   if (!currentUser) return;
   const chip = $('userChip');
@@ -84,21 +89,16 @@ function showUserChip() {
 
   const roleLabel = currentUser.role === 'admin' ? 'مدير'
                   : currentUser.role === 'teacher' ? 'أستاذ'
-                  : currentUser.role === 'reviewer' ? 'مراجع'
-                  : '';
-
+                  : currentUser.role === 'reviewer' ? 'مراجع' : '';
   const displayName = (currentUser.name || currentUser.email || '').trim();
 
   function normalize(s) {
     return String(s || '').trim().replace(/^ال/, '').replace(/[ًٌٍَُِّْـ]/g, '');
   }
-
   const sameAsRole = normalize(displayName) === normalize(roleLabel);
-  if (!displayName || sameAsRole) {
-    nameEl.textContent = roleLabel;
-  } else {
-    nameEl.textContent = displayName + ' · ' + roleLabel;
-  }
+
+  if (!displayName || sameAsRole) nameEl.textContent = roleLabel;
+  else nameEl.textContent = displayName + ' · ' + roleLabel;
 
   chip.style.display = 'inline-flex';
   if (window.lucide) window.lucide.createIcons();
@@ -110,7 +110,9 @@ async function logout() {
   location.href = '/admin.html';
 }
 
+// ═══════════════════════════════════════════════
 // 🔐 تسجيل الدخول
+// ═══════════════════════════════════════════════
 async function login(e) {
   if (e) e.preventDefault();
   const email = $('emailInput').value.trim();
@@ -135,9 +137,7 @@ async function login(e) {
       errEl.textContent = '';
       const meRes = await fetch(API + '/me', { credentials: 'same-origin' });
       if (meRes.ok) currentUser = await meRes.json();
-
       if (currentUser) saveAccount(currentUser.email, currentUser.role, currentUser.name);
-
       showPanel();
     } else {
       errEl.textContent = json.error || 'فشل الدخول';
@@ -155,8 +155,6 @@ function showPanel() {
   fillYears();
   loadAdminLessons();
   initReviewSection();
-
-  // 👥 إدارة الأساتذة للمدير فقط
   if (currentUser && currentUser.role === 'admin') {
     const card = $('teachersCard');
     if (card) card.style.display = 'block';
@@ -164,7 +162,9 @@ function showPanel() {
   }
 }
 
+// ═══════════════════════════════════════════════
 // 📋 القوائم
+// ═══════════════════════════════════════════════
 function fillYears() {
   const sel = $('yearSelect');
   if (!sel || sel.options.length > 1) return;
@@ -207,7 +207,95 @@ function updateSubjects() {
 window.updateSpecializations = updateSpecializations;
 window.updateSubjects = updateSubjects;
 
+// ═══════════════════════════════════════════════
+// 🎨 نافذة تأكيد مخصصة
+// ═══════════════════════════════════════════════
+function customConfirm(options) {
+  return new Promise(function (resolve) {
+    const opt = options || {};
+    const title = opt.title || 'تأكيد';
+    const message = opt.message || '';
+    const lines = opt.lines || [];
+    const confirmText = opt.confirmText || 'حسنًا';
+    const cancelText = opt.cancelText || 'إلغاء';
+    const variant = opt.variant || 'primary';
+
+    const root = $('modalRoot');
+    root.innerHTML =
+      '<div class="modal-backdrop" id="confirmBackdrop">' +
+        '<div class="modal-card confirm-card confirm-' + variant + '" onclick="event.stopPropagation()">' +
+          '<div class="confirm-icon">' +
+            (variant === 'danger'
+              ? '<i data-lucide="alert-triangle"></i>'
+              : variant === 'warning'
+              ? '<i data-lucide="alert-circle"></i>'
+              : '<i data-lucide="help-circle"></i>') +
+          '</div>' +
+          '<h3 class="confirm-title">' + escapeHtml(title) + '</h3>' +
+          (message ? '<p class="confirm-message">' + escapeHtml(message) + '</p>' : '') +
+          (lines.length
+            ? '<ul class="confirm-lines">' +
+                lines.map(function (line) {
+                  return '<li>' + escapeHtml(line) + '</li>';
+                }).join('') +
+              '</ul>'
+            : '') +
+          (opt.hint ? '<p class="confirm-hint">' + escapeHtml(opt.hint) + '</p>' : '') +
+          '<div class="confirm-actions">' +
+            '<button type="button" class="btn-modal secondary" id="confirmCancelBtn">' +
+              escapeHtml(cancelText) +
+            '</button>' +
+            '<button type="button" class="btn-modal ' + variant + '" id="confirmOkBtn">' +
+              escapeHtml(confirmText) +
+            '</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+    if (window.lucide) window.lucide.createIcons();
+
+    function cleanup(result) {
+      document.removeEventListener('keydown', onKey);
+      root.innerHTML = '';
+      resolve(result);
+    }
+    function onKey(e) {
+      if (e.key === 'Escape') cleanup(false);
+      if (e.key === 'Enter') cleanup(true);
+    }
+
+    document.addEventListener('keydown', onKey);
+    $('confirmBackdrop').addEventListener('click', function (e) {
+      if (e.target.id === 'confirmBackdrop') cleanup(false);
+    });
+    $('confirmCancelBtn').addEventListener('click', function () { cleanup(false); });
+    $('confirmOkBtn').addEventListener('click', function () { cleanup(true); });
+    $('confirmOkBtn').focus();
+  });
+}
+window.customConfirm = customConfirm;
+
+// ═══════════════════════════════════════════════
+// 🪟 نافذة Modal عامة
+// ═══════════════════════════════════════════════
+function openModal(html) {
+  const root = $('modalRoot');
+  root.innerHTML =
+    '<div class="modal-backdrop" id="modalBackdrop">' +
+      '<div class="modal-card" onclick="event.stopPropagation()">' + html + '</div>' +
+    '</div>';
+  $('modalBackdrop').addEventListener('click', closeModal);
+  if (window.lucide) window.lucide.createIcons();
+}
+function closeModal() {
+  const root = $('modalRoot');
+  if (root) root.innerHTML = '';
+}
+window.closeModal = closeModal;
+
+// ═══════════════════════════════════════════════
 // 📤 رفع درس (الأدمن)
+// ═══════════════════════════════════════════════
 async function handleUpload(e) {
   e.preventDefault();
   const form = e.target;
@@ -236,7 +324,9 @@ async function handleUpload(e) {
   }
 }
 
+// ═══════════════════════════════════════════════
 // 🗂️ إدارة الدروس
+// ═══════════════════════════════════════════════
 async function loadAdminLessons() {
   try {
     const res = await fetch(API + '/lessons');
@@ -268,7 +358,16 @@ async function loadAdminLessons() {
 }
 
 async function deleteLesson(id) {
-  if (!confirm('هل تريد حذف هذا الدرس نهائياً؟')) return;
+  const ok = await customConfirm({
+    title: 'حذف درس',
+    message: 'هل تريد حذف هذا الدرس نهائياً؟',
+    lines: ['سيُحذف الملف من السيرفر', 'لن يظهر للطلاب بعد الآن'],
+    confirmText: 'حذف',
+    variant: 'danger',
+    hint: 'لا يمكن التراجع!'
+  });
+  if (!ok) return;
+
   try {
     const res = await fetch(API + '/lessons/' + id, { method: 'DELETE', credentials: 'same-origin' });
     if (res.ok) { showToast('تم الحذف'); loadAdminLessons(); }
@@ -278,11 +377,8 @@ async function deleteLesson(id) {
 window.deleteLesson = deleteLesson;
 
 // ═══════════════════════════════════════════════
-// 👥 إدارة الأساتذة (للمدير فقط)
+// 👥 إدارة الأساتذة
 // ═══════════════════════════════════════════════
-
-let teachersCache = [];
-
 async function loadTeachers() {
   const container = $('teachersList');
   if (!container) return;
@@ -350,23 +446,6 @@ async function loadTeachers() {
 }
 window.loadTeachers = loadTeachers;
 
-// 🪟 إظهار نافذة إضافة/تعديل
-function openModal(html) {
-  const root = $('modalRoot');
-  root.innerHTML =
-    '<div class="modal-backdrop" id="modalBackdrop">' +
-      '<div class="modal-card" onclick="event.stopPropagation()">' + html + '</div>' +
-    '</div>';
-  const bd = $('modalBackdrop');
-  bd.addEventListener('click', closeModal);
-  if (window.lucide) window.lucide.createIcons();
-}
-function closeModal() {
-  const root = $('modalRoot');
-  if (root) root.innerHTML = '';
-}
-window.closeModal = closeModal;
-
 // ➕ إضافة أستاذ
 function openAddTeacher() {
   openModal(
@@ -430,24 +509,17 @@ function openEditTeacher(id) {
 }
 window.openEditTeacher = openEditTeacher;
 
-// 💾 حفظ (إضافة أو تعديل)
+// 💾 حفظ
 async function saveTeacher(id) {
   const errEl = $('modalErr');
   const name = $('tName').value.trim();
   const pwdEl = $('tPassword');
   const password = pwdEl ? pwdEl.value : '';
 
-  if (!name) {
-    errEl.textContent = 'الاسم مطلوب';
-    return;
-  }
-  if (!id && !password) {
-    errEl.textContent = 'كلمة السر مطلوبة';
-    return;
-  }
+  if (!name) { errEl.textContent = 'الاسم مطلوب'; return; }
+  if (!id && !password) { errEl.textContent = 'كلمة السر مطلوبة'; return; }
   if (password && password.length < 6) {
-    errEl.textContent = 'كلمة السر 6 أحرف على الأقل';
-    return;
+    errEl.textContent = 'كلمة السر 6 أحرف على الأقل'; return;
   }
 
   const btn = $('saveTeacherBtn');
@@ -457,7 +529,6 @@ async function saveTeacher(id) {
   try {
     let res;
     if (id) {
-      // تعديل
       res = await fetch(API + '/admin/teachers/' + id, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -465,7 +536,6 @@ async function saveTeacher(id) {
         body: JSON.stringify({ name, password: password || undefined })
       });
     } else {
-      // إضافة
       const email = $('tEmail').value.trim();
       if (!email) { errEl.textContent = 'البريد مطلوب'; btn.disabled = false; btn.textContent = 'حفظ'; return; }
       res = await fetch(API + '/admin/teachers', {
@@ -493,18 +563,25 @@ async function saveTeacher(id) {
   }
 }
 
-// ⏸️/▶️ تعطيل أو تفعيل
+// ⏸️/▶️ تعطيل/تفعيل
 async function toggleTeacherStatus(id, activate) {
   const t = teachersCache.find(x => x._id === id);
   if (!t) return;
 
   if (!activate) {
-    // تأكيد قبل التعطيل
-    const msg = 'تعطيل حساب "' + t.name + '"؟\n\n' +
-                '• لن يستطيع الدخول بعد الآن.\n' +
-                '• دروسه (' + t.lessonCount + ') ستبقى ظاهرة للطلاب.\n' +
-                '• يمكنك إعادة تفعيله في أي وقت.';
-    if (!confirm(msg)) return;
+    const ok = await customConfirm({
+      title: 'تعطيل ' + t.name,
+      message: 'هل تريد تعطيل هذا الحساب؟',
+      lines: [
+        'لن يستطيع الأستاذ الدخول',
+        t.lessonCount > 0
+          ? 'دروسه (' + t.lessonCount + ') ستبقى ظاهرة للطلاب'
+          : 'يمكنك إعادة تفعيله في أي وقت'
+      ],
+      confirmText: 'تعطيل',
+      variant: 'warning'
+    });
+    if (!ok) return;
   }
 
   const action = activate ? 'activate' : 'disable';
@@ -526,22 +603,31 @@ async function toggleTeacherStatus(id, activate) {
 }
 window.toggleTeacherStatus = toggleTeacherStatus;
 
-// 🗑️ حذف (تحقق أولاً)
+// 🗑️ حذف نهائي
 async function tryDeleteTeacher(id) {
   const t = teachersCache.find(x => x._id === id);
   if (!t) return;
 
+  const lines = ['حساب الأستاذ'];
   if (t.lessonCount > 0) {
-    alert(
-      'لا يمكن حذف "' + t.name + '".\n\n' +
-      'لديه ' + t.lessonCount + ' درس في الموقع.\n\n' +
-      'استخدم "تعطيل" بدلاً من الحذف،\n' +
-      'وسيبقى الأستاذ محفوظاً مع دروسه.'
-    );
-    return;
+    lines.push(t.lessonCount + ' درس من دروسه');
+    lines.push('جميع ملفات هذه الدروس');
   }
 
-  if (!confirm('حذف حساب "' + t.name + '" نهائياً؟\n\nلا يمكن التراجع!')) return;
+  const ok = await customConfirm({
+    title: 'حذف حساب ' + t.name,
+    message: t.lessonCount > 0
+      ? '⚠️ سيتم حذف:'
+      : 'لا يوجد لديه دروس حالياً.',
+    lines: lines,
+    confirmText: 'حذف نهائي',
+    cancelText: 'إلغاء',
+    variant: 'danger',
+    hint: t.lessonCount > 0
+      ? '💡 لإبقاء الدروس، اختر "إلغاء" ثم "تعطيل" بدلاً من الحذف.'
+      : 'لا يمكن التراجع!'
+  });
+  if (!ok) return;
 
   try {
     const res = await fetch(API + '/admin/teachers/' + id, {
@@ -550,8 +636,9 @@ async function tryDeleteTeacher(id) {
     });
     const json = await res.json();
     if (res.ok) {
-      showToast('تم حذف الأستاذ');
+      showToast(json.message || 'تم حذف الأستاذ');
       loadTeachers();
+      loadAdminLessons();
     } else {
       showToast(json.error || 'فشل الحذف');
     }
@@ -561,7 +648,9 @@ async function tryDeleteTeacher(id) {
 }
 window.tryDeleteTeacher = tryDeleteTeacher;
 
+// ═══════════════════════════════════════════════
 // 📥 قسم المراجعة
+// ═══════════════════════════════════════════════
 function initReviewSection() {
   if (reviewPassword) verifyReviewAndShow();
 }
@@ -658,7 +747,14 @@ async function loadPending() {
 }
 
 async function approvePending(id) {
-  if (!confirm('الموافقة على نشر هذا الدرس؟')) return;
+  const ok = await customConfirm({
+    title: 'نشر الدرس',
+    message: 'الموافقة على نشر هذا الدرس؟',
+    confirmText: 'نشر',
+    variant: 'primary'
+  });
+  if (!ok) return;
+
   try {
     const res = await fetch(API + '/pending/' + id + '/approve', {
       method: 'POST',
@@ -672,7 +768,16 @@ async function approvePending(id) {
 window.approvePending = approvePending;
 
 async function rejectPending(id) {
-  if (!confirm('رفض وحذف هذا الدرس؟ لا يمكن التراجع!')) return;
+  const ok = await customConfirm({
+    title: 'رفض الدرس',
+    message: 'هل تريد رفض وحذف هذا الدرس؟',
+    lines: ['سيُحذف الملف نهائياً'],
+    confirmText: 'رفض',
+    variant: 'danger',
+    hint: 'لا يمكن التراجع!'
+  });
+  if (!ok) return;
+
   try {
     const res = await fetch(API + '/pending/' + id + '/reject', {
       method: 'POST',
@@ -684,18 +789,20 @@ async function rejectPending(id) {
 }
 window.rejectPending = rejectPending;
 
+// ═══════════════════════════════════════════════
 // 🎯 الأحداث
+// ═══════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', async function () {
   await checkSession();
 
   const googleError = new URLSearchParams(location.search).get('error');
   if (googleError && $('loginError')) {
     const messages = {
-  unauthorized: 'هذا الحساب غير مصرّح له بالدخول',
-  google_denied: 'تم إلغاء الدخول بجوجل',
-  google_failed: 'تعذر الدخول بجوجل، حاول مرة أخرى',
-  wrong_role: 'هذا الحساب أستاذ. ادخل من بوابة الأساتذة بدلاً من هنا.'
-};
+      unauthorized: 'هذا الحساب غير مصرّح له بالدخول',
+      google_denied: 'تم إلغاء الدخول بجوجل',
+      google_failed: 'تعذر الدخول بجوجل، حاول مرة أخرى',
+      wrong_role: 'هذا الحساب أستاذ. ادخل من بوابة الأساتذة بدلاً من هنا.'
+    };
     $('loginError').textContent = messages[googleError] || 'تعذر الدخول بجوجل';
     history.replaceState(null, '', location.pathname);
   }
@@ -737,7 +844,6 @@ document.addEventListener('DOMContentLoaded', async function () {
   const logoutBtn = $('logoutBtn');
   if (logoutBtn) logoutBtn.addEventListener('click', logout);
 
-  // 👥 زر إضافة أستاذ
   const addTeacherBtn = $('addTeacherBtn');
   if (addTeacherBtn) addTeacherBtn.addEventListener('click', openAddTeacher);
 
@@ -745,7 +851,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 });
 
 // ═══════════════════════════════════════════════
-// 💾 الحسابات المحفوظة على الجهاز
+// 💾 الحسابات المحفوظة
 // ═══════════════════════════════════════════════
 const SAVED_KEY = 'savedAccounts_v1';
 
@@ -835,6 +941,6 @@ if (window.PasswordCredential && navigator.credentials) {
   window.addEventListener('load', async () => {
     try {
       await navigator.credentials.get({ password: true, mediation: 'optional' });
-    } catch (e) { /* المستخدم رفض */ }
+    } catch (e) {}
   });
 }
