@@ -3689,3 +3689,33 @@ html[data-theme="dark"] .student-upload-card .form-section-title svg { color: #7
   font-weight: 700; text-decoration: none; transition: all 0.3s ease;
 }
 .btn-google:hover { border-color: var(--gold); box-shadow: var(--shadow); }
+    /* ── زر جوجل + الفاصل ─────────── */
+    .login-divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 6px 0;
+      color: #999; font-size: 13px;
+    }
+    .login-divider::before, .login-divider::after {
+      content: ''; flex: 1; height: 1px; background: currentColor; opacity: .3;
+    }
+
+    .google-login-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 10px; width: 100%;
+      padding: 12px 16px;
+      background: #fff; color: #333;
+      border: 1px solid #dadce0; border-radius: 10px;
+      font-weight: 700; font-size: 15px;
+      text-decoration: none; cursor: pointer;
+      transition: box-shadow .15s, background .15s;
+      font-family: inherit;
+      box-sizing: border-box;
+    }
+    .google-login-btn:hover {
+      background: #f8f9fa;
+      box-shadow: 0 1px 3px rgba(0,0,0,.1);
+    }
+    [data-theme="dark"] .google-login-btn {
+      background: #2a2a2a; color: #eee; border-color: #444;
+    }
+    [data-theme="dark"] .google-login-btn:hover { background: #333; }

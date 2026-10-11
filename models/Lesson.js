@@ -15,19 +15,30 @@ const lessonSchema = new mongoose.Schema(
     url: String,
     storage: String,
     date: { type: Date, default: Date.now },
-    
-    status: { 
-      type: String, 
-      enum: ['approved', 'pending', 'rejected'], 
-      default: 'approved' 
+
+    status: {
+      type: String,
+      enum: ['approved', 'pending', 'rejected'],
+      default: 'approved'
     },
-    uploader: { 
-      type: String, 
-      enum: ['admin', 'teacher', 'student'], 
-      default: 'admin' 
+    uploader: {
+      type: String,
+      enum: ['admin', 'teacher', 'student'],
+      default: 'admin'
     },
-    uploaderName: { type: String, default: '' },
+
+    // ✨ جديد: ربط الأستاذ بهوية ثابتة
+    uploaderId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Teacher',
+      index: true,
+      default: null
+    },
     uploaderEmail: { type: String, default: '' },
+
+    // ⚠️ للتوافق: نُبقي uploaderName للعرض فقط
+    uploaderName: { type: String, default: '' },
+
     reviewNote: { type: String, default: '' },
     reviewedAt: { type: Date }
   },

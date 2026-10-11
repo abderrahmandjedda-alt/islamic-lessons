@@ -8,7 +8,10 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const { MongoStore } = require('connect-mongo');
 const { OAuth2Client } = require('google-auth-library');
+const bcrypt = require('bcryptjs');
+
 const Lesson = require('./models/Lesson');
+const Teacher = require('./models/Teacher');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,7 +25,7 @@ if (!process.env.MONGODB_URI) {
 }
 
 // ═══════════════════════════════════════════════
-// 🔐 Google OAuth (اختياري)
+// 🔐 Google OAuth
 // ═══════════════════════════════════════════════
 const googleClient = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
@@ -32,21 +35,6 @@ const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI ||
   (process.env.NODE_ENV === 'production'
     ? 'https://islamic-lessons.onrender.com/auth/google/callback'
     : 'http://localhost:3000/auth/google/callback');
-
-function getRoleAndName(email) {
-  const e = (email || '').toLowerCase().trim();
-  if (!e) return null;
-
-  const admins = (process.env.ADMIN_EMAILS || '')
-    .split(',').map(x => x.trim().toLowerCase()).filter(Boolean);
-  if (admins.includes(e)) return { role: 'admin', name: null };
-
-  // الأساتذة من TEACHERS_JSON (الصيغة الجديدة)
-  const t = TEACHERS[e];
-  if (t) return { role: 'teacher', name: t.name || null };
-
-  return null;
-}
 
 // ═══════════════════════════════════════════════
 // ☁️ Cloudinary
@@ -73,55 +61,11 @@ if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR);
 // ═══════════════════════════════════════════════
 // 🔐 كلمات السر
 // ═══════════════════════════════════════════════
-   const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
-   const REVIEW_PASSWORD = process.env.REVIEW_PASSWORD;
-   if (!ADMIN_PASSWORD || !REVIEW_PASSWORD || !process.env.SESSION_SECRET) {
-     console.error('❌ ADMIN_PASSWORD و REVIEW_PASSWORD و SESSION_SECRET مطلوبة');
-     process.exit(1);
-   }
-// ═══════════════════════════════════════════════
-// 👨‍🏫 قائمة الأساتذة: { email: { name, password } }
-// ═══════════════════════════════════════════════
-let TEACHERS = {};
-let TEACHERS_BY_PWD = {};
-
-try {
-  const raw = JSON.parse(process.env.TEACHERS_JSON || '{}');
-  Object.keys(raw).forEach(function (key) {
-    const val = raw[key];
-    if (typeof val === 'string') {
-      // صيغة قديمة: { name: password }
-      TEACHERS_BY_PWD[val] = key;
-    } else if (val && typeof val === 'object' && val.password) {
-      // صيغة جديدة: { email: { name, password } }
-      const email = key.toLowerCase().trim();
-      TEACHERS[email] = {
-        name: val.name || key,
-        password: val.password
-      };
-      TEACHERS_BY_PWD[val.password] = val.name || key;
-    }
-  });
-  console.log(`👨‍🏫 عدد الأساتذة المسجلين: ${Object.keys(TEACHERS).length}`);
-} catch (err) {
-  console.error('❌ خطأ في قراءة TEACHERS_JSON:', err.message);
-  TEACHERS = {};
-  TEACHERS_BY_PWD = {};
-}
-
-function findTeacherByEmail(email, password) {
-  if (!email || !password) return null;
-  const t = TEACHERS[email.toLowerCase().trim()];
-  if (!t) return null;
-  if (t.password !== password) return null;
-  return t;
-}
-
-function findTeacherByPassword(password) {
-  if (!password) return null;
-  const name = TEACHERS_BY_PWD[password];
-  if (!name) return null;
-  return { name };
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+const REVIEW_PASSWORD = process.env.REVIEW_PASSWORD;
+if (!ADMIN_PASSWORD || !REVIEW_PASSWORD || !process.env.SESSION_SECRET) {
+  console.error('❌ ADMIN_PASSWORD و REVIEW_PASSWORD و SESSION_SECRET مطلوبة');
+  process.exit(1);
 }
 
 // ═══════════════════════════════════════════════
@@ -132,7 +76,7 @@ app.use(cors());
 app.use(express.json({ limit: '200mb' }));
 
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'change-me-please',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
@@ -180,14 +124,32 @@ const checkAdmin = (req, res, next) => {
   res.status(401).json({ error: 'غير مصرح' });
 };
 
-const checkTeacher = (req, res, next) => {
+const checkTeacher = async (req, res, next) => {
   if (req.session && req.session.user && req.session.user.role === 'teacher') {
-    req.teacher = req.session.user.name || req.session.user.email;
+    // تحقق من أن الحساب لا يزال نشطاً (إن كان مربوطاً بـ Teacher._id)
+    if (req.session.user.id) {
+      try {
+        const t = await Teacher.findById(req.session.user.id).lean();
+        if (!t) {
+          return res.status(403).json({ error: 'الحساب غير موجود' });
+        }
+        if (!t.active) {
+          return res.status(403).json({ error: 'الحساب معطّل. تواصل مع الإدارة.' });
+        }
+        req.teacher = t.name;
+        req.teacherId = String(t._id);
+        req.teacherEmail = t.email;
+        return next();
+      } catch (e) {
+        // في حال خطأ في القراءة، نكمل بالبيانات القديمة
+      }
+    }
+    // حساب قديم (بدون _id) — للتوافق فقط
+    req.teacher = req.session.user.name;
+    req.teacherId = null;
+    req.teacherEmail = req.session.user.email || '';
     return next();
   }
-  const pwd = req.headers['x-teacher-password'];
-  const t = findTeacherByPassword(pwd);
-  if (t) { req.teacher = t.name; return next(); }
   res.status(401).json({ error: 'غير مصرح' });
 };
 
@@ -265,18 +227,42 @@ app.get('/auth/google/callback', async (req, res) => {
     });
     const payload = ticket.getPayload();
     const email = (payload.email || '').toLowerCase();
-    const info = getRoleAndName(email);
-    if (!info) return res.redirect('/admin.html?error=unauthorized');
+    console.log('📧 بريد Google المستلم:', email);
 
-    req.session.user = {
-      email,
-      name: info.name || payload.name || email,
-      picture: payload.picture || '',
-      role: info.role
-    };
-    if (info.role === 'admin') return res.redirect('/admin.html');
-    if (info.role === 'teacher') return res.redirect('/teacher.html');
-    res.redirect('/');
+    // ═══ 1) هل هو مدير؟ ═══
+    const admins = (process.env.ADMIN_EMAILS || '')
+      .split(',').map(x => x.trim().toLowerCase()).filter(Boolean);
+    if (admins.includes(email)) {
+      req.session.user = {
+        email,
+        name: 'المدير',
+        picture: payload.picture || '',
+        role: 'admin'
+      };
+      console.log('✅ مدير:', email);
+      return res.redirect('/admin.html');
+    }
+
+    // ═══ 2) هل هو أستاذ في قاعدة البيانات؟ ═══
+    const teacher = await Teacher.findOne({ email, active: true });
+    if (teacher) {
+      teacher.lastLogin = new Date();
+      await teacher.save();
+
+      req.session.user = {
+        id: String(teacher._id),
+        email: teacher.email,
+        name: teacher.name,
+        picture: payload.picture || '',
+        role: 'teacher'
+      };
+      console.log('✅ أستاذ:', teacher.name, '—', email);
+      return res.redirect('/teacher.html');
+    }
+
+    // ═══ 3) غير مصرح ═══
+    console.warn('⛔ بريد غير مصرح:', email);
+    return res.redirect('/admin.html?error=unauthorized');
   } catch (err) {
     console.error('خطأ في Google callback:', err);
     res.redirect('/admin.html?error=google_failed');
@@ -328,44 +314,217 @@ app.post('/api/login', (req, res) => {
 // ═══════════════════════════════════════════════
 // 🔐 تسجيل الدخول (الأستاذ)
 // ═══════════════════════════════════════════════
-app.post('/api/teacher-login', (req, res) => {
-  const { email, password } = req.body;
-
-  if (!password) {
-    return res.status(401).json({ error: 'البريد وكلمة السر مطلوبان' });
-  }
-
-  // الصيغة الجديدة: بريد + كلمة سر
-  if (email) {
-    const t = findTeacherByEmail(email, password);
-    if (t) {
-      req.session.user = {
-        email: email.toLowerCase().trim(),
-        name: t.name,
-        role: 'teacher'
-      };
-      return res.json({ success: true, role: 'teacher', name: t.name });
+app.post('/api/teacher-login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(401).json({ error: 'البريد وكلمة السر مطلوبان' });
     }
-    return res.status(401).json({ error: 'البريد أو كلمة السر غير صحيحة' });
-  }
 
-  // الصيغة القديمة: كلمة سر فقط
-  const t = findTeacherByPassword(password);
-  if (t) {
+    const teacher = await Teacher.findOne({ email: email.toLowerCase().trim() });
+    if (!teacher) {
+      return res.status(401).json({ error: 'البريد أو كلمة السر غير صحيحة' });
+    }
+
+    if (!teacher.active) {
+      return res.status(403).json({ error: 'هذا الحساب معطّل. تواصل مع الإدارة.' });
+    }
+
+    const ok = await bcrypt.compare(password, teacher.passwordHash);
+    if (!ok) {
+      return res.status(401).json({ error: 'البريد أو كلمة السر غير صحيحة' });
+    }
+
+    teacher.lastLogin = new Date();
+    await teacher.save();
+
     req.session.user = {
-      email: '',
-      name: t.name,
+      id: String(teacher._id),
+      email: teacher.email,
+      name: teacher.name,
       role: 'teacher'
     };
-    return res.json({ success: true, role: 'teacher', name: t.name });
-  }
 
-  res.status(401).json({ error: 'كلمة السر غير صحيحة' });
+    res.json({ success: true, role: 'teacher', name: teacher.name });
+  } catch (err) {
+    console.error('خطأ في teacher-login:', err);
+    res.status(500).json({ error: 'خطأ في الخادم' });
+  }
 });
 
 app.post('/api/review-login', (req, res) => {
   if (req.body.password === REVIEW_PASSWORD) res.json({ success: true, role: 'reviewer' });
   else res.status(401).json({ error: 'كلمة سر المراجعة خاطئة' });
+});
+
+// ═══════════════════════════════════════════════
+// 👥 إدارة الأساتذة (للمدير فقط)
+// ═══════════════════════════════════════════════
+
+// قائمة الأساتذة مع عدد الدروس
+app.get('/api/admin/teachers', checkAdmin, async (req, res) => {
+  try {
+    const teachers = await Teacher.find().sort({ createdAt: -1 }).lean();
+
+    // احسب عدد الدروس لكل أستاذ
+    const counts = await Lesson.aggregate([
+      { $match: { uploader: 'teacher', uploaderId: { $ne: null } } },
+      { $group: { _id: '$uploaderId', count: { $sum: 1 } } }
+    ]);
+    const countMap = {};
+    counts.forEach(c => { countMap[String(c._id)] = c.count; });
+
+    const result = teachers.map(t => ({
+      _id: String(t._id),
+      email: t.email,
+      name: t.name,
+      active: t.active,
+      createdAt: t.createdAt,
+      lastLogin: t.lastLogin,
+      lessonCount: countMap[String(t._id)] || 0
+    }));
+    res.json(result);
+  } catch (err) {
+    console.error('خطأ في جلب الأساتذة:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// إضافة أستاذ جديد
+app.post('/api/admin/teachers', checkAdmin, async (req, res) => {
+  try {
+    const { email, name, password } = req.body;
+
+    if (!email || !name || !password) {
+      return res.status(400).json({ error: 'البريد والاسم وكلمة السر مطلوبة' });
+    }
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'كلمة السر 6 أحرف على الأقل' });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+    const exists = await Teacher.findOne({ email: normalizedEmail });
+    if (exists) {
+      return res.status(409).json({ error: 'هذا البريد مسجل مسبقاً' });
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+    const teacher = await Teacher.create({
+      email: normalizedEmail,
+      name: name.trim(),
+      passwordHash,
+      active: true,
+      role: 'teacher',
+      createdBy: req.session.user.email || 'admin'
+    });
+
+    console.log(`✅ أستاذ جديد: ${teacher.name} — ${teacher.email}`);
+
+    res.json({
+      success: true,
+      teacher: {
+        _id: String(teacher._id),
+        email: teacher.email,
+        name: teacher.name,
+        active: teacher.active,
+        lessonCount: 0,
+        createdAt: teacher.createdAt
+      }
+    });
+  } catch (err) {
+    console.error('خطأ في إضافة أستاذ:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// تعديل أستاذ (الاسم / كلمة السر)
+app.put('/api/admin/teachers/:id', checkAdmin, async (req, res) => {
+  try {
+    const { name, password } = req.body;
+    const teacher = await Teacher.findById(req.params.id);
+    if (!teacher) return res.status(404).json({ error: 'الأستاذ غير موجود' });
+
+    if (name && name.trim()) teacher.name = name.trim();
+
+    if (password) {
+      if (password.length < 6) {
+        return res.status(400).json({ error: 'كلمة السر 6 أحرف على الأقل' });
+      }
+      teacher.passwordHash = await bcrypt.hash(password, 10);
+    }
+
+    await teacher.save();
+    console.log(`✏️ تحديث الأستاذ: ${teacher.name}`);
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('خطأ في تعديل الأستاذ:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// تعطيل أستاذ (Soft Delete)
+app.post('/api/admin/teachers/:id/disable', checkAdmin, async (req, res) => {
+  try {
+    const teacher = await Teacher.findByIdAndUpdate(
+      req.params.id,
+      { active: false },
+      { new: true }
+    );
+    if (!teacher) return res.status(404).json({ error: 'الأستاذ غير موجود' });
+
+    const count = await Lesson.countDocuments({ uploaderId: teacher._id });
+
+    console.log(`⏸️ تعطيل الأستاذ: ${teacher.name} (${count} درس محفوظ)`);
+
+    res.json({
+      success: true,
+      message: `تم تعطيل ${teacher.name}. ${count} درس ما زالت في الموقع.`
+    });
+  } catch (err) {
+    console.error('خطأ في تعطيل الأستاذ:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// إعادة تفعيل أستاذ
+app.post('/api/admin/teachers/:id/activate', checkAdmin, async (req, res) => {
+  try {
+    const teacher = await Teacher.findByIdAndUpdate(
+      req.params.id,
+      { active: true },
+      { new: true }
+    );
+    if (!teacher) return res.status(404).json({ error: 'الأستاذ غير موجود' });
+
+    console.log(`▶️ تفعيل الأستاذ: ${teacher.name}`);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('خطأ في تفعيل الأستاذ:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// حذف أستاذ نهائياً (فقط إن لم يكن لديه دروس)
+app.delete('/api/admin/teachers/:id', checkAdmin, async (req, res) => {
+  try {
+    const teacher = await Teacher.findById(req.params.id);
+    if (!teacher) return res.status(404).json({ error: 'الأستاذ غير موجود' });
+
+    const count = await Lesson.countDocuments({ uploaderId: teacher._id });
+    if (count > 0) {
+      return res.status(400).json({
+        error: `لا يمكن الحذف. للأستاذ ${count} درس. استخدم "تعطيل" بدلاً من ذلك.`
+      });
+    }
+
+    await Teacher.deleteOne({ _id: teacher._id });
+    console.log(`🗑️ حذف الأستاذ: ${teacher.name}`);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('خطأ في حذف الأستاذ:', err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // ═══════════════════════════════════════════════
@@ -410,8 +569,15 @@ app.post('/api/teacher/batch', checkTeacher, upload.array('files', 10), async (r
   try {
     const { year, specialization, subject } = req.body;
     const teacherName = req.teacher;
-    if (!req.files || req.files.length === 0) return res.status(400).json({ error: 'لم يتم إرسال ملفات' });
-    if (!year || !specialization || !subject) return res.status(400).json({ error: 'يجب اختيار السنة والتخصص والمادة' });
+    const teacherId = req.teacherId;
+    const teacherEmail = req.teacherEmail || '';
+
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ error: 'لم يتم إرسال ملفات' });
+    }
+    if (!year || !specialization || !subject) {
+      return res.status(400).json({ error: 'يجب اختيار السنة والتخصص والمادة' });
+    }
 
     const titles = Array.isArray(req.body.titles) ? req.body.titles : [req.body.titles].filter(Boolean);
     const uploaded = [];
@@ -423,6 +589,7 @@ app.post('/api/teacher/batch', checkTeacher, upload.array('files', 10), async (r
         const fileData = await uploadFile(file);
         const fixedName = fixEncoding(file.originalname);
         const title = (titles[i] && titles[i].trim()) || path.parse(fixedName).name;
+
         const lesson = await Lesson.create({
           id: Date.now().toString() + '-' + i,
           title, year, specialization, subject,
@@ -435,7 +602,9 @@ app.post('/api/teacher/batch', checkTeacher, upload.array('files', 10), async (r
           storage: fileData.storage,
           status: 'approved',
           uploader: 'teacher',
+          uploaderId: teacherId,
           uploaderName: teacherName,
+          uploaderEmail: teacherEmail,
           date: new Date()
         });
         uploaded.push(lesson);
@@ -443,20 +612,38 @@ app.post('/api/teacher/batch', checkTeacher, upload.array('files', 10), async (r
         errors.push({ filename: file.originalname, error: err.message });
       }
     }
-    res.json({ success: true, uploaded: uploaded.length, failed: errors.length, lessons: uploaded, errors });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+
+    res.json({
+      success: true,
+      uploaded: uploaded.length,
+      failed: errors.length,
+      lessons: uploaded,
+      errors
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.get('/api/teacher/my-lessons', checkTeacher, async (req, res) => {
   try {
-    const lessons = await Lesson.find({ uploader: 'teacher', uploaderName: req.teacher }).sort({ date: -1 });
+    const query = req.teacherId
+      ? { uploader: 'teacher', uploaderId: req.teacherId }
+      : { uploader: 'teacher', uploaderName: req.teacher };
+    const lessons = await Lesson.find(query).sort({ date: -1 });
     res.json(lessons);
-  } catch (err) { res.status(500).json({ error: 'تعذر جلب الدروس' }); }
+  } catch (err) {
+    res.status(500).json({ error: 'تعذر جلب الدروس' });
+  }
 });
 
 app.delete('/api/teacher/lessons/:id', checkTeacher, async (req, res) => {
   try {
-    const lesson = await Lesson.findOne({ id: req.params.id, uploader: 'teacher', uploaderName: req.teacher });
+    const query = req.teacherId
+      ? { id: req.params.id, uploader: 'teacher', uploaderId: req.teacherId }
+      : { id: req.params.id, uploader: 'teacher', uploaderName: req.teacher };
+
+    const lesson = await Lesson.findOne(query);
     if (!lesson) return res.status(403).json({ error: '❌ لا يمكنك حذف دروس أستاذ آخر' });
 
     if (lesson.storage === 'cloudinary' && lesson.storedName) {
@@ -467,7 +654,9 @@ app.delete('/api/teacher/lessons/:id', checkTeacher, async (req, res) => {
     }
     await Lesson.deleteOne({ id: req.params.id });
     res.json({ success: true });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // ═══════════════════════════════════════════════
@@ -512,7 +701,9 @@ app.post('/api/student/submit', upload.array('files', 5), async (req, res) => {
       }
     }
     res.json({ success: true, submitted: uploaded.length, failed: errors.length, errors });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // ═══════════════════════════════════════════════
@@ -524,14 +715,18 @@ app.get('/api/lessons', async (req, res) => {
       $or: [{ status: 'approved' }, { status: { $exists: false } }, { status: null }]
     }).sort({ date: -1 });
     res.json(lessons);
-  } catch (err) { res.status(500).json({ error: 'تعذر جلب الدروس' }); }
+  } catch (err) {
+    res.status(500).json({ error: 'تعذر جلب الدروس' });
+  }
 });
 
 app.get('/api/pending', checkReview, async (req, res) => {
   try {
     const pending = await Lesson.find({ status: 'pending' }).sort({ date: -1 });
     res.json(pending);
-  } catch (err) { res.status(500).json({ error: 'تعذر جلب المعلّقة' }); }
+  } catch (err) {
+    res.status(500).json({ error: 'تعذر جلب المعلّقة' });
+  }
 });
 
 app.post('/api/pending/:id/approve', checkReview, async (req, res) => {
@@ -543,7 +738,9 @@ app.post('/api/pending/:id/approve', checkReview, async (req, res) => {
     lesson.reviewNote = req.body.note || 'تمت الموافقة';
     await lesson.save();
     res.json({ success: true, lesson });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.post('/api/pending/:id/reject', checkReview, async (req, res) => {
@@ -555,7 +752,9 @@ app.post('/api/pending/:id/reject', checkReview, async (req, res) => {
     }
     await Lesson.deleteOne({ id: req.params.id });
     res.json({ success: true });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.delete('/api/lessons/:id', checkAdmin, async (req, res) => {
@@ -570,8 +769,107 @@ app.delete('/api/lessons/:id', checkAdmin, async (req, res) => {
     }
     await Lesson.deleteOne({ id: req.params.id });
     res.json({ success: true });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
+
+// ═══════════════════════════════════════════════
+// 🔄 Migration: نقل الأساتذة من TEACHERS_JSON إلى MongoDB
+// ═══════════════════════════════════════════════
+async function migrateTeachers() {
+  try {
+    const existing = await Teacher.countDocuments();
+    if (existing > 0) {
+      console.log(`👨‍🏫 الأساتذة في قاعدة البيانات: ${existing}`);
+      return;
+    }
+
+    const raw = process.env.TEACHERS_JSON || '{}';
+    let parsed;
+    try { parsed = JSON.parse(raw); } catch (e) { parsed = {}; }
+
+    let migrated = 0;
+    for (const key of Object.keys(parsed)) {
+      const val = parsed[key];
+      // الصيغة الجديدة فقط: { email: { name, password } }
+      if (val && typeof val === 'object' && val.password && key.includes('@')) {
+        const hash = await bcrypt.hash(val.password, 10);
+        try {
+          await Teacher.create({
+            email: key.toLowerCase().trim(),
+            name: val.name || key,
+            passwordHash: hash,
+            active: true,
+            role: 'teacher',
+            createdBy: 'migration'
+          });
+          migrated++;
+        } catch (e) {
+          if (e.code !== 11000) {
+            console.error(`خطأ في ترحيل ${key}:`, e.message);
+          }
+        }
+      }
+    }
+
+    if (migrated > 0) {
+      console.log(`🔄 تم ترحيل ${migrated} أستاذ من TEACHERS_JSON إلى قاعدة البيانات`);
+      console.log('ℹ️ يمكنك الآن حذف TEACHERS_JSON من .env إن أردت');
+    } else {
+      console.log('ℹ️ لا يوجد أساتذة لترحيلهم');
+    }
+  } catch (err) {
+    console.error('خطأ في ترحيل الأساتذة:', err.message);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// 🔄 Migration: ربط الدروس القديمة بالأساتذة
+// ═══════════════════════════════════════════════
+async function migrateLessonOwners() {
+  try {
+    const orphans = await Lesson.countDocuments({
+      uploader: 'teacher',
+      $or: [
+        { uploaderId: { $exists: false } },
+        { uploaderId: null }
+      ]
+    });
+
+    if (orphans === 0) return;
+
+    console.log(`🔄 ترحيل ${orphans} درس قديم (بدون uploaderId)...`);
+    const teachers = await Teacher.find().lean();
+    let linked = 0;
+    let unlinked = 0;
+
+    for (const t of teachers) {
+      const result = await Lesson.updateMany(
+        {
+          uploader: 'teacher',
+          uploaderName: t.name,
+          $or: [{ uploaderId: { $exists: false } }, { uploaderId: null }]
+        },
+        { $set: { uploaderId: t._id, uploaderEmail: t.email } }
+      );
+      linked += result.modifiedCount;
+    }
+
+    // احسب المتبقي
+    unlinked = await Lesson.countDocuments({
+      uploader: 'teacher',
+      $or: [{ uploaderId: { $exists: false } }, { uploaderId: null }]
+    });
+
+    console.log(`✅ تم ربط ${linked} درس بالأستاذ الصحيح`);
+    if (unlinked > 0) {
+      console.log(`⚠️ ${unlinked} درس لم نجد له أستاذاً مطابقاً (سيظهر للمدير فقط)`);
+    }
+  } catch (err) {
+    console.error('خطأ في ربط الدروس:', err.message);
+  }
+}
 
 // ═══════════════════════════════════════════════
 // 🚀 الاتصال + التشغيل
@@ -580,13 +878,22 @@ mongoose
   .connect(process.env.MONGODB_URI)
   .then(async () => {
     console.log('🍃 متصل بـ MongoDB');
+
+    // ترحيل الأساتذة
+    await migrateTeachers();
+    // ربط الدروس
+    await migrateLessonOwners();
+
+    // ترحيل قديم للدروس بدون status
     try {
       const result = await Lesson.updateMany(
         { status: { $exists: false } },
         { $set: { status: 'approved', uploader: 'admin' } }
       );
       if (result.modifiedCount > 0) console.log(`🔄 تم تحديث ${result.modifiedCount} درس قديم`);
-    } catch (err) { console.error('خطأ Migration:', err); }
+    } catch (err) {
+      console.error('خطأ Migration:', err);
+    }
 
     app.listen(PORT, () => {
       console.log(`✅ الموقع يعمل على http://localhost:${PORT}`);

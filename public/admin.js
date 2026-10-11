@@ -22,6 +22,7 @@ function formatSize(bytes) {
 }
 
 function formatDate(iso) {
+  if (!iso) return '—';
   return new Date(iso).toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
@@ -83,16 +84,11 @@ function showUserChip() {
 
   const displayName = (currentUser.name || currentUser.email || '').trim();
 
-  // تطبيع النص: احذف "ال" من البداية والتشكيل
   function normalize(s) {
-    return String(s || '')
-      .trim()
-      .replace(/^ال/, '')
-      .replace(/[ًٌٍَُِّْـ]/g, '');
+    return String(s || '').trim().replace(/^ال/, '').replace(/[ًٌٍَُِّْـ]/g, '');
   }
 
   const sameAsRole = normalize(displayName) === normalize(roleLabel);
-
   if (!displayName || sameAsRole) {
     nameEl.textContent = roleLabel;
   } else {
@@ -135,10 +131,7 @@ async function login(e) {
       const meRes = await fetch(API + '/me', { credentials: 'same-origin' });
       if (meRes.ok) currentUser = await meRes.json();
 
-      // 💾 احفظ الحساب على الجهاز
-      if (currentUser) {
-        saveAccount(currentUser.email, currentUser.role, currentUser.name);
-      }
+      if (currentUser) saveAccount(currentUser.email, currentUser.role, currentUser.name);
 
       showPanel();
     } else {
@@ -157,6 +150,13 @@ function showPanel() {
   fillYears();
   loadAdminLessons();
   initReviewSection();
+
+  // 👥 إدارة الأساتذة للمدير فقط
+  if (currentUser && currentUser.role === 'admin') {
+    const card = $('teachersCard');
+    if (card) card.style.display = 'block';
+    loadTeachers();
+  }
 }
 
 // 📋 القوائم
@@ -202,7 +202,7 @@ function updateSubjects() {
 window.updateSpecializations = updateSpecializations;
 window.updateSubjects = updateSubjects;
 
-// 📤 رفع درس
+// 📤 رفع درس (الأدمن)
 async function handleUpload(e) {
   e.preventDefault();
   const form = e.target;
@@ -271,6 +271,290 @@ async function deleteLesson(id) {
   } catch (err) { showToast('خطأ في الاتصال'); }
 }
 window.deleteLesson = deleteLesson;
+
+// ═══════════════════════════════════════════════
+// 👥 إدارة الأساتذة (للمدير فقط)
+// ═══════════════════════════════════════════════
+
+let teachersCache = [];
+
+async function loadTeachers() {
+  const container = $('teachersList');
+  if (!container) return;
+
+  container.innerHTML = '<div class="teachers-empty">جارٍ التحميل...</div>';
+
+  try {
+    const res = await fetch(API + '/admin/teachers', { credentials: 'same-origin' });
+    if (!res.ok) {
+      container.innerHTML = '<div class="teachers-empty">تعذّر تحميل قائمة الأساتذة</div>';
+      return;
+    }
+    teachersCache = await res.json();
+
+    if (!teachersCache.length) {
+      container.innerHTML = '<div class="teachers-empty">لا يوجد أساتذة بعد. اضغط "إضافة أستاذ" للبدء.</div>';
+      return;
+    }
+
+    container.innerHTML =
+      '<table class="teachers-table">' +
+        '<thead><tr>' +
+          '<th>الاسم</th>' +
+          '<th>البريد الإلكتروني</th>' +
+          '<th>الدروس</th>' +
+          '<th>الحالة</th>' +
+          '<th>إجراءات</th>' +
+        '</tr></thead>' +
+        '<tbody>' +
+          teachersCache.map(function (t) {
+            const statusBadge = t.active
+              ? '<span class="teacher-badge active">نشط</span>'
+              : '<span class="teacher-badge inactive">معطّل</span>';
+            const toggleIcon = t.active ? 'pause-circle' : 'play-circle';
+            const toggleTitle = t.active ? 'تعطيل' : 'تفعيل';
+            const toggleClass = t.active ? 'danger' : 'success';
+            return '<tr class="' + (t.active ? '' : 'inactive') + '">' +
+              '<td><strong>' + escapeHtml(t.name) + '</strong></td>' +
+              '<td dir="ltr" style="text-align:left">' + escapeHtml(t.email) + '</td>' +
+              '<td>' + t.lessonCount + '</td>' +
+              '<td>' + statusBadge + '</td>' +
+              '<td>' +
+                '<div class="teacher-actions">' +
+                  '<button class="btn-icon-sm" title="تعديل" onclick="openEditTeacher(\'' + t._id + '\')">' +
+                    '<i data-lucide="pencil"></i>' +
+                  '</button>' +
+                  '<button class="btn-icon-sm ' + toggleClass + '" title="' + toggleTitle + '" onclick="toggleTeacherStatus(\'' + t._id + '\', ' + (!t.active) + ')">' +
+                    '<i data-lucide="' + toggleIcon + '"></i>' +
+                  '</button>' +
+                  '<button class="btn-icon-sm danger" title="حذف" onclick="tryDeleteTeacher(\'' + t._id + '\')">' +
+                    '<i data-lucide="trash-2"></i>' +
+                  '</button>' +
+                '</div>' +
+              '</td>' +
+            '</tr>';
+          }).join('') +
+        '</tbody>' +
+      '</table>';
+
+    if (window.lucide) window.lucide.createIcons();
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = '<div class="teachers-empty">خطأ في الاتصال</div>';
+  }
+}
+window.loadTeachers = loadTeachers;
+
+// 🪟 إظهار نافذة إضافة/تعديل
+function openModal(html) {
+  const root = $('modalRoot');
+  root.innerHTML =
+    '<div class="modal-backdrop" id="modalBackdrop">' +
+      '<div class="modal-card" onclick="event.stopPropagation()">' + html + '</div>' +
+    '</div>';
+  const bd = $('modalBackdrop');
+  bd.addEventListener('click', closeModal);
+  if (window.lucide) window.lucide.createIcons();
+}
+function closeModal() {
+  const root = $('modalRoot');
+  if (root) root.innerHTML = '';
+}
+window.closeModal = closeModal;
+
+// ➕ إضافة أستاذ
+function openAddTeacher() {
+  openModal(
+    '<h3 class="modal-title"><i data-lucide="user-plus"></i> إضافة أستاذ جديد</h3>' +
+    '<div class="modal-field">' +
+      '<label for="tName">الاسم الكامل</label>' +
+      '<input type="text" id="tName" placeholder="مثال: أ. أحمد محمد" autocomplete="off">' +
+    '</div>' +
+    '<div class="modal-field">' +
+      '<label for="tEmail">البريد الإلكتروني</label>' +
+      '<input type="email" id="tEmail" placeholder="teacher@example.com" dir="ltr" autocomplete="off">' +
+    '</div>' +
+    '<div class="modal-field">' +
+      '<label for="tPassword">كلمة السر</label>' +
+      '<input type="text" id="tPassword" placeholder="6 أحرف على الأقل" dir="ltr" autocomplete="off">' +
+      '<div class="modal-hint">انسخها وأرسلها للأستاذ. يمكنه تغييرها لاحقاً.</div>' +
+    '</div>' +
+    '<p class="modal-error" id="modalErr"></p>' +
+    '<div class="modal-actions">' +
+      '<button class="btn-modal secondary" type="button" onclick="closeModal()">إلغاء</button>' +
+      '<button class="btn-modal primary" type="button" id="saveTeacherBtn">حفظ</button>' +
+    '</div>'
+  );
+
+  $('saveTeacherBtn').addEventListener('click', function () {
+    saveTeacher(null);
+  });
+}
+window.openAddTeacher = openAddTeacher;
+
+// ✏️ تعديل أستاذ
+function openEditTeacher(id) {
+  const t = teachersCache.find(x => x._id === id);
+  if (!t) return;
+
+  openModal(
+    '<h3 class="modal-title"><i data-lucide="pencil"></i> تعديل أستاذ</h3>' +
+    '<div class="modal-field">' +
+      '<label>البريد الإلكتروني</label>' +
+      '<input type="email" value="' + escapeHtml(t.email) + '" dir="ltr" disabled>' +
+      '<div class="modal-hint">البريد غير قابل للتعديل.</div>' +
+    '</div>' +
+    '<div class="modal-field">' +
+      '<label for="tName">الاسم الكامل</label>' +
+      '<input type="text" id="tName" value="' + escapeHtml(t.name) + '">' +
+    '</div>' +
+    '<div class="modal-field">' +
+      '<label for="tPassword">كلمة سر جديدة (اتركها فارغة لعدم التغيير)</label>' +
+      '<input type="text" id="tPassword" placeholder="6 أحرف على الأقل" dir="ltr">' +
+    '</div>' +
+    '<p class="modal-error" id="modalErr"></p>' +
+    '<div class="modal-actions">' +
+      '<button class="btn-modal secondary" type="button" onclick="closeModal()">إلغاء</button>' +
+      '<button class="btn-modal primary" type="button" id="saveTeacherBtn">حفظ التغييرات</button>' +
+    '</div>'
+  );
+
+  $('saveTeacherBtn').addEventListener('click', function () {
+    saveTeacher(id);
+  });
+}
+window.openEditTeacher = openEditTeacher;
+
+// 💾 حفظ (إضافة أو تعديل)
+async function saveTeacher(id) {
+  const errEl = $('modalErr');
+  const name = $('tName').value.trim();
+  const pwdEl = $('tPassword');
+  const password = pwdEl ? pwdEl.value : '';
+
+  if (!name) {
+    errEl.textContent = 'الاسم مطلوب';
+    return;
+  }
+  if (!id && !password) {
+    errEl.textContent = 'كلمة السر مطلوبة';
+    return;
+  }
+  if (password && password.length < 6) {
+    errEl.textContent = 'كلمة السر 6 أحرف على الأقل';
+    return;
+  }
+
+  const btn = $('saveTeacherBtn');
+  btn.disabled = true;
+  btn.textContent = 'جارٍ الحفظ...';
+
+  try {
+    let res;
+    if (id) {
+      // تعديل
+      res = await fetch(API + '/admin/teachers/' + id, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ name, password: password || undefined })
+      });
+    } else {
+      // إضافة
+      const email = $('tEmail').value.trim();
+      if (!email) { errEl.textContent = 'البريد مطلوب'; btn.disabled = false; btn.textContent = 'حفظ'; return; }
+      res = await fetch(API + '/admin/teachers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ email, name, password })
+      });
+    }
+
+    const json = await res.json();
+    if (res.ok) {
+      showToast(id ? 'تم تحديث الأستاذ' : 'تمت إضافة الأستاذ');
+      closeModal();
+      loadTeachers();
+    } else {
+      errEl.textContent = json.error || 'فشل الحفظ';
+      btn.disabled = false;
+      btn.textContent = id ? 'حفظ التغييرات' : 'حفظ';
+    }
+  } catch (err) {
+    errEl.textContent = 'خطأ في الاتصال';
+    btn.disabled = false;
+    btn.textContent = 'حفظ';
+  }
+}
+
+// ⏸️/▶️ تعطيل أو تفعيل
+async function toggleTeacherStatus(id, activate) {
+  const t = teachersCache.find(x => x._id === id);
+  if (!t) return;
+
+  if (!activate) {
+    // تأكيد قبل التعطيل
+    const msg = 'تعطيل حساب "' + t.name + '"؟\n\n' +
+                '• لن يستطيع الدخول بعد الآن.\n' +
+                '• دروسه (' + t.lessonCount + ') ستبقى ظاهرة للطلاب.\n' +
+                '• يمكنك إعادة تفعيله في أي وقت.';
+    if (!confirm(msg)) return;
+  }
+
+  const action = activate ? 'activate' : 'disable';
+  try {
+    const res = await fetch(API + '/admin/teachers/' + id + '/' + action, {
+      method: 'POST',
+      credentials: 'same-origin'
+    });
+    const json = await res.json();
+    if (res.ok) {
+      showToast(activate ? 'تم تفعيل الأستاذ' : 'تم تعطيل الأستاذ');
+      loadTeachers();
+    } else {
+      showToast(json.error || 'فشل التغيير');
+    }
+  } catch (err) {
+    showToast('خطأ في الاتصال');
+  }
+}
+window.toggleTeacherStatus = toggleTeacherStatus;
+
+// 🗑️ حذف (تحقق أولاً)
+async function tryDeleteTeacher(id) {
+  const t = teachersCache.find(x => x._id === id);
+  if (!t) return;
+
+  if (t.lessonCount > 0) {
+    alert(
+      'لا يمكن حذف "' + t.name + '".\n\n' +
+      'لديه ' + t.lessonCount + ' درس في الموقع.\n\n' +
+      'استخدم "تعطيل" بدلاً من الحذف،\n' +
+      'وسيبقى الأستاذ محفوظاً مع دروسه.'
+    );
+    return;
+  }
+
+  if (!confirm('حذف حساب "' + t.name + '" نهائياً؟\n\nلا يمكن التراجع!')) return;
+
+  try {
+    const res = await fetch(API + '/admin/teachers/' + id, {
+      method: 'DELETE',
+      credentials: 'same-origin'
+    });
+    const json = await res.json();
+    if (res.ok) {
+      showToast('تم حذف الأستاذ');
+      loadTeachers();
+    } else {
+      showToast(json.error || 'فشل الحذف');
+    }
+  } catch (err) {
+    showToast('خطأ في الاتصال');
+  }
+}
+window.tryDeleteTeacher = tryDeleteTeacher;
 
 // 📥 قسم المراجعة
 function initReviewSection() {
@@ -399,7 +683,6 @@ window.rejectPending = rejectPending;
 document.addEventListener('DOMContentLoaded', async function () {
   await checkSession();
 
-  // رسالة الخطأ القادمة من الدخول بجوجل
   const googleError = new URLSearchParams(location.search).get('error');
   if (googleError && $('loginError')) {
     const messages = {
@@ -410,9 +693,11 @@ document.addEventListener('DOMContentLoaded', async function () {
     $('loginError').textContent = messages[googleError] || 'تعذر الدخول بجوجل';
     history.replaceState(null, '', location.pathname);
   }
+
   const loginForm = $('loginForm');
   if (loginForm) loginForm.addEventListener('submit', login);
-    const emailToggle = $('emailDropdownToggle');
+
+  const emailToggle = $('emailDropdownToggle');
   if (emailToggle) emailToggle.addEventListener('click', function (e) {
     e.stopPropagation();
     toggleEmailDropdown();
@@ -446,8 +731,13 @@ document.addEventListener('DOMContentLoaded', async function () {
   const logoutBtn = $('logoutBtn');
   if (logoutBtn) logoutBtn.addEventListener('click', logout);
 
+  // 👥 زر إضافة أستاذ
+  const addTeacherBtn = $('addTeacherBtn');
+  if (addTeacherBtn) addTeacherBtn.addEventListener('click', openAddTeacher);
+
   if (window.lucide) window.lucide.createIcons();
 });
+
 // ═══════════════════════════════════════════════
 // 💾 الحسابات المحفوظة على الجهاز
 // ═══════════════════════════════════════════════
@@ -499,7 +789,6 @@ function renderSavedAccounts() {
 
   if (window.lucide) window.lucide.createIcons();
 
-  // انقر لاختيار حساب
   dropdown.querySelectorAll('.email-item').forEach(function (item) {
     item.addEventListener('click', function (ev) {
       if (ev.target.closest('[data-remove]')) return;
@@ -510,7 +799,6 @@ function renderSavedAccounts() {
     });
   });
 
-  // زر الإزالة
   dropdown.querySelectorAll('[data-remove]').forEach(function (btn) {
     btn.addEventListener('click', function (ev) {
       ev.stopPropagation();
@@ -532,12 +820,11 @@ function toggleEmailDropdown(show) {
   }
 }
 
-// أغلق القائمة عند النقر خارجها
 document.addEventListener('click', function (e) {
   const wrap = e.target.closest('.email-field-wrap');
   if (!wrap) toggleEmailDropdown(false);
 });
-// استخدم واجهة المتصفح لعرض الحسابات المحفوظة تلقائياً
+
 if (window.PasswordCredential && navigator.credentials) {
   window.addEventListener('load', async () => {
     try {

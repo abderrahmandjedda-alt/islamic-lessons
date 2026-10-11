@@ -37,6 +37,158 @@
       font-size: 13px; color: var(--text-light);
     }
     #loginForm input { margin-bottom: 14px; }
+
+    /* ═══════════════════════════════════════════ */
+    /* 👥 إدارة الأساتذة */
+    /* ═══════════════════════════════════════════ */
+    .teachers-card {
+      background: #fff; border-radius: 14px; padding: 22px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 18px rgba(0,0,0,.05);
+    }
+    [data-theme="dark"] .teachers-card { background: #1e1e1e; }
+
+    .teachers-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 16px; flex-wrap: wrap; gap: 12px;
+    }
+    .teachers-header h3 {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 20px; margin: 0;
+    }
+    .teachers-header h3 svg { color: var(--gold-dark); }
+    [data-theme="dark"] .teachers-header h3 svg { color: var(--gold); }
+
+    .btn-add-teacher {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 16px; border-radius: 10px;
+      background: var(--emerald, #0d5a3a); color: #fff;
+      border: none; cursor: pointer; font-weight: 700; font-size: 14px;
+      font-family: inherit; transition: opacity .15s;
+    }
+    .btn-add-teacher:hover { opacity: .9; }
+
+    .teachers-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 14px;
+    }
+    .teachers-table th,
+    .teachers-table td {
+      padding: 12px 10px; text-align: right;
+      border-bottom: 1px solid rgba(0,0,0,.06);
+    }
+    [data-theme="dark"] .teachers-table th,
+    [data-theme="dark"] .teachers-table td {
+      border-bottom-color: rgba(255,255,255,.06);
+    }
+    .teachers-table th {
+      font-weight: 700; color: var(--text-light, #666); font-size: 13px;
+      background: rgba(0,0,0,.02);
+    }
+    [data-theme="dark"] .teachers-table th { background: rgba(255,255,255,.03); }
+
+    .teachers-table tr.inactive td { opacity: .55; }
+
+    .teacher-badge {
+      display: inline-block; padding: 3px 10px; border-radius: 999px;
+      font-size: 12px; font-weight: 700;
+    }
+    .teacher-badge.active { background: #c9ecd0; color: #0d4d1e; }
+    .teacher-badge.inactive { background: #f0d5d3; color: #7a2018; }
+    [data-theme="dark"] .teacher-badge.active { background: #0d4d1e; color: #c9ecd0; }
+    [data-theme="dark"] .teacher-badge.inactive { background: #7a2018; color: #f0d5d3; }
+
+    .teacher-actions { display: flex; gap: 6px; }
+
+    .btn-icon-sm {
+      background: transparent; border: 1px solid rgba(0,0,0,.1);
+      width: 34px; height: 34px; border-radius: 8px;
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all .15s;
+      color: var(--text-light, #666);
+    }
+    .btn-icon-sm:hover { background: rgba(0,0,0,.05); }
+    [data-theme="dark"] .btn-icon-sm { border-color: rgba(255,255,255,.1); }
+    [data-theme="dark"] .btn-icon-sm:hover { background: rgba(255,255,255,.05); }
+    .btn-icon-sm.danger:hover { color: #b42318; background: rgba(180,35,24,.08); border-color: rgba(180,35,24,.3); }
+    .btn-icon-sm.success:hover { color: var(--emerald, #0d5a3a); background: rgba(13,90,58,.08); border-color: rgba(13,90,58,.3); }
+    .btn-icon-sm svg { width: 16px; height: 16px; }
+
+    .teachers-empty {
+      text-align: center; padding: 30px 20px;
+      color: var(--text-light, #888); font-size: 14px;
+    }
+
+    /* ═══════════════════════════════════════════ */
+    /* 🪟 النافذة المنبثقة (Modal) */
+    /* ═══════════════════════════════════════════ */
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.55);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999; padding: 20px;
+      backdrop-filter: blur(2px);
+    }
+    .modal-card {
+      background: #fff; border-radius: 16px;
+      width: 100%; max-width: 460px;
+      padding: 24px; box-shadow: 0 20px 60px rgba(0,0,0,.3);
+      animation: modalIn .2s ease;
+    }
+    [data-theme="dark"] .modal-card { background: #1e1e1e; color: #eee; }
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-title {
+      display: flex; align-items: center; gap: 10px;
+      margin: 0 0 18px; font-size: 18px;
+    }
+    .modal-title svg { color: var(--gold-dark); }
+    [data-theme="dark"] .modal-title svg { color: var(--gold); }
+
+    .modal-field { margin-bottom: 14px; }
+    .modal-field label {
+      display: block; font-size: 13px;
+      color: var(--text-light, #666); margin-bottom: 6px;
+    }
+    .modal-field input {
+      width: 100%; padding: 12px 14px;
+      border-radius: 10px; border: 1px solid #ddd;
+      font-family: inherit; font-size: 15px;
+      background: #fff; color: #222; box-sizing: border-box;
+    }
+    [data-theme="dark"] .modal-field input {
+      background: #2a2a2a; color: #eee; border-color: #444;
+    }
+    .modal-field input[dir="ltr"] { text-align: left; }
+
+    .modal-actions {
+      display: flex; gap: 10px; justify-content: flex-end;
+      margin-top: 20px;
+    }
+    .btn-modal {
+      padding: 11px 20px; border-radius: 10px;
+      font-family: inherit; font-size: 14px; font-weight: 700;
+      cursor: pointer; border: none; transition: opacity .15s;
+    }
+    .btn-modal:hover { opacity: .9; }
+    .btn-modal.primary { background: var(--emerald, #0d5a3a); color: #fff; }
+    .btn-modal.secondary {
+      background: rgba(0,0,0,.06); color: var(--text, #222);
+    }
+    [data-theme="dark"] .btn-modal.secondary { background: rgba(255,255,255,.08); color: #eee; }
+    .btn-modal.danger { background: #b42318; color: #fff; }
+
+    .modal-error {
+      color: #b42318; font-size: 13px;
+      margin-top: 10px; min-height: 18px;
+    }
+    .modal-hint {
+      font-size: 12px; color: var(--text-light, #888);
+      margin-top: 4px;
+    }
   </style>
 </head>
 <body>
@@ -100,7 +252,6 @@
         <i data-lucide="log-in" class="admin-icon"></i> دخول
       </button>
       <p id="loginError" class="error"></p>
-    </form>      <p id="loginError" class="error"></p>
 
       <div class="login-divider"><span>أو</span></div>
       <a href="/auth/google" class="btn-google">
@@ -119,6 +270,21 @@
 <!-- لوحة التحكم -->
 <div id="adminPanel" class="container section" style="display:none;">
 
+  <!-- 👥 إدارة الأساتذة (للمدير فقط) -->
+  <div id="teachersCard" class="teachers-card" style="display:none;">
+    <div class="teachers-header">
+      <h3><i data-lucide="users" class="admin-icon"></i> إدارة الأساتذة</h3>
+      <button id="addTeacherBtn" class="btn-add-teacher" type="button">
+        <i data-lucide="user-plus" class="admin-icon"></i> إضافة أستاذ
+      </button>
+    </div>
+
+    <div id="teachersList">
+      <div class="teachers-empty">جارٍ التحميل...</div>
+    </div>
+  </div>
+
+  <!-- قسم المراجعة -->
   <div class="review-card">
     <div class="review-header">
       <div class="review-title">
@@ -149,6 +315,7 @@
     <div id="pendingList" class="pending-list" style="display:none;"></div>
   </div>
 
+  <!-- رفع درس جديد -->
   <div class="upload-card">
     <h3><i data-lucide="cloud-upload" class="admin-icon"></i> رفع درس جديد</h3>
     <form id="uploadForm">
@@ -177,6 +344,7 @@
     </form>
   </div>
 
+  <!-- إدارة الدروس -->
   <div class="manage-card">
     <h3><i data-lucide="library-big" class="admin-icon"></i> إدارة الدروس المرفوعة</h3>
     <div id="adminLessons"></div>
@@ -190,6 +358,9 @@
     <p class="footer-author">إعداد: جدة عبد الرحمن</p>
   </div>
 </footer>
+
+<!-- جذر النوافذ المنبثقة -->
+<div id="modalRoot"></div>
 
 <script src="data.js"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
