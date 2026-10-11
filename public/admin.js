@@ -399,6 +399,17 @@ window.rejectPending = rejectPending;
 document.addEventListener('DOMContentLoaded', async function () {
   await checkSession();
 
+  // رسالة الخطأ القادمة من الدخول بجوجل
+  const googleError = new URLSearchParams(location.search).get('error');
+  if (googleError && $('loginError')) {
+    const messages = {
+      unauthorized: 'هذا الحساب غير مصرّح له بالدخول',
+      google_denied: 'تم إلغاء الدخول بجوجل',
+      google_failed: 'تعذر الدخول بجوجل، حاول مرة أخرى'
+    };
+    $('loginError').textContent = messages[googleError] || 'تعذر الدخول بجوجل';
+    history.replaceState(null, '', location.pathname);
+  }
   const loginForm = $('loginForm');
   if (loginForm) loginForm.addEventListener('submit', login);
     const emailToggle = $('emailDropdownToggle');

@@ -24,8 +24,10 @@ if (!process.env.MONGODB_URI) {
 // ═══════════════════════════════════════════════
 // 🔐 Google OAuth (اختياري)
 // ═══════════════════════════════════════════════
-const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-
+const googleClient = new OAuth2Client(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET
+);
 const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI ||
   (process.env.NODE_ENV === 'production'
     ? 'https://islamic-lessons.onrender.com/auth/google/callback'
@@ -71,9 +73,12 @@ if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR);
 // ═══════════════════════════════════════════════
 // 🔐 كلمات السر
 // ═══════════════════════════════════════════════
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'jeddah2025';
-const REVIEW_PASSWORD = process.env.REVIEW_PASSWORD || 'Review2025!Jeddah';
-
+   const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+   const REVIEW_PASSWORD = process.env.REVIEW_PASSWORD;
+   if (!ADMIN_PASSWORD || !REVIEW_PASSWORD || !process.env.SESSION_SECRET) {
+     console.error('❌ ADMIN_PASSWORD و REVIEW_PASSWORD و SESSION_SECRET مطلوبة');
+     process.exit(1);
+   }
 // ═══════════════════════════════════════════════
 // 👨‍🏫 قائمة الأساتذة: { email: { name, password } }
 // ═══════════════════════════════════════════════
@@ -254,7 +259,6 @@ app.get('/auth/google/callback', async (req, res) => {
     if (!code) return res.redirect('/admin.html?error=no_code');
 
     const { tokens } = await googleClient.getToken({ code, redirect_uri: GOOGLE_REDIRECT_URI });
-    googleClient.setCredentials(tokens);
     const ticket = await googleClient.verifyIdToken({
       idToken: tokens.id_token,
       audience: process.env.GOOGLE_CLIENT_ID
