@@ -212,6 +212,7 @@ async function doLogin(e) {
     if (res.ok) {
       teacherName = data.name || '';
       sessionStorage.setItem('teacherName', teacherName);
+      sessionStorage.setItem('teacherEmail', email);
       setMsg(errEl, '');
       saveAccount(email, 'teacher', teacherName);
       showPanel();
@@ -239,7 +240,7 @@ async function verifyAndShow() {
       google_denied: 'تم إلغاء الدخول من Google.',
       google_failed: 'فشل الدخول بحساب Google. حاول مجدداً.',
       no_code: 'لم يتم استلام بيانات من Google.',
-      wrong_role: 'هذا الحساب مدير. ادخل من لوحة التحكم بدلاً من هنا.'
+      wrong_role: 'هذا الحساب لا يملك صلاحية لهذه الصفحة.'
     };
     if (errEl) {
       setMsg(errEl, messages[err] || 'حدث خطأ في الدخول.', 'circle-x');
@@ -259,11 +260,20 @@ async function verifyAndShow() {
       if (user.role === 'teacher') {
         teacherName = user.name || teacherName;
         sessionStorage.setItem('teacherName', teacherName);
-        if (user.email) saveAccount(user.email, 'teacher', teacherName);
+        if (user.email) {
+          sessionStorage.setItem('teacherEmail', user.email);
+          saveAccount(user.email, 'teacher', teacherName);
+        }
         showPanel();
+        return;
       }
+      // student → لا يفتح البوابة
+      sessionStorage.removeItem('teacherName');
+      sessionStorage.removeItem('teacherEmail');
+      teacherName = '';
     } else {
       sessionStorage.removeItem('teacherName');
+      sessionStorage.removeItem('teacherEmail');
       teacherName = '';
     }
   } catch (err) { console.error('خطأ:', err); }
@@ -291,6 +301,39 @@ function showPanel() {
   if (currentFilesCount() === 0) addFileInput();
   loadMyLessons();
   initProfileCard();
+  initUploadChip();
+}
+// ═══════════════════════════════════════════════
+// 📤 رفع الدروس — طي/فتح
+// ═══════════════════════════════════════════════
+function toggleUploadForm(show) {
+  const wrap = $('uploadFormWrap');
+  const chip = $('uploadChip');
+  if (!wrap || !chip) return;
+
+  const willShow = show !== undefined ? show : wrap.style.display === 'none';
+
+  wrap.style.display = willShow ? 'block' : 'none';
+  chip.classList.toggle('open', willShow);
+  chip.setAttribute('aria-expanded', String(willShow));
+
+  if (window.lucide) window.lucide.createIcons();
+}
+
+function initUploadChip() {
+  const chip = $('uploadChip');
+  if (!chip) return;
+
+  chip.addEventListener('click', function () {
+    toggleUploadForm();
+  });
+
+  chip.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggleUploadForm();
+    }
+  });
 }
 
 // ═══════════════════════════════════════════════
@@ -441,6 +484,7 @@ async function handleUpload(e) {
     if (res.status === 401 || res.status === 403) {
       setStatus('انتهت الجلسة', 'red', 'circle-x');
       sessionStorage.removeItem('teacherName');
+      sessionStorage.removeItem('teacherEmail');
       setTimeout(function() { location.reload(); }, 2000);
       return;
     }
@@ -575,12 +619,62 @@ function renderProfileAvatar() {
   const el = $('profileAvatar');
   if (!el) return;
   if (profileCache.photoUrl) {
-    el.innerHTML = '<img src="' + escapeHtml(profileCache.photoUrl) + '" alt="" style="width:100%;height:100%;object-fit:cover;">';
+    const img = document.createElement('img');
+    img.alt = '';
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+    img.src = profileCache.photoUrl + (profileCache.photoUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
+    img.onerror = function () {
+      console.error('❌ فشل تحميل الصورة:', profileCache.photoUrl);
+      el.textContent = initialOf(teacherName);
+    };
+    el.innerHTML = '';
+    el.appendChild(img);
   } else {
     el.textContent = initialOf(teacherName);
   }
   const removeBtn = $('removePhotoBtn');
   if (removeBtn) removeBtn.style.display = profileCache.photoUrl ? 'inline-flex' : 'none';
+}
+
+// الشريط المصغّر
+function updateProfileChip() {
+  const chipName = $('profileChipName');
+  const chipEmail = $('profileChipEmail');
+  const chipAvatar = $('profileChipAvatar');
+
+  if (chipName) chipName.textContent = teacherName || '—';
+  if (chipEmail) {
+    const email = sessionStorage.getItem('teacherEmail') || '';
+    chipEmail.textContent = email || '—';
+  }
+  if (chipAvatar) {
+    if (profileCache.photoUrl) {
+      const img = document.createElement('img');
+      img.src = profileCache.photoUrl;
+      img.alt = teacherName || '';
+      img.onerror = function () {
+        chipAvatar.textContent = initialOf(teacherName);
+      };
+      chipAvatar.innerHTML = '';
+      chipAvatar.appendChild(img);
+    } else {
+      chipAvatar.textContent = initialOf(teacherName);
+    }
+  }
+}
+
+function toggleProfileForm(show) {
+  const wrap = $('profileFormWrap');
+  const chip = $('profileChip');
+  if (!wrap || !chip) return;
+
+  const willShow = show !== undefined ? show : wrap.style.display === 'none';
+
+  wrap.style.display = willShow ? 'block' : 'none';
+  chip.classList.toggle('open', willShow);
+  chip.setAttribute('aria-expanded', String(willShow));
+
+  if (window.lucide) window.lucide.createIcons();
 }
 
 async function loadProfileCard() {
@@ -592,12 +686,17 @@ async function loadProfileCard() {
     if (!res.ok) throw new Error();
     const data = await res.json();
     profileCache.photoUrl = data.photoUrl || '';
-    $('profileRank').value = data.rank || '';
-    $('profileSpecialty').value = data.specialty || '';
-    $('profileContactEmail').value = data.contactEmail || '';
-    $('profileBio').value = data.bio || '';
+    const rankEl = $('profileRank');
+    const specEl = $('profileSpecialty');
+    const contactEl = $('profileContactEmail');
+    const bioEl = $('profileBio');
+    if (rankEl) rankEl.value = data.rank || '';
+    if (specEl) specEl.value = data.specialty || '';
+    if (contactEl) contactEl.value = data.contactEmail || '';
+    if (bioEl) bioEl.value = data.bio || '';
     updateBioCount();
     renderProfileAvatar();
+    updateProfileChip();
   } catch (err) {
     console.error('فشل تحميل البطاقة', err);
   }
@@ -657,6 +756,7 @@ async function uploadPhoto(file) {
     if (res.ok) {
       profileCache.photoUrl = data.photoUrl;
       renderProfileAvatar();
+      updateProfileChip();
       status.textContent = 'تم رفع الصورة';
       status.style.color = 'green';
       setTimeout(() => { status.textContent = ''; }, 2500);
@@ -679,6 +779,7 @@ async function removePhoto() {
     if (res.ok) {
       profileCache.photoUrl = '';
       renderProfileAvatar();
+      updateProfileChip();
       showToast('تم حذف الصورة', 'circle-check');
     }
   } catch (err) {}
@@ -686,6 +787,28 @@ async function removePhoto() {
 
 function initProfileCard() {
   loadProfileCard();
+
+  const chip = $('profileChip');
+  if (chip) {
+    chip.addEventListener('click', function (e) {
+      if (e.target.closest('.profile-chip-toggle')) return;
+      toggleProfileForm();
+    });
+    chip.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggleProfileForm();
+      }
+    });
+  }
+
+  const toggleBtn = document.querySelector('.profile-chip-toggle');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      toggleProfileForm();
+    });
+  }
 
   const saveBtn = $('saveProfileBtn');
   if (saveBtn) saveBtn.addEventListener('click', saveProfile);
@@ -696,7 +819,7 @@ function initProfileCard() {
   const uploadBtn = $('uploadPhotoBtn');
   const fileInput = $('profilePhotoInput');
   if (uploadBtn && fileInput) {
-    uploadBtn.addEventListener('click', () => fileInput.click());
+    uploadBtn.addEventListener('click', function () { fileInput.click(); });
     fileInput.addEventListener('change', function () {
       const f = fileInput.files[0];
       if (f) uploadPhoto(f);
@@ -708,6 +831,7 @@ function initProfileCard() {
   if (removeBtn) removeBtn.addEventListener('click', removePhoto);
 
   renderProfileAvatar();
+  updateProfileChip();
 }
 
 // ═══════════════════════════════════════════════
@@ -733,6 +857,7 @@ document.addEventListener('DOMContentLoaded', function() {
     logoutBtn.addEventListener('click', async function() {
       try { await fetch('/auth/logout', { method: 'POST', credentials: 'same-origin' }); } catch (e) {}
       sessionStorage.removeItem('teacherName');
+      sessionStorage.removeItem('teacherEmail');
       location.reload();
     });
   }

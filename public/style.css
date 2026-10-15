@@ -28,7 +28,6 @@
   --gradient-hero: linear-gradient(135deg, #0d5f4a 0%, #1a7d63 50%, #084636 100%);
 }
 
-/* الوضع الليلي */
 html[data-theme="dark"] {
   --bg: #0a1f18;
   --bg-alt: #0f2a20;
@@ -82,9 +81,6 @@ body::before {
   z-index: 1;
 }
 
-/* ═══════════════════════════════════════════════ */
-/* الخطوط */
-/* ═══════════════════════════════════════════════ */
 h1, h2, h3, h4 {
   font-family: 'Amiri', serif;
   font-weight: 700;
@@ -143,9 +139,7 @@ html[data-theme="dark"] .navbar {
   line-height: 1.2;
 }
 
-html[data-theme="dark"] .logo h1 {
-  color: var(--gold);
-}
+html[data-theme="dark"] .logo h1 { color: var(--gold); }
 
 .logo p {
   font-size: 0.85rem;
@@ -177,9 +171,7 @@ nav a:hover {
   color: var(--emerald);
 }
 
-html[data-theme="dark"] nav a:hover {
-  color: var(--gold);
-}
+html[data-theme="dark"] nav a:hover { color: var(--gold); }
 
 .btn-admin {
   background: var(--gradient-emerald) !important;
@@ -320,9 +312,7 @@ html[data-theme="dark"] nav a:hover {
   color: var(--gold-dark);
 }
 
-html[data-theme="dark"] .crumb-link {
-  color: var(--gold);
-}
+html[data-theme="dark"] .crumb-link { color: var(--gold); }
 
 .crumb-sep { opacity: 0.4; font-size: 0.8rem; }
 .crumb-current { color: var(--text); font-weight: 700; }
@@ -1131,9 +1121,6 @@ html[data-theme="dark"] .footer-author { color: var(--gold-light); }
 }
 ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
 
-/* ═══════════════════════════════════════════════ */
-/* Selection */
-/* ═══════════════════════════════════════════════ */
 ::selection { background: var(--gold); color: white; }
 
 /* ═══════════════════════════════════════════════ */
@@ -1149,13 +1136,8 @@ html[data-theme="dark"] .footer-author { color: var(--gold-light); }
   100% { transform: scale(1); }
 }
 
-@keyframes slideIn {
-  from { opacity: 0; transform: translateX(-20px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
 /* ═══════════════════════════════════════════════ */
-/* ☰ قائمة المنيو المنسدلة */
+/* ☰ القائمة المنسدلة */
 /* ═══════════════════════════════════════════════ */
 .menu-toggle {
   font-weight: 900;
@@ -1251,11 +1233,6 @@ html[data-theme="dark"] .menu-item:hover { color: var(--gold) !important; }
   opacity: 0.6;
 }
 
-@keyframes menuSlide {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
 @media (max-width: 768px) {
   .menu-dropdown {
     left: 16px;
@@ -1267,7 +1244,7 @@ html[data-theme="dark"] .menu-item:hover { color: var(--gold) !important; }
 }
 
 /* ═══════════════════════════════════════════════ */
-/* 📄 صفحات "قريباً" */
+/* 📄 Coming Soon */
 /* ═══════════════════════════════════════════════ */
 .coming-soon {
   min-height: 70vh;
@@ -1346,7 +1323,7 @@ html[data-theme="dark"] .coming-soon-box h2 { color: var(--gold); }
 }
 
 /* ═══════════════════════════════════════════════ */
-/* 📞 صفحة تواصل مع الإدارة */
+/* 📞 Contact */
 /* ═══════════════════════════════════════════════ */
 .contact-hero {
   background: var(--gradient-hero);
@@ -1508,11 +1485,7 @@ html[data-theme="dark"] .contact-card h3 { color: var(--gold); }
   gap: 6px;
 }
 
-.copy-btn:hover {
-  box-shadow: 0 6px 20px rgba(13, 95, 74, 0.35);
-}
-
-.copy-btn:active { transform: translateY(0) scale(0.96); }
+.copy-btn:hover { box-shadow: 0 6px 20px rgba(13, 95, 74, 0.35); }
 
 .whatsapp-btn {
   background: linear-gradient(135deg, #25d366, #128c7e);
@@ -1532,9 +1505,7 @@ html[data-theme="dark"] .contact-card h3 { color: var(--gold); }
   box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25);
 }
 
-.whatsapp-btn:hover {
-  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
-}
+.whatsapp-btn:hover { box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4); }
 
 .tips-card {
   background: var(--card);
@@ -1617,7 +1588,26 @@ html[data-theme="dark"] .tips-card li strong { color: var(--gold); }
   box-shadow: 0 10px 32px rgba(13, 95, 74, 0.4);
 }
 
-/* إشعار Toast */
+@media (max-width: 768px) {
+  .contact-hero { padding: 40px 0 35px; }
+  .contact-hero-icon { font-size: 2.8rem; }
+  .contact-hero h1 { font-size: 1.6rem; }
+  .contact-section { padding: 30px 16px; }
+  .contact-card { padding: 22px 18px; }
+  .contact-card-icon { font-size: 2rem; width: 50px; height: 50px; }
+  .contact-card h3 { font-size: 1.15rem; }
+  .contact-value { flex-direction: column; align-items: stretch; padding: 14px 16px; }
+  .contact-btns { width: 100%; }
+  .copy-btn, .whatsapp-btn { flex: 1; justify-content: center; padding: 12px 16px; }
+  .tips-card { padding: 22px 18px; }
+  .tips-card h3 { font-size: 1.15rem; }
+  .tips-card li { font-size: 0.92rem; }
+  .btn-back-large { padding: 14px 28px; font-size: 0.95rem; }
+}
+
+/* ═══════════════════════════════════════════════ */
+/* 💬 Toast */
+/* ═══════════════════════════════════════════════ */
 .toast-notification {
   position: fixed;
   bottom: 30px;
@@ -1635,6 +1625,9 @@ html[data-theme="dark"] .tips-card li strong { color: var(--gold); }
   opacity: 1;
   transition: all 0.3s ease;
   animation: toastSlideIn 0.4s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .toast-notification.toast-hide {
@@ -1647,28 +1640,8 @@ html[data-theme="dark"] .tips-card li strong { color: var(--gold); }
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
-@media (max-width: 768px) {
-  .contact-hero { padding: 40px 0 35px; }
-  .contact-hero-icon { font-size: 2.8rem; }
-  .contact-hero h1 { font-size: 1.6rem; }
-  .contact-hero p { font-size: 0.95rem; }
-
-  .contact-section { padding: 30px 16px; }
-  .contact-card { padding: 22px 18px; }
-  .contact-card-icon { font-size: 2rem; width: 50px; height: 50px; }
-  .contact-card h3 { font-size: 1.15rem; }
-
-  .contact-value { flex-direction: column; align-items: stretch; padding: 14px 16px; }
-  .contact-btns { width: 100%; }
-  .copy-btn, .whatsapp-btn { flex: 1; justify-content: center; padding: 12px 16px; }
-  .tips-card { padding: 22px 18px; }
-  .tips-card h3 { font-size: 1.15rem; }
-  .tips-card li { font-size: 0.92rem; }
-  .btn-back-large { padding: 14px 28px; font-size: 0.95rem; }
-}
-
 /* ═══════════════════════════════════════════════ */
-/* ⭐ زر المفضلة */
+/* ⭐ Favorites button */
 /* ═══════════════════════════════════════════════ */
 .fav-btn {
   background: var(--bg-alt);
@@ -1754,7 +1727,7 @@ html[data-theme="dark"] .fav-btn.active {
 }
 
 /* ═══════════════════════════════════════════════ */
-/* ⭐ صفحة المفضلة */
+/* ⭐ Favorites page */
 /* ═══════════════════════════════════════════════ */
 .fav-section { margin-bottom: 50px; }
 
@@ -1797,7 +1770,7 @@ html[data-theme="dark"] .fav-section-title { color: var(--gold); }
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  transition: all 0.3s ease;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
   flex-wrap: wrap;
 }
 
@@ -1860,9 +1833,7 @@ html[data-theme="dark"] .fav-section-title { color: var(--gold); }
   box-shadow: 0 4px 12px rgba(13, 95, 74, 0.2);
 }
 
-.fav-go-btn:hover {
-  box-shadow: 0 6px 20px rgba(13, 95, 74, 0.35);
-}
+.fav-go-btn:hover { box-shadow: 0 6px 20px rgba(13, 95, 74, 0.35); }
 
 .fav-remove-btn {
   background: linear-gradient(135deg, #fee2e2, #fecaca);
@@ -1879,10 +1850,7 @@ html[data-theme="dark"] .fav-section-title { color: var(--gold); }
   transition: all 0.3s ease;
 }
 
-.fav-remove-btn:hover {
-  background: #dc2626;
-  color: white;
-}
+.fav-remove-btn:hover { background: #dc2626; color: white; }
 
 .fav-empty {
   text-align: center;
@@ -1924,7 +1892,7 @@ html[data-theme="dark"] .fav-empty a { color: var(--gold); }
 }
 
 /* ═══════════════════════════════════════════════ */
-/* 📱 زر تثبيت التطبيق */
+/* 📱 Install app button */
 /* ═══════════════════════════════════════════════ */
 .install-btn {
   background: linear-gradient(135deg, #d4a574, #b8935a) !important;
@@ -1942,9 +1910,7 @@ html[data-theme="dark"] .fav-empty a { color: var(--gold); }
   background: linear-gradient(135deg, #b8935a, #a67d4a) !important;
 }
 
-.install-btn .menu-icon {
-  animation: pulse-icon 2s ease-in-out infinite;
-}
+.install-btn .menu-icon { animation: pulse-icon 2s ease-in-out infinite; }
 
 @keyframes pulse-icon {
   0%, 100% { transform: scale(1); }
@@ -1952,7 +1918,7 @@ html[data-theme="dark"] .fav-empty a { color: var(--gold); }
 }
 
 /* ═══════════════════════════════════════════════ */
-/* 👨‍🏫 بوابة الأساتذة / الطلبة */
+/* 👨‍🏫 Teacher upload */
 /* ═══════════════════════════════════════════════ */
 .teacher-files-info {
   display: flex;
@@ -1980,9 +1946,7 @@ html[data-theme="dark"] .fav-empty a { color: var(--gold); }
   box-shadow: 0 4px 12px rgba(13, 95, 74, 0.2);
 }
 
-.btn-add-file:hover {
-  box-shadow: 0 6px 20px rgba(13, 95, 74, 0.35);
-}
+.btn-add-file:hover { box-shadow: 0 6px 20px rgba(13, 95, 74, 0.35); }
 
 .files-count {
   font-family: 'Tajawal', sans-serif;
@@ -2047,10 +2011,7 @@ html[data-theme="dark"] .file-number { color: var(--gold); }
   transition: all 0.3s ease;
 }
 
-.file-remove-btn:hover {
-  background: #dc2626;
-  color: white;
-}
+.file-remove-btn:hover { background: #dc2626; color: white; }
 
 .file-input {
   width: 100%;
@@ -2129,7 +2090,7 @@ html[data-theme="dark"] .upload-results h3 { color: var(--gold); }
 }
 
 /* ═══════════════════════════════════════════════ */
-/* 🚪 زر الخروج */
+/* 🚪 Logout button */
 /* ═══════════════════════════════════════════════ */
 .btn-logout {
   background: linear-gradient(135deg, #fee2e2, #fecaca);
@@ -2155,7 +2116,7 @@ html[data-theme="dark"] .upload-results h3 { color: var(--gold); }
 }
 
 /* ═══════════════════════════════════════════════ */
-/* 👨‍🏫 بوابة الأساتذة - نسخة احترافية */
+/* 👨‍🏫 Teacher page */
 /* ═══════════════════════════════════════════════ */
 .teacher-hero {
   background: var(--gradient-hero);
@@ -2226,9 +2187,7 @@ html[data-theme="dark"] .upload-results h3 { color: var(--gold); }
   transition: all 0.3s ease;
 }
 
-.feature-chip:hover {
-  background: rgba(255, 255, 255, 0.25);
-}
+.feature-chip:hover { background: rgba(255, 255, 255, 0.25); }
 
 .login-icon {
   font-size: 3rem;
@@ -2273,7 +2232,6 @@ html[data-theme="dark"] .upload-results h3 { color: var(--gold); }
   justify-content: center;
 }
 
-/* بطاقة الرفع */
 .teacher-upload-card {
   border: 2px solid var(--border-gold) !important;
   padding: 0 !important;
@@ -2406,17 +2364,29 @@ html[data-theme="dark"] .form-section-title { color: var(--gold); }
   background: var(--card);
 }
 
-.files-info-left { display: flex; align-items: center; gap: 10px; }
-.files-info-icon { font-size: 1.3rem; }
-
-.files-count {
+.form-group textarea {
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 2px solid var(--border);
   font-family: 'Tajawal', sans-serif;
   font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--emerald);
+  background: var(--bg);
+  color: var(--text);
+  transition: all 0.3s ease;
+  outline: none;
+  resize: vertical;
+  min-height: 100px;
 }
 
-html[data-theme="dark"] .files-count { color: var(--gold); }
+.form-group textarea:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.15);
+  background: var(--card);
+}
+
+.files-info-left { display: flex; align-items: center; gap: 10px; }
+.files-info-icon { font-size: 1.3rem; }
 
 .btn-add-file {
   background: var(--gradient-gold);
@@ -2602,7 +2572,7 @@ button:disabled {
 }
 
 /* ═══════════════════════════════════════════════ */
-/* 👋 ترحيب بالأستاذ */
+/* 👋 Welcome teacher */
 /* ═══════════════════════════════════════════════ */
 .teacher-welcome {
   background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
@@ -2623,7 +2593,7 @@ html[data-theme="dark"] .teacher-welcome {
 }
 
 /* ═══════════════════════════════════════════════ */
-/* 👨‍🎓 بوابة الطلبة */
+/* 👨‍🎓 Student page */
 /* ═══════════════════════════════════════════════ */
 .student-hero {
   background: linear-gradient(135deg, #1a5f8a, #2a7da3, #0d3d5c);
@@ -2766,27 +2736,6 @@ html[data-theme="dark"] .student-upload-card .form-section-title { color: #7dd3f
   text-align: center;
 }
 
-.form-group textarea {
-  width: 100%;
-  padding: 14px 18px;
-  border-radius: 12px;
-  border: 2px solid var(--border);
-  font-family: 'Tajawal', sans-serif;
-  font-size: 0.95rem;
-  background: var(--bg);
-  color: var(--text);
-  transition: all 0.3s ease;
-  outline: none;
-  resize: vertical;
-  min-height: 100px;
-}
-
-.form-group textarea:focus {
-  border-color: var(--gold);
-  box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.15);
-  background: var(--card);
-}
-
 @media (max-width: 768px) {
   .student-hero { padding: 50px 0 40px; }
   .student-hero-icon { font-size: 3rem; }
@@ -2797,7 +2746,7 @@ html[data-theme="dark"] .student-upload-card .form-section-title { color: #7dd3f
 }
 
 /* ═══════════════════════════════════════════════ */
-/* 🤲 إشعار الذكر */
+/* 🤲 Adhkar notify */
 /* ═══════════════════════════════════════════════ */
 .adhkar-notify {
   position: fixed;
@@ -2900,11 +2849,7 @@ html[data-theme="dark"] .student-upload-card .form-section-title { color: #7dd3f
     padding: 12px 14px;
     gap: 10px;
   }
-
-  .adhkar-notify.visible {
-    transform: translateX(0) translateY(0);
-  }
-
+  .adhkar-notify.visible { transform: translateX(0) translateY(0); }
   .adhkar-notify-icon { font-size: 1.5rem; }
   .adhkar-notify-text { font-size: 0.95rem; }
   .adhkar-notify-source { font-size: 0.7rem; }
@@ -2912,7 +2857,7 @@ html[data-theme="dark"] .student-upload-card .form-section-title { color: #7dd3f
 }
 
 /* ═══════════════════════════════════════════════ */
-/* 📥 قسم المراجعة (admin.html) */
+/* 📥 Review (admin) */
 /* ═══════════════════════════════════════════════ */
 .review-card {
   background: var(--card);
@@ -3145,9 +3090,7 @@ html[data-theme="dark"] .pending-meta strong { color: var(--gold); }
   box-shadow: 0 4px 12px rgba(13, 95, 74, 0.25);
 }
 
-.pending-btn.view:hover {
-  box-shadow: 0 6px 20px rgba(13, 95, 74, 0.4);
-}
+.pending-btn.view:hover { box-shadow: 0 6px 20px rgba(13, 95, 74, 0.4); }
 
 .pending-btn.approve {
   background: linear-gradient(135deg, #10b981, #059669);
@@ -3155,22 +3098,17 @@ html[data-theme="dark"] .pending-meta strong { color: var(--gold); }
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
-.pending-btn.approve:hover {
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
-}
+.pending-btn.approve:hover { box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5); }
 
 .pending-btn.reject {
   background: linear-gradient(135deg, #fee2e2, #fecaca);
   color: #dc2626;
 }
 
-.pending-btn.reject:hover {
-  background: #dc2626;
-  color: white;
-}
+.pending-btn.reject:hover { background: #dc2626; color: white; }
 
 /* ═══════════════════════════════════════════════ */
-/* 📚 قسم دروسي المرفوعة (الأستاذ) */
+/* 📚 My lessons (teacher) */
 /* ═══════════════════════════════════════════════ */
 .my-lessons-section {
   background: var(--card);
@@ -3392,20 +3330,7 @@ html[data-theme="dark"] .my-lessons-subtitle span { color: var(--gold); }
 .admin-hidden { display: none !important; }
 
 /* ═══════════════════════════════════════════════ */
-/* 🛠️ إصلاح اهتزاز بطاقة المفضلة */
-/* ═══════════════════════════════════════════════ */
-.fav-card,
-.fav-card:hover {
-  transform: none !important;
-  animation: none !important;
-}
-
-.fav-card {
-  transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
-}
-
-/* ═══════════════════════════════════════════════ */
-/* 🎨 الأيقونات (Lucide) */
+/* Lucide icons */
 /* ═══════════════════════════════════════════════ */
 svg.lucide {
   width: 1.1em;
@@ -3413,11 +3338,10 @@ svg.lucide {
   stroke-width: 2;
   flex-shrink: 0;
   vertical-align: -0.15em;
+  pointer-events: none;
 }
 
-nav a,
-.crumb-link,
-.btn-admin {
+nav a, .crumb-link, .btn-admin {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -3426,7 +3350,6 @@ nav a,
 .theme-btn svg { width: 20px; height: 20px; }
 .menu-icon svg { width: 20px; height: 20px; }
 
-/* البحث */
 .search-hero::after { content: none; }
 .search-ico {
   position: absolute;
@@ -3439,23 +3362,20 @@ nav a,
   pointer-events: none;
 }
 
-/* السنوات والتخصصات والمواد */
 .year-icon svg { width: 56px; height: 56px; stroke-width: 1.5; color: var(--emerald); }
 .spec-icon svg { width: 34px; height: 34px; stroke-width: 1.75; color: var(--emerald); }
 .subject-card .icon svg { width: 42px; height: 42px; stroke-width: 1.5; color: var(--emerald); }
+
 html[data-theme="dark"] .year-icon svg,
 html[data-theme="dark"] .spec-icon svg,
 html[data-theme="dark"] .subject-card .icon svg { color: var(--gold); }
 
-/* المفضلة */
 .fav-btn svg { width: 18px; height: 18px; }
 .lesson-fav svg { width: 16px; height: 16px; }
 .fav-btn.active svg { fill: currentColor; }
 
-/* الدروس */
 .lesson-meta span { display: inline-flex; align-items: center; gap: 6px; }
 
-/* الحالة الفارغة */
 .empty::before { content: none; }
 .empty-ico {
   display: block;
@@ -3466,18 +3386,10 @@ html[data-theme="dark"] .subject-card .icon svg { color: var(--gold); }
   opacity: 0.5;
 }
 
-/* الإشعار */
-.toast-notification { display: flex; align-items: center; gap: 8px; }
-
 @media (max-width: 768px) {
   .year-icon svg { width: 40px; height: 40px; }
   .subject-card .icon svg { width: 34px; height: 34px; }
 }
-
-/* ═══════════════════════════════════════════════ */
-/* 👆 تحسين الضغط على الأزرار والأيقونات */
-/* ═══════════════════════════════════════════════ */
-svg.lucide { pointer-events: none; }
 
 a, button, .year-card, .specialization-card, .subject-card,
 .lesson-card, .menu-item, .logo {
@@ -3485,9 +3397,6 @@ a, button, .year-card, .specialization-card, .subject-card,
   -webkit-tap-highlight-color: transparent;
 }
 
-/* ═══════════════════════════════════════════════ */
-/* ⭐ أيقونات صفحة المفضلة */
-/* ═══════════════════════════════════════════════ */
 .contact-hero-icon svg {
   width: 56px;
   height: 56px;
@@ -3514,9 +3423,6 @@ html[data-theme="dark"] .fav-card-icon svg { color: var(--gold); }
   stroke-width: 1.25;
 }
 
-/* ═══════════════════════════════════════════════ */
-/* 📞 أيقونات صفحة التواصل وإشعار الذكر */
-/* ═══════════════════════════════════════════════ */
 .contact-card-icon svg { width: 30px; height: 30px; stroke-width: 1.75; color: var(--emerald); }
 html[data-theme="dark"] .contact-card-icon svg { color: var(--gold); }
 
@@ -3526,13 +3432,9 @@ html[data-theme="dark"] .contact-card-icon svg { color: var(--gold); }
 .tips-card h3 svg { width: 24px; height: 24px; color: var(--gold); }
 .btn-back-large svg { width: 20px; height: 20px; }
 
-/* إشعار الذكر */
 .adhkar-notify-icon svg { width: 30px; height: 30px; stroke-width: 1.5; color: var(--gold-light); }
 .adhkar-notify-close svg { width: 14px; height: 14px; }
 
-/* ═══════════════════════════════════════════════ */
-/* 👨‍🏫 أيقونات بوابة الأساتذة */
-/* ═══════════════════════════════════════════════ */
 .teacher-hero-icon svg { width: 64px; height: 64px; stroke-width: 1.25; color: var(--gold-light); }
 
 .feature-chip { display: inline-flex; align-items: center; gap: 8px; }
@@ -3569,15 +3471,12 @@ html[data-theme="dark"] .contact-card-icon svg { color: var(--gold); }
 .my-lessons-empty { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .my-lessons-empty .empty-icon svg { width: 48px; height: 48px; stroke-width: 1.25; }
 
-/* رسائل الحالة والخطأ */
 .error svg,
 .status svg { width: 18px; height: 18px; vertical-align: -4px; margin-inline-end: 6px; }
 
-/* دوران أيقونة التحميل */
 .spin { animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* الوضع الليلي */
 html[data-theme="dark"] .login-icon svg,
 html[data-theme="dark"] .form-group label svg,
 html[data-theme="dark"] .files-info-icon svg,
@@ -3585,9 +3484,6 @@ html[data-theme="dark"] .results-icon svg,
 html[data-theme="dark"] .my-lessons-icon svg,
 html[data-theme="dark"] .my-lesson-icon svg { color: var(--gold); }
 
-/* ═══════════════════════════════════════════════ */
-/* 👨‍🎓 أيقونات بوابة الطلبة */
-/* ═══════════════════════════════════════════════ */
 .student-hero-icon svg { width: 64px; height: 64px; stroke-width: 1.25; color: #fff; }
 
 .notice-icon svg { width: 32px; height: 32px; stroke-width: 1.5; color: #0369a1; }
@@ -3605,530 +3501,7 @@ html[data-theme="dark"] .student-upload-card .form-section-title svg { color: #7
 .result-thanks svg { width: 22px; height: 22px; }
 
 /* ═══════════════════════════════════════════════ */
-/* 🔐 حقول البريد + Google (admin/teacher) */
-/* ═══════════════════════════════════════════════ */
-.email-field-wrap { position: relative; }
-.email-field-wrap input { margin-bottom: 14px; padding-left: 42px; }
-
-.email-drop-toggle {
-  position: absolute;
-  left: 8px;
-  top: 6px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: var(--text-light);
-  padding: 6px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.email-drop-toggle:hover { background: rgba(0,0,0,.05); }
-[data-theme="dark"] .email-drop-toggle:hover { background: rgba(255,255,255,.08); }
-
-.email-dropdown {
-  position: absolute;
-  top: calc(100% - 10px);
-  right: 0;
-  left: 0;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  box-shadow: 0 8px 24px rgba(0,0,0,.12);
-  z-index: 100;
-  max-height: 240px;
-  overflow-y: auto;
-  padding: 6px;
-  text-align: right;
-}
-[data-theme="dark"] .email-dropdown {
-  background: #2a2a2a; border-color: #444;
-}
-.email-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 10px 12px; border-radius: 8px;
-  cursor: pointer; font-size: 14px;
-  color: var(--text);
-  transition: background .12s;
-}
-.email-item:hover { background: rgba(0,0,0,.05); }
-[data-theme="dark"] .email-item:hover { background: rgba(255,255,255,.08); }
-.email-item .avatar {
-  width: 32px; height: 32px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  background: #e8f0ea; color: var(--emerald);
-  font-weight: 700; font-size: 14px; flex-shrink: 0;
-}
-[data-theme="dark"] .email-item .avatar { background: #1f3a2b; }
-.email-item .info { flex: 1; min-width: 0; }
-.email-item .info .email {
-  display: block; font-weight: 700; font-size: 13px;
-  direction: ltr; text-align: left;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.email-item .info .role {
-  display: block; font-size: 12px; color: var(--text-light);
-}
-.email-item .remove-btn {
-  background: transparent; border: none; cursor: pointer;
-  color: var(--text-light); padding: 4px; border-radius: 6px;
-}
-.email-item .remove-btn:hover { color: #b42318; background: rgba(180,35,24,.08); }
-.email-empty {
-  padding: 14px; text-align: center;
-  color: var(--text-light); font-size: 13px;
-}
-
-.login-divider {
-  display: flex; align-items: center; gap: 12px;
-  margin: 18px 0; color: var(--text-muted); font-size: 0.9rem;
-}
-.login-divider::before, .login-divider::after {
-  content: ''; flex: 1; height: 1px; background: var(--border);
-}
-
-.btn-google {
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-  padding: 14px; border-radius: 14px; background: #fff; color: #3c4043;
-  border: 2px solid var(--border); font-family: 'Tajawal', sans-serif;
-  font-weight: 700; text-decoration: none; transition: all 0.3s ease;
-}
-.btn-google:hover { border-color: var(--gold); box-shadow: var(--shadow); }
-
-.google-login-btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  gap: 10px; width: 100%;
-  padding: 12px 16px;
-  background: #fff; color: #333;
-  border: 1px solid #dadce0; border-radius: 10px;
-  font-weight: 700; font-size: 15px;
-  text-decoration: none; cursor: pointer;
-  transition: box-shadow .15s, background .15s;
-  font-family: inherit;
-  box-sizing: border-box;
-}
-.google-login-btn:hover {
-  background: #f8f9fa;
-  box-shadow: 0 1px 3px rgba(0,0,0,.1);
-}
-[data-theme="dark"] .google-login-btn {
-  background: #2a2a2a; color: #eee; border-color: #444;
-}
-[data-theme="dark"] .google-login-btn:hover { background: #333; }
-
-/* ═══════════════════════════════════════════════ */
-/* 👥 إدارة الأساتذة (admin.html) */
-/* ═══════════════════════════════════════════════ */
-.teachers-card {
-  background: var(--card);
-  border-radius: 24px;
-  padding: 32px;
-  margin-bottom: 32px;
-  border: 2px solid var(--border-gold);
-  box-shadow: var(--shadow);
-  position: relative;
-  overflow: hidden;
-}
-
-.teachers-card::before {
-  content: '';
-  position: absolute;
-  top: 0; right: 0;
-  width: 100%;
-  height: 5px;
-  background: var(--gradient-gold);
-}
-
-.teachers-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  gap: 16px;
-  flex-wrap: wrap;
-  padding-bottom: 20px;
-  border-bottom: 2px dashed var(--border-gold);
-}
-
-.teachers-header h3 {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  font-family: 'Amiri', serif;
-  font-size: 1.5rem;
-  color: var(--emerald);
-  margin: 0;
-}
-
-html[data-theme="dark"] .teachers-header h3 { color: var(--gold); }
-
-.teachers-header h3 svg { width: 28px; height: 28px; color: var(--gold-dark); }
-html[data-theme="dark"] .teachers-header h3 svg { color: var(--gold); }
-
-.btn-add-teacher {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 22px;
-  border-radius: 12px;
-  background: var(--gradient-emerald);
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  font-family: 'Tajawal', sans-serif;
-  font-weight: 700;
-  font-size: 0.95rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 16px rgba(13, 95, 74, 0.25);
-}
-
-.btn-add-teacher:hover {
-  box-shadow: 0 8px 24px rgba(13, 95, 74, 0.4);
-}
-
-.btn-add-teacher svg { width: 18px; height: 18px; }
-
-/* ✨ قائمة الأساتذة: تمرير داخلي عند الكثرة */
-#teachersList {
-  max-height: 60vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-  border-radius: 10px;
-  scroll-behavior: smooth;
-  padding-inline-end: 4px;
-  position: relative;
-}
-
-/* شريط تمرير أنيق للقائمة */
-#teachersList::-webkit-scrollbar {
-  width: 8px;
-}
-#teachersList::-webkit-scrollbar-track {
-  background: rgba(0,0,0,.03);
-  border-radius: 4px;
-}
-#teachersList::-webkit-scrollbar-thumb {
-  background: linear-gradient(var(--emerald), var(--emerald-dark));
-  border-radius: 4px;
-  transition: background .2s;
-}
-#teachersList::-webkit-scrollbar-thumb:hover {
-  background: var(--gold);
-}
-[data-theme="dark"] #teachersList::-webkit-scrollbar-track {
-  background: rgba(255,255,255,.05);
-}
-[data-theme="dark"] #teachersList::-webkit-scrollbar-thumb {
-  background: linear-gradient(var(--emerald-light), var(--emerald));
-}
-
-.teachers-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  font-family: 'Tajawal', sans-serif;
-  font-size: 0.95rem;
-}
-
-/* رأس الجدول ثابت أثناء التمرير */
-.teachers-table thead th {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  padding: 14px 12px;
-  text-align: right;
-  font-weight: 700;
-  font-size: 0.9rem;
-  color: var(--text-light);
-  background: var(--bg-alt);
-  border-bottom: 2px solid var(--border-gold);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-}
-
-html[data-theme="dark"] .teachers-table thead th {
-  background: #1a3a2c;
-}
-
-.teachers-table tbody td {
-  padding: 16px 12px;
-  text-align: right;
-  border-bottom: 1px solid var(--border);
-  transition: background .2s;
-}
-
-.teachers-table tbody tr {
-  transition: background .2s;
-}
-
-.teachers-table tbody tr:hover td {
-  background: var(--card-hover);
-}
-
-.teachers-table tbody tr.inactive td {
-  opacity: 0.55;
-}
-
-.teacher-badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 999px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.teacher-badge.active {
-  background: linear-gradient(135deg, #c9ecd0, #a8ddb6);
-  color: #0d4d1e;
-}
-.teacher-badge.inactive {
-  background: linear-gradient(135deg, #f0d5d3, #e5b8b3);
-  color: #7a2018;
-}
-
-[data-theme="dark"] .teacher-badge.active {
-  background: linear-gradient(135deg, #0d4d1e, #134e22);
-  color: #c9ecd0;
-}
-[data-theme="dark"] .teacher-badge.inactive {
-  background: linear-gradient(135deg, #7a2018, #5c1710);
-  color: #f0d5d3;
-}
-
-.teacher-actions {
-  display: flex;
-  gap: 6px;
-  justify-content: flex-end;
-}
-
-.btn-icon-sm {
-  background: var(--bg-alt);
-  border: 1px solid var(--border);
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  color: var(--text-light);
-  font-family: inherit;
-  padding: 0;
-}
-
-.btn-icon-sm:hover {
-  background: var(--card);
-  border-color: var(--gold);
-  color: var(--emerald);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(13, 95, 74, 0.15);
-}
-
-html[data-theme="dark"] .btn-icon-sm:hover {
-  color: var(--gold);
-  border-color: var(--gold);
-  box-shadow: 0 4px 12px rgba(212, 165, 116, 0.15);
-}
-
-.btn-icon-sm.danger:hover {
-  color: #dc2626;
-  border-color: #dc2626;
-  background: rgba(220, 38, 38, 0.08);
-}
-
-.btn-icon-sm.success:hover {
-  color: #059669;
-  border-color: #059669;
-  background: rgba(5, 150, 105, 0.08);
-}
-
-.btn-icon-sm svg {
-  width: 16px;
-  height: 16px;
-  stroke-width: 2;
-}
-
-.teachers-empty {
-  text-align: center;
-  padding: 50px 24px;
-  color: var(--text-light);
-  font-family: 'Tajawal', sans-serif;
-  font-size: 1rem;
-  border: 2px dashed var(--border-gold);
-  border-radius: 14px;
-  background: var(--bg-alt);
-}
-
-/* ═══════════════════════════════════════════════ */
-/* 🪟 النافذة المنبثقة (Modal) */
-/* ═══════════════════════════════════════════════ */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.55);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  padding: 20px;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  animation: modalFadeIn 0.2s ease;
-}
-
-@keyframes modalFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.modal-card {
-  background: var(--card);
-  color: var(--text);
-  border-radius: 20px;
-  width: 100%;
-  max-width: 460px;
-  padding: 28px;
-  box-shadow: 0 20px 60px rgba(0,0,0,.3), 0 0 0 2px var(--border-gold);
-  animation: modalIn .25s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-}
-
-@keyframes modalIn {
-  from { opacity: 0; transform: translateY(14px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.modal-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 0 0 22px;
-  font-family: 'Amiri', serif;
-  font-size: 1.25rem;
-  color: var(--emerald);
-  padding-bottom: 14px;
-  border-bottom: 2px solid var(--border-gold);
-}
-
-html[data-theme="dark"] .modal-title { color: var(--gold); }
-
-.modal-title svg { width: 22px; height: 22px; color: var(--gold-dark); }
-html[data-theme="dark"] .modal-title svg { color: var(--gold); }
-
-.modal-field { margin-bottom: 16px; }
-
-.modal-field label {
-  display: block;
-  font-family: 'Tajawal', sans-serif;
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--text-light);
-  margin-bottom: 8px;
-}
-
-.modal-field input {
-  width: 100%;
-  padding: 14px 16px;
-  border-radius: 12px;
-  border: 2px solid var(--border);
-  font-family: 'Tajawal', sans-serif;
-  font-size: 0.95rem;
-  background: var(--bg);
-  color: var(--text);
-  box-sizing: border-box;
-  transition: all 0.3s ease;
-  outline: none;
-}
-
-.modal-field input:focus {
-  border-color: var(--gold);
-  box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.15);
-  background: var(--card);
-}
-
-.modal-field input[dir="ltr"] { text-align: left; }
-.modal-field input:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  background: var(--bg-alt);
-}
-
-.modal-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-  margin-top: 22px;
-}
-
-.btn-modal {
-  padding: 12px 22px;
-  border-radius: 12px;
-  font-family: 'Tajawal', sans-serif;
-  font-size: 0.95rem;
-  font-weight: 700;
-  cursor: pointer;
-  border: none;
-  transition: all 0.3s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.btn-modal:hover { opacity: 0.92; transform: translateY(-1px); }
-.btn-modal:active { transform: translateY(0); }
-
-.btn-modal.primary {
-  background: var(--gradient-emerald);
-  color: #fff;
-  box-shadow: 0 4px 16px rgba(13, 95, 74, 0.25);
-}
-
-.btn-modal.secondary {
-  background: var(--bg-alt);
-  color: var(--text);
-  border: 2px solid var(--border);
-}
-
-.btn-modal.danger {
-  background: linear-gradient(135deg, #dc2626, #b91c1c);
-  color: #fff;
-  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.25);
-}
-
-.modal-error {
-  color: #dc2626;
-  font-family: 'Tajawal', sans-serif;
-  font-size: 0.9rem;
-  font-weight: 600;
-  margin-top: 10px;
-  min-height: 20px;
-}
-
-.modal-hint {
-  font-family: 'Tajawal', sans-serif;
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  margin-top: 6px;
-}
-
-@media (max-width: 768px) {
-  .teachers-card { padding: 22px 18px; }
-  .teachers-header { flex-direction: column; align-items: stretch; }
-  .btn-add-teacher { width: 100%; justify-content: center; }
-  #teachersList { max-height: 55vh; }
-  .teachers-table { font-size: 0.85rem; }
-  .teachers-table thead th,
-  .teachers-table tbody td { padding: 10px 8px; }
-  .btn-icon-sm { width: 32px; height: 32px; }
-  .modal-card { padding: 22px 18px; }
-  .modal-actions { flex-direction: column-reverse; }
-  .btn-modal { width: 100%; justify-content: center; }
-}
-/* ═══════════════════════════════════════════════ */
-/* 🎴 بطاقات الأساتذة */
+/* 🎴 Teacher cards */
 /* ═══════════════════════════════════════════════ */
 .teacher-card {
   background: var(--card);
@@ -4188,7 +3561,7 @@ html[data-theme="dark"] .teacher-stats { color: var(--gold); }
 .teacher-stats svg { width: 16px; height: 16px; }
 
 /* ═══════════════════════════════════════════════ */
-/* 📄 صفحة الملف الشخصي */
+/* 📄 Teacher profile page */
 /* ═══════════════════════════════════════════════ */
 .profile-card {
   background: var(--card); border-radius: 24px;
@@ -4293,8 +3666,9 @@ html[data-theme="dark"] .lessons-section h2 { color: var(--gold); }
   .profile-card h1 { font-size: 1.4rem; }
   .profile-bio { padding: 16px; font-size: .95rem; }
 }
+
 /* ═══════════════════════════════════════════════ */
-/* 👤 شريط اسم الأستاذ في بطاقة الدرس */
+/* 👤 Teacher line inside lesson card */
 /* ═══════════════════════════════════════════════ */
 .lesson-teacher {
   display: inline-flex;
@@ -4338,17 +3712,1035 @@ html[data-theme="dark"] .lesson-teacher:hover {
   transform: none;
   border-color: transparent;
 }
+
 /* ═══════════════════════════════════════════════ */
-/* 📸 زر حذف الصورة (لا يدور) */
+/* 🌟 Welcome Modal (زجاجية داكنة) */
 /* ═══════════════════════════════════════════════ */
-#removePhotoBtn:hover,
-#removePhotoBtn.btn-refresh:hover {
-  transform: none !important;
-  background: linear-gradient(135deg, #fee2e2, #fecaca) !important;
-  color: #dc2626 !important;
-  border-color: #fecaca !important;
+.welcome-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(13, 40, 33, 0.55);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  padding: 20px;
+  animation: welcomeFadeIn 0.3s ease;
 }
 
-#removePhotoBtn:hover svg {
-  color: #dc2626 !important;
+@keyframes welcomeFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+html[data-theme="light"] .welcome-backdrop {
+  background: rgba(13, 40, 33, 0.5);
+}
+
+.welcome-card {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  /* 🪟 زجاج داكن شفاف */
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(30px) saturate(180%) brightness(0.85);
+  -webkit-backdrop-filter: blur(30px) saturate(180%) brightness(0.85);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 24px;
+  padding: 38px 32px 28px;
+  box-shadow:
+    0 25px 80px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  color: #f0f7f3;
+  text-align: center;
+  animation: welcomeSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* نفس المظهر في الوضع النهاري */
+html[data-theme="light"] .welcome-card {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #f0f7f3;
+  box-shadow:
+    0 25px 80px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+@keyframes welcomeSlideIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* زر الإغلاق */
+.welcome-close {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+  padding: 0;
+  font-family: inherit;
+}
+.welcome-close:hover {
+  background: rgba(220, 38, 38, 0.7);
+  transform: rotate(90deg);
+}
+.welcome-close svg { width: 18px; height: 18px; }
+
+/* أيقونة الدرع */
+.welcome-icon-wrap {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(212, 165, 116, 0.35), rgba(212, 165, 116, 0.1));
+  border: 2px solid rgba(212, 165, 116, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 18px;
+  color: #f0d9b3;
+  box-shadow: 0 8px 24px rgba(212, 165, 116, 0.35);
+}
+.welcome-icon-wrap svg {
+  width: 38px;
+  height: 38px;
+  stroke-width: 1.8;
+}
+
+/* العنوان */
+.welcome-title {
+  font-family: 'Amiri', serif;
+  font-size: 1.7rem;
+  font-weight: 700;
+  margin: 0 0 22px;
+  color: #e8c9a0;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.3px;
+}
+
+.welcome-subtitle { display: none; }
+
+/* الحقول */
+.welcome-field {
+  margin-bottom: 16px;
+  text-align: right;
+}
+.welcome-field label {
+  display: block;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.welcome-input-wrap { position: relative; }
+
+/* أيقونة الحقل */
+.welcome-input-wrap .welcome-ico {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  color: rgba(255, 255, 255, 0.75);
+  pointer-events: none;
+  transition: color 0.25s ease;
+  z-index: 2;
+}
+.welcome-input-wrap .welcome-ico svg,
+.welcome-input-wrap svg.lucide {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
+  color: rgba(255, 255, 255, 0.75);
+  display: block;
+}
+
+/* حقل الإدخال */
+.welcome-input-wrap input {
+  width: 100%;
+  padding: 14px 16px 14px 46px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.12);
+  color: #f0f7f3;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.25s ease;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+}
+.welcome-input-wrap input::placeholder { color: rgba(255, 255, 255, 0.5); }
+.welcome-input-wrap input:focus {
+  border-color: #d4a574;
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.3);
+}
+.welcome-input-wrap:focus-within .welcome-ico svg,
+.welcome-input-wrap:focus-within svg.lucide {
+  color: #d4a574;
+}
+
+/* رسالة الخطأ */
+.welcome-error {
+  color: #fca5a5;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 4px 0 10px;
+  min-height: 18px;
+  text-align: center;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* زر الدخول */
+.welcome-btn-primary {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0d5f4a, #1a7d63);
+  color: #fff;
+  border: none;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(13, 95, 74, 0.5);
+  margin-top: 4px;
+}
+.welcome-btn-primary:hover {
+  box-shadow: 0 10px 32px rgba(13, 95, 74, 0.7);
+  transform: translateY(-1px);
+}
+.welcome-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+.welcome-btn-primary svg { width: 18px; height: 18px; }
+
+/* الفاصل */
+.welcome-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.8rem;
+}
+.welcome-divider::before,
+.welcome-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.5;
+}
+
+/* زر Google */
+.welcome-btn-google {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #333;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.25s ease;
+  box-sizing: border-box;
+}
+.welcome-btn-google:hover {
+  background: #fff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  transform: translateY(-1px);
+}
+.welcome-btn-google svg { flex-shrink: 0; }
+
+/* التلميح */
+.welcome-guest-hint {
+  margin-top: 18px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.5;
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .welcome-card { padding: 32px 22px 24px; border-radius: 20px; }
+  .welcome-title { font-size: 1.4rem; }
+  .welcome-icon-wrap { width: 62px; height: 62px; margin-bottom: 14px; }
+  .welcome-icon-wrap svg { width: 30px; height: 30px; }
+}
+
+@keyframes welcomeFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+html[data-theme="light"] .welcome-backdrop {
+  background: rgba(30, 58, 47, 0.55);
+}
+
+.welcome-card {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  background: rgba(20, 45, 38, 0.78);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(212, 165, 116, 0.35);
+  border-radius: 24px;
+  padding: 38px 32px 28px;
+  box-shadow:
+    0 25px 80px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  color: #f0f7f3;
+  text-align: center;
+  animation: welcomeSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html[data-theme="light"] .welcome-card {
+  background: rgba(250, 246, 240, 0.92);
+  border-color: rgba(212, 165, 116, 0.45);
+  color: #1e3a2f;
+  box-shadow:
+    0 25px 80px rgba(13, 95, 74, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+@keyframes welcomeSlideIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.welcome-close {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+  padding: 0;
+  font-family: inherit;
+}
+.welcome-close:hover {
+  background: rgba(220, 38, 38, 0.7);
+  color: #fff;
+  transform: rotate(90deg);
+}
+html[data-theme="light"] .welcome-close {
+  background: rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.12);
+  color: #1e3a2f;
+}
+.welcome-close svg { width: 18px; height: 18px; }
+
+.welcome-icon-wrap {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(212, 165, 116, 0.3), rgba(212, 165, 116, 0.08));
+  border: 2px solid rgba(212, 165, 116, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 18px;
+  color: #e8c9a0;
+  box-shadow: 0 8px 24px rgba(212, 165, 116, 0.3);
+}
+.welcome-icon-wrap svg {
+  width: 38px;
+  height: 38px;
+  stroke-width: 1.8;
+}
+html[data-theme="light"] .welcome-icon-wrap {
+  background: linear-gradient(135deg, rgba(13, 95, 74, 0.2), rgba(13, 95, 74, 0.06));
+  color: #0d5f4a;
+  border-color: rgba(13, 95, 74, 0.4);
+}
+
+.welcome-title {
+  font-family: 'Amiri', serif;
+  font-size: 1.7rem;
+  font-weight: 700;
+  margin: 0 0 22px;
+  color: #e8c9a0;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  letter-spacing: 0.3px;
+}
+html[data-theme="light"] .welcome-title {
+  color: #0d5f4a;
+  text-shadow: none;
+}
+
+/* إخفاء النص الفرعي */
+.welcome-subtitle { display: none; }
+
+.welcome-field {
+  margin-bottom: 16px;
+  text-align: right;
+}
+.welcome-field label {
+  display: block;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: rgba(255, 255, 255, 0.95);
+}
+html[data-theme="light"] .welcome-field label { color: #5a7268; }
+
+.welcome-input-wrap { position: relative; }
+
+.welcome-input-wrap svg {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  color: rgba(255, 255, 255, 0.65);
+  pointer-events: none;
+  transition: color 0.25s ease;
+}
+html[data-theme="light"] .welcome-input-wrap svg { color: #8a9a91; }
+
+.welcome-input-wrap input {
+  width: 100%;
+  padding: 14px 46px 14px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.14);
+  color: #f0f7f3;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.25s ease;
+  box-sizing: border-box;
+}
+.welcome-input-wrap input::placeholder { color: rgba(255, 255, 255, 0.5); }
+.welcome-input-wrap input:focus {
+  border-color: #d4a574;
+  background: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.3);
+}
+.welcome-input-wrap:focus-within svg { color: #d4a574; }
+
+html[data-theme="light"] .welcome-input-wrap input {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(229, 219, 208, 0.9);
+  color: #1e3a2f;
+}
+html[data-theme="light"] .welcome-input-wrap input::placeholder { color: #8a9a91; }
+html[data-theme="light"] .welcome-input-wrap input:focus {
+  border-color: #b8935a;
+  box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.25);
+  background: #fff;
+}
+html[data-theme="light"] .welcome-input-wrap:focus-within svg { color: #b8935a; }
+
+.welcome-error {
+  color: #fca5a5;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 4px 0 10px;
+  min-height: 18px;
+  text-align: center;
+}
+html[data-theme="light"] .welcome-error { color: #dc2626; }
+
+.welcome-btn-primary {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0d5f4a, #1a7d63);
+  color: #fff;
+  border: none;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(13, 95, 74, 0.5);
+  margin-top: 4px;
+}
+.welcome-btn-primary:hover {
+  box-shadow: 0 10px 32px rgba(13, 95, 74, 0.65);
+  transform: translateY(-1px);
+}
+.welcome-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+.welcome-btn-primary svg { width: 18px; height: 18px; }
+
+.welcome-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  color: rgba(255, 255, 255, 0.55);
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.8rem;
+}
+html[data-theme="light"] .welcome-divider { color: #8a9a91; }
+.welcome-divider::before,
+.welcome-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.4;
+}
+
+.welcome-btn-google {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #fff;
+  color: #333;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.25s ease;
+  box-sizing: border-box;
+}
+.welcome-btn-google:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  transform: translateY(-1px);
+}
+.welcome-btn-google svg { flex-shrink: 0; }
+
+.welcome-guest-hint {
+  margin-top: 18px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.5;
+  text-align: center;
+}
+html[data-theme="light"] .welcome-guest-hint { color: #8a9a91; }
+
+@media (max-width: 480px) {
+  .welcome-card { padding: 32px 22px 24px; border-radius: 20px; }
+  .welcome-title { font-size: 1.4rem; }
+  .welcome-icon-wrap { width: 62px; height: 62px; margin-bottom: 14px; }
+  .welcome-icon-wrap svg { width: 30px; height: 30px; }
+}
+
+/* ═══════════════════════════════════════════════ */
+/* 👤 Logged in chip */
+/* ═══════════════════════════════════════════════ */
+.logged-chip {
+  position: fixed;
+  top: 88px;
+  left: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--card);
+  border: 2px solid var(--border-gold);
+  box-shadow: 0 8px 24px rgba(13, 95, 74, 0.18);
+  z-index: 500;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.85rem;
+  color: var(--text);
+  animation: welcomeSlideIn 0.4s ease;
+}
+
+.logged-chip-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--gradient-emerald);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.logged-chip-icon svg { width: 14px; height: 14px; }
+.logged-chip-label { font-weight: 700; }
+
+.logged-chip-action {
+  color: var(--emerald);
+  font-weight: 700;
+  text-decoration: none;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(13, 95, 74, 0.1);
+  transition: background 0.2s ease;
+}
+.logged-chip-action:hover { background: rgba(13, 95, 74, 0.2); }
+html[data-theme="dark"] .logged-chip-action {
+  color: var(--gold);
+  background: rgba(212, 165, 116, 0.15);
+}
+html[data-theme="dark"] .logged-chip-action:hover {
+  background: rgba(212, 165, 116, 0.28);
+}
+
+.logged-chip-logout {
+  background: transparent;
+  border: none;
+  color: var(--text-light);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+.logged-chip-logout:hover { color: #dc2626; background: rgba(220, 38, 38, 0.1); }
+.logged-chip-logout svg { width: 16px; height: 16px; }
+
+/* شارة الطالب — لون أزرق هادئ */
+.logged-chip.role-student .logged-chip-icon {
+  background: linear-gradient(135deg, #1a5f8a, #2a7da3);
+}
+.logged-chip.role-student .logged-chip-action {
+  color: #1a5f8a;
+  background: rgba(26, 95, 138, 0.1);
+}
+.logged-chip.role-student .logged-chip-action:hover {
+  background: rgba(26, 95, 138, 0.2);
+}
+html[data-theme="dark"] .logged-chip.role-student .logged-chip-action {
+  color: #7dd3fc;
+  background: rgba(125, 211, 252, 0.15);
+}
+
+@media (max-width: 768px) {
+  .logged-chip {
+    top: auto;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.8rem;
+    max-width: calc(100% - 30px);
+  }
+  .logged-chip-label { display: none; }
+}
+
+/* ═══════════════════════════════════════════════ */
+/* 🔐 Login button in navbar */
+/* ═══════════════════════════════════════════════ */
+.login-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: 30px;
+  background: var(--gradient-emerald);
+  color: #fff;
+  border: none;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(13, 95, 74, 0.25);
+}
+.login-nav-btn:hover {
+  box-shadow: 0 6px 24px rgba(13, 95, 74, 0.4);
+  transform: translateY(-1px);
+}
+.login-nav-btn svg { width: 16px; height: 16px; }
+/* شارة الطالب — لون أزرق هادئ */
+.logged-chip.role-student .logged-chip-icon {
+  background: linear-gradient(135deg, #1a5f8a, #2a7da3);
+}
+.logged-chip.role-student .logged-chip-action {
+  color: #1a5f8a;
+  background: rgba(26, 95, 138, 0.1);
+}
+.logged-chip.role-student .logged-chip-action:hover {
+  background: rgba(26, 95, 138, 0.2);
+}
+html[data-theme="dark"] .logged-chip.role-student .logged-chip-action {
+  color: #7dd3fc;
+  background: rgba(125, 211, 252, 0.15);
+}
+/* ═══════════════════════════════════════════════ */
+/* 🔐 زر خروج مع شارة الدور (الشريط العلوي) */
+/* ═══════════════════════════════════════════════ */
+.logout-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 30px;
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  color: #dc2626;
+  border: 2px solid #fecaca;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.logout-nav-btn:hover {
+  background: #dc2626;
+  color: #fff;
+  border-color: #dc2626;
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.35);
+  transform: translateY(-1px);
+}
+.logout-nav-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.role-badge {
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  font-family: 'Tajawal', sans-serif;
+  white-space: nowrap;
+}
+.role-badge.role-admin {
+  background: #d4a574;
+  color: #3b2400;
+}
+.role-badge.role-teacher {
+  background: #0d5f4a;
+  color: #fff;
+}
+.role-badge.role-student {
+  background: #1a5f8a;
+  color: #fff;
+}
+html[data-theme="dark"] .role-badge.role-admin {
+  background: #e8c9a0;
+  color: #3b2400;
+}
+html[data-theme="dark"] .role-badge.role-teacher {
+  background: #1a7d63;
+}
+html[data-theme="dark"] .role-badge.role-student {
+  background: #2a7da3;
+}
+/* ═══════════════════════════════════════════════ */
+/* 🎴 بطاقة الأستاذ — الشريط المصغّر */
+/* ═══════════════════════════════════════════════ */
+.profile-wrap {
+  background: var(--card);
+  border-radius: 20px;
+  border: 2px solid var(--border-gold);
+  box-shadow: var(--shadow);
+  margin-bottom: 32px;
+  overflow: hidden;
+  position: relative;
+}
+
+.profile-chip {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s ease;
+  outline: none;
+}
+.profile-chip:hover,
+.profile-chip:focus-visible {
+  background: var(--bg-alt);
+}
+
+.profile-chip-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--gradient-emerald);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Amiri', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 2px solid var(--gold-light);
+  box-shadow: 0 4px 12px rgba(13, 95, 74, 0.15);
+}
+.profile-chip-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-chip-info {
+  flex: 1;
+  min-width: 0;
+  text-align: right;
+}
+.profile-chip-name {
+  display: block;
+  font-family: 'Tajawal', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.profile-chip-email {
+  display: block;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.85rem;
+  color: var(--text-light);
+  direction: ltr;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+.profile-chip-toggle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--bg-alt);
+  border: 2px solid var(--border);
+  color: var(--text-light);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+.profile-chip-toggle:hover {
+  background: var(--gradient-emerald);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 6px 18px rgba(13, 95, 74, 0.3);
+}
+.profile-chip-toggle svg {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s ease;
+}
+.profile-chip.open .profile-chip-toggle svg {
+  transform: rotate(180deg);
+}
+
+.profile-form-wrap {
+  padding: 24px;
+  border-top: 2px dashed var(--border-gold);
+  animation: fadeInUp 0.3s ease;
+}
+
+/* زر حذف الصورة (لا يدور عند التمرير) */
+.btn-delete-photo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  color: #dc2626;
+  border: 2px solid #fecaca;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.btn-delete-photo:hover {
+  background: #dc2626;
+  color: #fff;
+  border-color: #dc2626;
+  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.3);
+  transform: none !important;
+}
+.btn-delete-photo svg { width: 16px; height: 16px; }
+
+@media (max-width: 768px) {
+  .profile-chip { padding: 12px 14px; gap: 10px; }
+  .profile-chip-avatar { width: 48px; height: 48px; font-size: 1.3rem; }
+  .profile-chip-name { font-size: 0.95rem; }
+  .profile-chip-email { font-size: 0.8rem; }
+  .profile-chip-toggle { width: 38px; height: 38px; }
+  .profile-form-wrap { padding: 18px 16px; }
+}
+/* ═══════════════════════════════════════════════ */
+/* 📤 شريط رفع الدروس المصغّر */
+/* ═══════════════════════════════════════════════ */
+.teacher-upload-card {
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.upload-chip {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 22px 28px;
+  background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
+  color: #fff;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.25s ease;
+  outline: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-chip::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(212, 165, 116, 0.3), transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.upload-chip:hover {
+  background: linear-gradient(135deg, var(--emerald-dark), var(--emerald));
+}
+
+.upload-chip .upload-card-icon {
+  position: relative;
+  z-index: 1;
+}
+
+.upload-chip-text {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.upload-chip-text h3 {
+  font-family: 'Amiri', serif;
+  font-size: 1.35rem;
+  margin: 0 0 4px;
+  color: #fff;
+}
+
+.upload-chip-text .upload-card-subtitle {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  font-family: 'Tajawal', sans-serif;
+  margin: 0;
+  color: #fff;
+}
+
+.upload-chip-chevron {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+.upload-chip-chevron svg {
+  width: 22px;
+  height: 22px;
+  transition: transform 0.3s ease;
+  color: #fff;
+}
+.upload-chip.open .upload-chip-chevron svg {
+  transform: rotate(180deg);
+}
+.upload-chip.open .upload-chip-chevron {
+  background: rgba(212, 165, 116, 0.3);
+}
+
+.upload-form-wrap {
+  padding: 0;
+  animation: fadeInUp 0.3s ease;
+}
+
+.upload-form-wrap form {
+  padding: 36px;
+}
+
+@media (max-width: 768px) {
+  .upload-chip {
+    padding: 18px 20px;
+    gap: 12px;
+  }
+  .upload-chip-text h3 {
+    font-size: 1.15rem;
+  }
+  .upload-chip-text .upload-card-subtitle {
+    font-size: 0.8rem;
+  }
+  .upload-chip-chevron {
+    width: 36px;
+    height: 36px;
+  }
+  .upload-form-wrap form {
+    padding: 22px;
+  }
 }

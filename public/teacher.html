@@ -188,19 +188,24 @@
 
   <div id="welcomeTeacher" style="display:none;" class="teacher-welcome"></div>
 
-  <!-- 🎴 بطاقة الأستاذ -->
-  <div id="profileCard" class="upload-card" style="display:none;">
-    <div class="upload-card-header">
-      <div class="upload-card-title">
-        <span class="upload-card-icon"><i data-lucide="user-round"></i></span>
-        <div>
-          <h3>بطاقتي الشخصية</h3>
-          <p class="upload-card-subtitle">تظهر هذه المعلومات لزوار الموقع</p>
-        </div>
+  <!-- 🎴 بطاقة الأستاذ (شريط مصغّر + نموذج قابلة للتوسيع) -->
+  <div id="profileCard" class="profile-wrap" style="display:none;">
+
+    <!-- الشريط المصغّر -->
+    <div id="profileChip" class="profile-chip" role="button" tabindex="0" aria-expanded="false">
+      <div class="profile-chip-avatar" id="profileChipAvatar"></div>
+      <div class="profile-chip-info">
+        <span class="profile-chip-name" id="profileChipName">—</span>
+        <span class="profile-chip-email" id="profileChipEmail">—</span>
       </div>
+      <button type="button" class="profile-chip-toggle" aria-label="تعديل البطاقة">
+        <i data-lucide="chevron-down"></i>
+      </button>
     </div>
 
-    <div style="padding: 28px;">
+    <!-- النموذج (يظهر عند الضغط) -->
+    <div id="profileFormWrap" class="profile-form-wrap" style="display:none;">
+
       <div style="display:flex; gap:20px; align-items:center; flex-wrap:wrap; margin-bottom:24px;">
         <div id="profileAvatar" style="width:110px;height:110px;border-radius:50%;background:var(--gradient-emerald);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Amiri',serif;font-size:2.5rem;font-weight:700;overflow:hidden;box-shadow:0 8px 24px rgba(13,95,74,.25);border:3px solid var(--gold-light);flex-shrink:0;"></div>
         <div style="flex:1;min-width:200px;">
@@ -208,10 +213,10 @@
           <button type="button" id="uploadPhotoBtn" class="btn-primary" style="width:auto;padding:10px 18px;">
             <i data-lucide="image-plus"></i> اختيار صورة
           </button>
-          <button type="button" id="removePhotoBtn" class="btn-refresh" style="margin-top:8px;display:none;">
+          <button type="button" id="removePhotoBtn" class="btn-delete-photo" style="margin-top:8px;display:none;">
             <i data-lucide="trash-2"></i> حذف الصورة
           </button>
-          <p style="font-size:0.8rem;color:var(--text-muted);margin-top:8px;">JPG / PNG / WEBP — بحد أقصى 3 MB</p>
+          <p style="font-size:0.8rem;color:var(--text-muted);margin-top:8px;">JPG / PNG / WEBP — بحد أقصى 5 MB</p>
         </div>
       </div>
 
@@ -232,7 +237,7 @@
 
       <div class="form-group" style="margin-top:14px;">
         <label><i data-lucide="file-text"></i> نبذة شخصية</label>
-        <textarea id="profileBio" rows="5" maxlength="800" placeholder="اكتب نبذة عن خبرتك، مؤلفاتك، اهتماماتك العلمية..." style="width:100%;padding:14px 18px;border-radius:12px;border:2px solid var(--border);font-family:'Tajawal',sans-serif;font-size:0.95rem;background:var(--bg);color:var(--text);outline:none;resize:vertical;"></textarea>
+        <textarea id="profileBio" rows="5" maxlength="800" placeholder="اكتب نبذة عن خبرتك، مؤلفاتك، اهتماماتك العلمية..."></textarea>
         <div style="text-align:left;font-size:0.75rem;color:var(--text-muted);margin-top:4px;"><span id="bioCount">0</span> / 800</div>
       </div>
 
@@ -244,15 +249,20 @@
   </div>
 
   <div class="upload-card teacher-upload-card">
-    <div class="upload-card-header">
-      <div class="upload-card-title">
-        <span class="upload-card-icon"><i data-lucide="upload"></i></span>
-        <div>
-          <h3>رفع دروس جديدة</h3>
-          <p class="upload-card-subtitle">حتى 10 ملفات PDF أو Word في وقت واحد</p>
-        </div>
-      </div>
+
+  <!-- رأس قابل للضغط -->
+  <div id="uploadChip" class="upload-chip" role="button" tabindex="0" aria-expanded="false">
+    <span class="upload-card-icon"><i data-lucide="upload"></i></span>
+    <div class="upload-chip-text">
+      <h3>رفع دروس جديدة</h3>
+      <p class="upload-card-subtitle">حتى 10 ملفات PDF أو Word في وقت واحد</p>
     </div>
+    <span class="upload-chip-chevron"><i data-lucide="chevron-down"></i></span>
+  </div>
+
+  <!-- النموذج (يظهر عند الضغط) -->
+  <div id="uploadFormWrap" class="upload-form-wrap" style="display:none;">
+  <form id="uploadForm" enctype="multipart/form-data">
 
     <form id="uploadForm" enctype="multipart/form-data">
       <div class="form-section">
@@ -330,6 +340,7 @@
 
       <p id="uploadStatus" class="status" role="status"></p>
     </form>
+  </div>
   </div>
 
   <div id="uploadResults" class="upload-results" style="display:none;">

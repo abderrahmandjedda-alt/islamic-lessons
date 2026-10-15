@@ -12,11 +12,21 @@ const FAVORITES_KEY = 'islamic_lessons_favorites';
 // ═══════════════════════════════════════════════
 // 🧭 ذاكرة موضع التمرير لكل قسم
 // ═══════════════════════════════════════════════
+
+if ('scrollRestoration' in history) {
+  history.scrollRestoration = 'manual';
+}
+
 const scrollMemory = {};
 let currentViewKey = 'home';
 
+function getScrollY() {
+  return window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+}
+
 function saveCurrentScroll() {
-  scrollMemory[currentViewKey] = window.scrollY || window.pageYOffset || 0;
+  if (!currentViewKey) return;
+  scrollMemory[currentViewKey] = getScrollY();
 }
 
 function setView(key) {
@@ -27,16 +37,20 @@ function scrollToView(key) {
   const hasSaved = Object.prototype.hasOwnProperty.call(scrollMemory, key);
   const pos = hasSaved ? scrollMemory[key] : 0;
 
-  // ننتظر إطارين حتى يكتمل الرسم ثم نمرر
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
+  const delays = [0, 30, 100, 250, 500];
+  delays.forEach(function (d) {
+    setTimeout(function () {
       window.scrollTo(0, pos);
-    });
+    }, d);
   });
 }
 
+window.addEventListener('beforeunload', function () {
+  saveCurrentScroll();
+});
+
 // ═══════════════════════════════════════════════
-// 🎨 نظام الأيقونات - Lucide
+// 🎨 الأيقونات
 // ═══════════════════════════════════════════════
 
 function icon(name, cls = '') {
@@ -123,7 +137,7 @@ function getSubjectIcon(subject) {
 }
 
 // ═══════════════════════════════════════════════
-// ⭐ نظام المفضلة
+// ⭐ المفضلة
 // ═══════════════════════════════════════════════
 
 function getFavorites() {
@@ -491,7 +505,7 @@ function selectSubject(subjectName) {
 }
 
 // ═══════════════════════════════════════════════
-// 🔙 أزرار الرجوع
+// 🔙 الرجوع
 // ═══════════════════════════════════════════════
 
 function backToSpecializations() {
@@ -673,7 +687,6 @@ if (searchInput) {
     renderLessons(filtered, 'searchResultsGrid', 'searchEmptyMsg');
     refreshIcons();
 
-    // عند البحث الجديد، نذهب للأعلى دائماً
     setView('search');
     scrollToView('search');
   });
@@ -821,6 +834,167 @@ function restoreFavoriteNavigation() {
   currentSpecialization = gotoSpec;
   selectSpecialization(gotoSpec);
 }
+
+// ═══════════════════════════════════════════════
+// 🌟 نافذة الترحيب + تسجيل دخول موحّد
+// ═══════════════════════════════════════════════
+
+(function initWelcomeModal() {
+  const modal = document.getElementById('welcomeModal');
+  if (!modal) return;
+
+  const closeBtn = document.getElementById('welcomeCloseBtn');
+  const openLoginBtn = document.getElementById('openLoginBtn');
+  const form = document.getElementById('welcomeForm');
+  const emailInput = document.getElementById('welcomeEmail');
+  const passwordInput = document.getElementById('welcomePassword');
+  const loginBtn = document.getElementById('welcomeLoginBtn');
+  const errorEl = document.getElementById('welcomeError');
+  const chip = document.getElementById('loggedInChip');
+
+  let isLoggedIn = false;
+
+  function openModal() {
+    modal.style.display = 'flex';
+    if (window.lucide) window.lucide.createIcons();
+    setTimeout(function () {
+      if (emailInput) emailInput.focus();
+    }, 200);
+  }
+
+  function closeModal() {
+    modal.style.display = 'none';
+    if (errorEl) errorEl.textContent = '';
+  }
+
+  function setGuestMode() {
+    try { sessionStorage.setItem('guestModeActive', '1'); } catch (e) {}
+    closeModal();
+  }
+
+  function isGuestMode() {
+    try { return sessionStorage.getItem('guestModeActive') === '1'; }
+    catch (e) { return false; }
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && modal.style.display === 'flex') setGuestMode();
+  });
+
+  modal.addEventListener('click', function (e) {
+    if (e.target === modal) setGuestMode();
+  });
+
+  if (closeBtn) closeBtn.addEventListener('click', setGuestMode);
+
+  // زر الدخول في الشريط العلوي — يتحول إلى "خروج" بعد الدخول
+  if (openLoginBtn) {
+    openLoginBtn.addEventListener('click', function () {
+      if (isLoggedIn) {
+        fetch('/auth/logout', { method: 'POST', credentials: 'same-origin' })
+          .then(function () { location.reload(); })
+          .catch(function () { location.reload(); });
+      } else {
+        openModal();
+      }
+    });
+  }
+
+  // النموذج
+  if (form) {
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const email = emailInput ? emailInput.value.trim() : '';
+      const password = passwordInput ? passwordInput.value : '';
+
+      if (!email || !password) {
+        if (errorEl) errorEl.textContent = 'البريد وكلمة السر مطلوبان';
+        return;
+      }
+
+      loginBtn.disabled = true;
+      const originalText = loginBtn.innerHTML;
+      loginBtn.innerHTML = 'جارٍ التحقق...';
+      if (errorEl) errorEl.textContent = '';
+
+      try {
+        const res = await fetch('/api/unified-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ email, password })
+        });
+        const json = await res.json();
+
+        if (res.ok && json.redirect) {
+          if (errorEl) errorEl.textContent = '';
+          window.location.href = json.redirect;
+          return;
+        }
+        if (errorEl) errorEl.textContent = json.error || 'فشل الدخول';
+      } catch (err) {
+        if (errorEl) errorEl.textContent = 'خطأ في الاتصال';
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = originalText;
+        if (window.lucide) window.lucide.createIcons();
+      }
+    });
+  }
+
+  // رسالة خطأ من Google
+  const params = new URLSearchParams(location.search);
+  const googleError = params.get('error');
+
+  // فحص الجلسة
+  fetch('/api/me', { credentials: 'same-origin' })
+    .then(function (res) {
+      return res.ok ? res.json() : null;
+    })
+    .then(function (user) {
+      if (user && (user.role === 'admin' || user.role === 'teacher' || user.role === 'student')) {
+        // مسجّل — نحوّل زر "دخول" إلى "خروج" + شارة الدور
+        isLoggedIn = true;
+
+        if (openLoginBtn) {
+          const roleLabels = { admin: 'مدير', teacher: 'أستاذ', student: 'طالب' };
+          const roleLabel = roleLabels[user.role] || 'زائر';
+
+          openLoginBtn.classList.remove('login-nav-btn');
+          openLoginBtn.classList.add('logout-nav-btn');
+          openLoginBtn.title = 'تسجيل الخروج';
+          openLoginBtn.innerHTML =
+            '<span>خروج</span>' +
+            '<i data-lucide="log-out"></i>' +
+            '<span class="role-badge role-' + user.role + '">' + roleLabel + '</span>';
+
+          if (window.lucide) window.lucide.createIcons();
+        }
+
+        // أخفِ الشارة العائمة (لأن الدور ظاهر في الزر)
+        if (chip) chip.style.display = 'none';
+
+      } else {
+        // غير مسجّل
+        if (googleError) {
+          openModal();
+          const messages = {
+            unauthorized: 'هذا الحساب غير مصرّح له بالدخول',
+            google_denied: 'تم إلغاء الدخول بجوجل',
+            google_failed: 'تعذر الدخول بجوجل، حاول مرة أخرى',
+            wrong_role: 'هذا الحساب لا يملك صلاحية لهذه الصفحة'
+          };
+          if (errorEl) errorEl.textContent = messages[googleError] || 'تعذر الدخول';
+          history.replaceState(null, '', location.pathname);
+        } else if (!isGuestMode()) {
+          setTimeout(openModal, 400);
+        }
+      }
+    })
+    .catch(function () {
+      if (!isGuestMode()) setTimeout(openModal, 400);
+    });
+})();
 
 // ═══════════════════════════════════════════════
 // 🚀 بدء التطبيق
