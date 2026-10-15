@@ -154,6 +154,8 @@ function showPanel() {
   fillYears();
   loadAdminLessons();
   initReviewSection();
+  initAllCollapsibles();
+
   if (currentUser && currentUser.role === 'admin') {
     const card = $('teachersCard');
     if (card) card.style.display = 'block';
@@ -205,6 +207,37 @@ function updateSubjects() {
 }
 window.updateSpecializations = updateSpecializations;
 window.updateSubjects = updateSubjects;
+
+// ═══════════════════════════════════════════════
+// 🎴 الأقسام القابلة للطي
+// ═══════════════════════════════════════════════
+function initCollapsibleChip(chipId, bodyId) {
+  const chip = $(chipId);
+  const body = $(bodyId);
+  if (!chip || !body) return;
+
+  function toggle(show) {
+    const willShow = show !== undefined ? show : body.style.display === 'none';
+    body.style.display = willShow ? 'block' : 'none';
+    chip.classList.toggle('open', willShow);
+    chip.setAttribute('aria-expanded', String(willShow));
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  chip.addEventListener('click', function () { toggle(); });
+  chip.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggle();
+    }
+  });
+}
+
+function initAllCollapsibles() {
+  initCollapsibleChip('reviewChip', 'reviewBody');
+  initCollapsibleChip('uploadChip', 'uploadBody');
+  initCollapsibleChip('manageChip', 'manageBody');
+}
 
 // ═══════════════════════════════════════════════
 // 🎨 نافذة تأكيد
@@ -323,6 +356,11 @@ async function loadAdminLessons() {
     const res = await fetch(API + '/lessons');
     const lessons = await res.json();
     const div = $('adminLessons');
+
+    // تحديث العدّاد في الشريحة
+    const countEl = $('manageCount');
+    if (countEl) countEl.textContent = lessons.length + ' درس';
+
     if (!lessons.length) {
       div.innerHTML = '<p style="color:var(--text-light);text-align:center;padding:20px">لا توجد دروس مرفوعة</p>';
       return;
@@ -715,6 +753,16 @@ function showPendingList() {
   const list = $('pendingList');
   if (ls) ls.style.display = 'none';
   if (list) list.style.display = 'flex';
+
+  // افتح قسم المراجعة تلقائياً
+  const chip = $('reviewChip');
+  const body = $('reviewBody');
+  if (chip && body) {
+    body.style.display = 'block';
+    chip.classList.add('open');
+    chip.setAttribute('aria-expanded', 'true');
+  }
+  if (window.lucide) window.lucide.createIcons();
 }
 
 async function loadPending() {

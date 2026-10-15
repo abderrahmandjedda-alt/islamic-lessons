@@ -506,19 +506,17 @@
   </div>
 
   <!-- قسم المراجعة -->
-  <div class="review-card">
-    <div class="review-header">
-      <div class="review-title">
-        <i data-lucide="inbox" class="admin-icon"></i>
-        <div>
-          <h3>الدروس بانتظار المراجعة</h3>
-          <p class="review-subtitle"><span id="pendingCount">0</span> درس</p>
-        </div>
-      </div>
-      <button id="refreshPendingBtn" class="btn-refresh" type="button">
-        <i data-lucide="refresh-cw" class="admin-icon"></i> تحديث
-      </button>
+<div class="review-card collapsible-card">
+  <div class="collapsible-chip chip-gold" id="reviewChip" role="button" tabindex="0" aria-expanded="false">
+    <i data-lucide="inbox" class="chip-icon"></i>
+    <div class="chip-text">
+      <h3>الدروس بانتظار المراجعة</h3>
+      <p class="chip-subtitle"><span id="pendingCount">0</span> درس</p>
     </div>
+    <span class="chip-chevron"><i data-lucide="chevron-down"></i></span>
+  </div>
+
+  <div class="collapsible-body" id="reviewBody" style="display:none;">
 
     <div id="reviewLoginScreen" class="review-login">
       <div class="review-login-box">
@@ -534,11 +532,27 @@
     </div>
 
     <div id="pendingList" class="pending-list" style="display:none;"></div>
+
+    <div style="padding: 0 26px 20px; text-align: left;">
+      <button id="refreshPendingBtn" class="btn-refresh" type="button">
+        <i data-lucide="refresh-cw" class="admin-icon"></i> تحديث
+      </button>
+    </div>
   </div>
+</div>
 
   <!-- رفع درس جديد -->
-  <div class="upload-card">
-    <h3><i data-lucide="cloud-upload" class="admin-icon"></i> رفع درس جديد</h3>
+<div class="upload-card collapsible-card">
+  <div class="collapsible-chip chip-emerald" id="uploadChip" role="button" tabindex="0" aria-expanded="false">
+    <i data-lucide="cloud-upload" class="chip-icon"></i>
+    <div class="chip-text">
+      <h3>رفع درس جديد</h3>
+      <p class="chip-subtitle">أضف ملفاً جديداً إلى المنصة</p>
+    </div>
+    <span class="chip-chevron"><i data-lucide="chevron-down"></i></span>
+  </div>
+
+  <div class="collapsible-body" id="uploadBody" style="display:none;">
     <form id="uploadForm">
       <label for="yearSelect">السنة الدراسية</label>
       <select name="year" id="yearSelect" required><option value="">اختر السنة</option></select>
@@ -564,13 +578,21 @@
       <p id="uploadStatus" class="status" aria-live="polite"></p>
     </form>
   </div>
-
+</div>
   <!-- إدارة الدروس -->
-  <div class="manage-card">
-    <h3><i data-lucide="library-big" class="admin-icon"></i> إدارة الدروس المرفوعة</h3>
-    <div id="adminLessons"></div>
+<div class="manage-card collapsible-card">
+  <div class="collapsible-chip chip-emerald" id="manageChip" role="button" tabindex="0" aria-expanded="false">
+    <i data-lucide="library-big" class="chip-icon"></i>
+    <div class="chip-text">
+      <h3>إدارة الدروس المرفوعة</h3>
+      <p class="chip-subtitle" id="manageCount">جميع دروس المنصة</p>
+    </div>
+    <span class="chip-chevron"><i data-lucide="chevron-down"></i></span>
   </div>
 
+  <div class="collapsible-body" id="manageBody" style="display:none;">
+    <div id="adminLessons"></div>
+  </div>
 </div>
 
 <footer>
