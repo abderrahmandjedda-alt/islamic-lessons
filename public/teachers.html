@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>هيئة التدريس — كلية العلوم الإسلامية</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  .teachers-hero {
+    background: var(--gradient-hero); color: white;
+    padding: 70px 0 60px; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .teachers-hero::before {
+    content: ''; position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill='none' stroke='%23d4a574' stroke-width='0.8' stroke-opacity='0.2'%3E%3Cpath d='M50 5L60 30L85 40L60 50L50 75L40 50L15 40L40 30Z'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 100px 100px; opacity: 0.4;
+  }
+  .teachers-hero .container { position: relative; z-index: 1; }
+  .teachers-hero h1 {
+    font-size: 2.5rem; margin-bottom: 16px;
+    background: linear-gradient(135deg, #ffffff, #e8c9a0);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; font-weight: 900;
+  }
+  .teachers-hero p {
+    font-size: 1.05rem; opacity: 0.95;
+    font-family: 'Tajawal', sans-serif; max-width: 600px;
+    margin: 0 auto 24px;
+  }
+
+  .teachers-search {
+    max-width: 520px; margin: 0 auto; position: relative;
+  }
+  .teachers-search input {
+    width: 100%; padding: 16px 52px 16px 20px;
+    border-radius: 50px; border: 2px solid rgba(212,165,116,.5);
+    font-family: 'Tajawal', sans-serif; font-size: 1rem;
+    background: rgba(255,255,255,.98); color: var(--text);
+    outline: none; transition: all .3s;
+    box-shadow: 0 8px 32px rgba(0,0,0,.2);
+  }
+  .teachers-search input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 12px 48px rgba(212,165,116,.4);
+  }
+  .teachers-search svg {
+    position: absolute; left: 20px; top: 50%;
+    transform: translateY(-50%);
+    width: 22px; height: 22px; color: var(--emerald);
+    pointer-events: none;
+  }
+
+  .teachers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 22px;
+  }
+
+  .teacher-card {
+    background: var(--card); border-radius: 20px;
+    padding: 26px 22px; box-shadow: var(--shadow);
+    border: 2px solid var(--border); text-align: center;
+    transition: all .3s ease; cursor: pointer;
+    position: relative; overflow: hidden;
+    animation: fadeInUp .5s ease backwards;
+  }
+  .teacher-card::before {
+    content: ''; position: absolute; top: 0; right: 0;
+    width: 100%; height: 5px; background: var(--gradient-gold);
+    transform: scaleX(0); transform-origin: right;
+    transition: transform .4s ease;
+  }
+  .teacher-card:hover::before { transform: scaleX(1); }
+  .teacher-card:hover {
+    border-color: var(--gold);
+    box-shadow: var(--shadow-lg), var(--shadow-gold);
+    transform: translateY(-3px);
+  }
+
+  .teacher-avatar {
+    width: 90px; height: 90px; border-radius: 50%;
+    margin: 0 auto 16px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--gradient-emerald); color: #fff;
+    font-family: 'Amiri', serif; font-size: 2rem;
+    font-weight: 700; overflow: hidden;
+    box-shadow: 0 8px 24px rgba(13,95,74,.25);
+    border: 3px solid var(--gold-light);
+  }
+  .teacher-avatar img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+
+  .teacher-card h3 {
+    font-family: 'Amiri', serif; font-size: 1.25rem;
+    color: var(--text); margin-bottom: 6px;
+    line-height: 1.4;
+  }
+  .teacher-rank {
+    display: inline-block; padding: 3px 12px;
+    background: rgba(212,165,116,.15);
+    color: var(--gold-dark); border-radius: 20px;
+    font-size: .78rem; font-weight: 700;
+    font-family: 'Tajawal', sans-serif;
+    margin-bottom: 8px;
+  }
+  html[data-theme="dark"] .teacher-rank { color: var(--gold); }
+  .teacher-specialty {
+    color: var(--text-light); font-size: .9rem;
+    font-family: 'Tajawal', sans-serif;
+    margin-bottom: 12px; min-height: 20px;
+  }
+  .teacher-bio-preview {
+    color: var(--text-muted); font-size: .83rem;
+    line-height: 1.6; font-family: 'Tajawal', sans-serif;
+    display: -webkit-box; -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical; overflow: hidden;
+    margin-bottom: 16px; min-height: 50px;
+  }
+  .teacher-stats {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px; padding: 10px 14px;
+    background: var(--bg-alt); border-radius: 12px;
+    font-family: 'Tajawal', sans-serif;
+    font-size: .85rem; font-weight: 700;
+    color: var(--emerald);
+  }
+  html[data-theme="dark"] .teacher-stats { color: var(--gold); }
+  .teacher-stats svg { width: 16px; height: 16px; }
+
+  .teachers-empty {
+    text-align: center; padding: 60px 24px;
+    color: var(--text-light); font-family: 'Tajawal', sans-serif;
+    background: var(--card); border-radius: 20px;
+    border: 2px dashed var(--border-gold);
+    grid-column: 1 / -1;
+  }
+
+  @media (max-width: 768px) {
+    .teachers-hero { padding: 50px 0 40px; }
+    .teachers-hero h1 { font-size: 1.8rem; }
+    .teachers-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="container nav-wrap">
+    <div class="logo" onclick="window.location.href='index.html'">
+      <img src="lion.png" alt="جامعة وهران 1" class="logo-img">
+      <div>
+        <h1>كلية العلوم الإسلامية</h1>
+        <p>جامعة وهران 1 أحمد بن بلة</p>
+      </div>
+    </div>
+    <nav>
+      <a href="index.html"><i data-lucide="house"></i> الرئيسية</a>
+      <a href="teachers.html" class="btn-admin"><i data-lucide="users"></i> هيئة التدريس</a>
+      <button id="themeToggle" class="theme-btn" aria-label="الوضع الليلي">
+        <i data-lucide="moon"></i>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<section class="teachers-hero">
+  <div class="container">
+    <h1>هيئة التدريس</h1>
+    <p>تعرّف على أساتذة الكلية ودروسهم المرفوعة على المنصة</p>
+
+    <div class="teachers-search">
+      <i data-lucide="search"></i>
+      <input type="search" id="teacherSearch" placeholder="ابحث بالاسم أو التخصص...">
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div id="teachersGrid" class="teachers-grid">
+      <div class="teachers-empty">جارٍ التحميل...</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p class="footer-line">© 2025 — كلية العلوم الإسلامية | جامعة وهران 1 أحمد بن بلة</p>
+    <p class="footer-author">إعداد: جدة عبد الرحمن</p>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="teachers.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.lucide) window.lucide.createIcons();
+  });
+</script>
+</body>
+</html>

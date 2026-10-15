@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════
-// 👨‍🏫 بوابة الأساتذة — دخول بالبريد وكلمة السر
+// 👨‍🏫 بوابة الأساتذة
 // ═══════════════════════════════════════════════
 
 const API = '/api';
@@ -10,28 +10,24 @@ let teacherName = sessionStorage.getItem('teacherName') || '';
 let fileCounter = 0;
 let resetTimer = null;
 let resultsTimer = null;
+let profileCache = { photoUrl: '' };
 
 // ═══════════════════════════════════════════════
-// 🎨 نظام الأيقونات (Lucide)
+// 🎨 الأيقونات
 // ═══════════════════════════════════════════════
 function icon(name, cls) {
   return '<i data-lucide="' + name + '"' + (cls ? ' class="' + cls + '"' : '') + '></i>';
 }
-
 function refreshIcons() {
   if (window.lucide) window.lucide.createIcons();
 }
-
 (function watchIcons() {
   if (!window.lucide) return;
   let scheduled = false;
   new MutationObserver(function() {
     if (scheduled) return;
     scheduled = true;
-    requestAnimationFrame(function() {
-      scheduled = false;
-      refreshIcons();
-    });
+    requestAnimationFrame(function() { scheduled = false; refreshIcons(); });
   }).observe(document.body, { childList: true, subtree: true });
   refreshIcons();
 })();
@@ -57,9 +53,7 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
-function currentFilesCount() {
-  return document.querySelectorAll('.file-input-item').length;
-}
+function currentFilesCount() { return document.querySelectorAll('.file-input-item').length; }
 
 function setStatus(msg, color, iconName) {
   const status = $('uploadStatus');
@@ -115,7 +109,7 @@ function showToast(msg, iconName) {
 })();
 
 // ═══════════════════════════════════════════════
-// 💾 الحسابات المحفوظة على الجهاز
+// 💾 الحسابات المحفوظة
 // ═══════════════════════════════════════════════
 const SAVED_KEY = 'savedAccounts_v1';
 
@@ -140,13 +134,11 @@ function removeSavedAccount(email) {
 function renderSavedAccounts() {
   const dropdown = $('emailDropdown');
   if (!dropdown) return;
-
   const accounts = getSavedAccounts().filter(a => a.role === 'teacher');
   if (!accounts.length) {
     dropdown.innerHTML = '<div class="email-empty">لا توجد حسابات محفوظة بعد</div>';
     return;
   }
-
   dropdown.innerHTML = accounts.map(function(a) {
     const initial = (a.name || a.email || '?').trim().charAt(0).toUpperCase();
     return '<div class="email-item" data-email="' + escapeHtml(a.email) + '">' +
@@ -160,7 +152,6 @@ function renderSavedAccounts() {
       '</button>' +
     '</div>';
   }).join('');
-
   refreshIcons();
 
   dropdown.querySelectorAll('.email-item').forEach(function(item) {
@@ -172,12 +163,10 @@ function renderSavedAccounts() {
       setTimeout(() => $('passwordInput').focus(), 50);
     });
   });
-
   dropdown.querySelectorAll('[data-remove]').forEach(function(btn) {
     btn.addEventListener('click', function(ev) {
       ev.stopPropagation();
-      const email = btn.getAttribute('data-remove');
-      removeSavedAccount(email);
+      removeSavedAccount(btn.getAttribute('data-remove'));
     });
   });
 }
@@ -186,12 +175,8 @@ function toggleEmailDropdown(show) {
   const dropdown = $('emailDropdown');
   if (!dropdown) return;
   const willShow = show !== undefined ? show : dropdown.style.display === 'none';
-  if (willShow) {
-    renderSavedAccounts();
-    dropdown.style.display = 'block';
-  } else {
-    dropdown.style.display = 'none';
-  }
+  if (willShow) { renderSavedAccounts(); dropdown.style.display = 'block'; }
+  else dropdown.style.display = 'none';
 }
 
 document.addEventListener('click', function(e) {
@@ -222,7 +207,6 @@ async function doLogin(e) {
       credentials: 'same-origin',
       body: JSON.stringify({ email, password })
     });
-
     const data = await res.json();
 
     if (res.ok) {
@@ -240,14 +224,12 @@ async function doLogin(e) {
     errEl.style.color = 'red';
   }
 }
-
 window.doLogin = doLogin;
 
 // ═══════════════════════════════════════════════
-// ✅ التحقق التلقائي من الجلسة
+// ✅ التحقق من الجلسة
 // ═══════════════════════════════════════════════
 async function verifyAndShow() {
-  // اقرأ رسالة الخطأ من رابط Google إن وُجدت
   const params = new URLSearchParams(location.search);
   const err = params.get('error');
   if (err) {
@@ -270,13 +252,10 @@ async function verifyAndShow() {
     const res = await fetch(API + '/me', { credentials: 'same-origin' });
     if (res.ok) {
       const user = await res.json();
-
-      // ⚠️ إن كان الحساب مديراً، احوّله للوحة التحكم
       if (user.role === 'admin') {
         window.location.href = '/admin.html';
         return;
       }
-
       if (user.role === 'teacher') {
         teacherName = user.name || teacherName;
         sessionStorage.setItem('teacherName', teacherName);
@@ -287,13 +266,11 @@ async function verifyAndShow() {
       sessionStorage.removeItem('teacherName');
       teacherName = '';
     }
-  } catch (err) {
-    console.error('خطأ:', err);
-  }
+  } catch (err) { console.error('خطأ:', err); }
 }
 
 // ═══════════════════════════════════════════════
-// 🎨 عرض اللوحة
+// 🎨 اللوحة
 // ═══════════════════════════════════════════════
 function showPanel() {
   const loginScreen = $('loginScreen');
@@ -313,18 +290,16 @@ function showPanel() {
   fillYears();
   if (currentFilesCount() === 0) addFileInput();
   loadMyLessons();
+  initProfileCard();
 }
 
 // ═══════════════════════════════════════════════
-// 📋 ملء القوائم
+// 📋 القوائم
 // ═══════════════════════════════════════════════
 function fillYears() {
   const sel = $('yearSelect');
   if (!sel || sel.options.length > 1) return;
-  if (typeof YEARS === 'undefined') {
-    console.error('YEARS غير معرّف');
-    return;
-  }
+  if (typeof YEARS === 'undefined') return;
   YEARS.forEach(function(y) {
     const opt = document.createElement('option');
     opt.value = y.id;
@@ -364,7 +339,6 @@ function updateSubjects() {
     });
   }
 }
-
 window.updateSpecializations = updateSpecializations;
 window.updateSubjects = updateSubjects;
 
@@ -379,7 +353,6 @@ function addFileInput() {
   fileCounter++;
   const container = $('filesContainer');
   if (!container) return;
-
   const div = document.createElement('div');
   div.className = 'file-input-item';
   div.innerHTML =
@@ -402,7 +375,6 @@ function updateFilesCount() {
   const countEl = $('filesCount');
   if (countEl) countEl.textContent = items.length + ' من ' + MAX_FILES;
 }
-
 window.addFileInput = addFileInput;
 
 // ═══════════════════════════════════════════════
@@ -410,7 +382,6 @@ window.addFileInput = addFileInput;
 // ═══════════════════════════════════════════════
 async function handleUpload(e) {
   e.preventDefault();
-
   const year = $('yearSelect').value;
   const specialization = $('specializationSelect').value;
   const subject = $('subjectSelect').value;
@@ -422,7 +393,6 @@ async function handleUpload(e) {
 
   const files = [];
   const titles = [];
-
   document.querySelectorAll('.file-input-item').forEach(function(item) {
     const fileInput = item.querySelector('.file-input');
     const titleInput = item.querySelector('.file-title-input');
@@ -444,7 +414,6 @@ async function handleUpload(e) {
       oversized.push(files[i].name + ' (' + sizeMB + ' MB)');
     }
   }
-
   if (oversized.length > 0) {
     setStatus('ملفات كبيرة (الحد 10 MB)', 'red', 'circle-x');
     alert('الملفات التالية كبيرة جداً:\n\n' + oversized.join('\n') +
@@ -466,9 +435,7 @@ async function handleUpload(e) {
 
   try {
     const res = await fetch(API + '/teacher/batch', {
-      method: 'POST',
-      credentials: 'same-origin',
-      body: formData
+      method: 'POST', credentials: 'same-origin', body: formData
     });
 
     if (res.status === 401 || res.status === 403) {
@@ -479,7 +446,6 @@ async function handleUpload(e) {
     }
 
     const data = await res.json();
-
     if (res.ok && data.success) {
       setStatus('تم رفع ' + data.uploaded + ' ملف بنجاح!', 'green', 'circle-check');
       showResults(data);
@@ -497,7 +463,7 @@ async function handleUpload(e) {
 }
 
 // ═══════════════════════════════════════════════
-// 📊 عرض النتائج
+// 📊 النتائج
 // ═══════════════════════════════════════════════
 function showResults(data) {
   const results = $('uploadResults');
@@ -506,7 +472,6 @@ function showResults(data) {
 
   let html = '<div class="result-summary">' +
     '<p>' + icon('circle-check') + ' نجح: <strong>' + (Number(data.uploaded) || 0) + '</strong></p>';
-
   if (data.failed > 0) {
     html += '<p>' + icon('circle-x') + ' فشل: <strong>' + Number(data.failed) + '</strong></p>';
   }
@@ -519,7 +484,6 @@ function showResults(data) {
     });
     html += '</ul></div>';
   }
-
   content.innerHTML = html;
   results.style.display = 'block';
   clearTimeout(resultsTimer);
@@ -535,7 +499,7 @@ function resetForm() {
 }
 
 // ═══════════════════════════════════════════════
-// 📚 إدارة دروسي المرفوعة
+// 📚 دروسي المرفوعة
 // ═══════════════════════════════════════════════
 async function loadMyLessons() {
   const list = $('myLessonsList');
@@ -546,21 +510,17 @@ async function loadMyLessons() {
 
   try {
     const res = await fetch(API + '/teacher/my-lessons', { credentials: 'same-origin' });
-
     if (!res.ok) {
       list.innerHTML = '<div class="my-lessons-empty">' + icon('circle-x') + ' تعذّر تحميل الدروس</div>';
       return;
     }
-
     const lessons = await res.json();
     if (countEl) countEl.textContent = lessons.length;
 
     if (!lessons.length) {
-      list.innerHTML =
-        '<div class="my-lessons-empty">' +
-          '<span class="empty-icon">' + icon('inbox') + '</span>' +
-          '<p>لم ترفع أي دروس بعد</p>' +
-        '</div>';
+      list.innerHTML = '<div class="my-lessons-empty">' +
+        '<span class="empty-icon">' + icon('inbox') + '</span>' +
+        '<p>لم ترفع أي دروس بعد</p></div>';
       return;
     }
 
@@ -594,52 +554,180 @@ async function loadMyLessons() {
 
 async function deleteMyLesson(id, title) {
   if (!confirm('هل أنت متأكد من حذف هذا الدرس؟\n\n' + title + '\n\nلا يمكن التراجع!')) return;
-
   try {
-    const res = await fetch(API + '/teacher/lessons/' + id, {
-      method: 'DELETE',
-      credentials: 'same-origin'
-    });
-    if (res.ok) {
-      showToast('تم حذف الدرس', 'circle-check');
-      loadMyLessons();
-    } else {
-      const data = await res.json();
-      showToast(data.error || 'فشل الحذف', 'circle-x');
-    }
-  } catch (err) {
-    showToast('خطأ في الاتصال', 'circle-x');
-    console.error('خطأ:', err);
-  }
+    const res = await fetch(API + '/teacher/lessons/' + id, { method: 'DELETE', credentials: 'same-origin' });
+    if (res.ok) { showToast('تم حذف الدرس', 'circle-check'); loadMyLessons(); }
+    else { const data = await res.json(); showToast(data.error || 'فشل الحذف', 'circle-x'); }
+  } catch (err) { showToast('خطأ في الاتصال', 'circle-x'); }
 }
-
 window.loadMyLessons = loadMyLessons;
 window.deleteMyLesson = deleteMyLesson;
 
 // ═══════════════════════════════════════════════
-// 🎯 ربط الأحداث
+// 🎴 بطاقة الأستاذ
+// ═══════════════════════════════════════════════
+function initialOf(name) {
+  const n = String(name || '').replace(/^أ\.\s*/, '').replace(/^د\.\s*/, '').trim();
+  return n.charAt(0) || '؟';
+}
+
+function renderProfileAvatar() {
+  const el = $('profileAvatar');
+  if (!el) return;
+  if (profileCache.photoUrl) {
+    el.innerHTML = '<img src="' + escapeHtml(profileCache.photoUrl) + '" alt="" style="width:100%;height:100%;object-fit:cover;">';
+  } else {
+    el.textContent = initialOf(teacherName);
+  }
+  const removeBtn = $('removePhotoBtn');
+  if (removeBtn) removeBtn.style.display = profileCache.photoUrl ? 'inline-flex' : 'none';
+}
+
+async function loadProfileCard() {
+  const card = $('profileCard');
+  if (card) card.style.display = 'block';
+
+  try {
+    const res = await fetch(API + '/teacher/me/profile', { credentials: 'same-origin' });
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    profileCache.photoUrl = data.photoUrl || '';
+    $('profileRank').value = data.rank || '';
+    $('profileSpecialty').value = data.specialty || '';
+    $('profileContactEmail').value = data.contactEmail || '';
+    $('profileBio').value = data.bio || '';
+    updateBioCount();
+    renderProfileAvatar();
+  } catch (err) {
+    console.error('فشل تحميل البطاقة', err);
+  }
+}
+
+function updateBioCount() {
+  const el = $('bioCount');
+  const ta = $('profileBio');
+  if (el && ta) el.textContent = ta.value.length;
+}
+
+async function saveProfile() {
+  const status = $('profileSaveStatus');
+  status.textContent = 'جارٍ الحفظ...';
+  status.style.color = 'var(--emerald)';
+
+  try {
+    const res = await fetch(API + '/teacher/profile', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify({
+        rank: $('profileRank').value.trim(),
+        specialty: $('profileSpecialty').value.trim(),
+        contactEmail: $('profileContactEmail').value.trim(),
+        bio: $('profileBio').value
+      })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      status.textContent = 'تم حفظ بطاقتك بنجاح';
+      status.style.color = 'green';
+      setTimeout(() => { status.textContent = ''; }, 2500);
+    } else {
+      status.textContent = data.error || 'فشل الحفظ';
+      status.style.color = 'red';
+    }
+  } catch (err) {
+    status.textContent = 'خطأ في الاتصال';
+    status.style.color = 'red';
+  }
+}
+
+async function uploadPhoto(file) {
+  const status = $('profileSaveStatus');
+  status.textContent = 'جارٍ رفع الصورة...';
+  status.style.color = 'var(--emerald)';
+
+  const fd = new FormData();
+  fd.append('photo', file);
+
+  try {
+    const res = await fetch(API + '/teacher/profile/photo', {
+      method: 'POST', credentials: 'same-origin', body: fd
+    });
+    const data = await res.json();
+    if (res.ok) {
+      profileCache.photoUrl = data.photoUrl;
+      renderProfileAvatar();
+      status.textContent = 'تم رفع الصورة';
+      status.style.color = 'green';
+      setTimeout(() => { status.textContent = ''; }, 2500);
+    } else {
+      status.textContent = data.error || 'فشل الرفع';
+      status.style.color = 'red';
+    }
+  } catch (err) {
+    status.textContent = 'خطأ في الاتصال';
+    status.style.color = 'red';
+  }
+}
+
+async function removePhoto() {
+  if (!confirm('حذف صورة البطاقة؟')) return;
+  try {
+    const res = await fetch(API + '/teacher/profile/photo', {
+      method: 'DELETE', credentials: 'same-origin'
+    });
+    if (res.ok) {
+      profileCache.photoUrl = '';
+      renderProfileAvatar();
+      showToast('تم حذف الصورة', 'circle-check');
+    }
+  } catch (err) {}
+}
+
+function initProfileCard() {
+  loadProfileCard();
+
+  const saveBtn = $('saveProfileBtn');
+  if (saveBtn) saveBtn.addEventListener('click', saveProfile);
+
+  const bio = $('profileBio');
+  if (bio) bio.addEventListener('input', updateBioCount);
+
+  const uploadBtn = $('uploadPhotoBtn');
+  const fileInput = $('profilePhotoInput');
+  if (uploadBtn && fileInput) {
+    uploadBtn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', function () {
+      const f = fileInput.files[0];
+      if (f) uploadPhoto(f);
+      fileInput.value = '';
+    });
+  }
+
+  const removeBtn = $('removePhotoBtn');
+  if (removeBtn) removeBtn.addEventListener('click', removePhoto);
+
+  renderProfileAvatar();
+}
+
+// ═══════════════════════════════════════════════
+// 🎯 الأحداث
 // ═══════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', function() {
-  // النموذج
   const loginForm = $('loginForm');
   if (loginForm) loginForm.addEventListener('submit', doLogin);
 
-  // زر القائمة المنسدلة
   const emailToggle = $('emailDropdownToggle');
   if (emailToggle) emailToggle.addEventListener('click', function(e) {
     e.stopPropagation();
     toggleEmailDropdown();
   });
 
-  // عند الضغط على حقل البريد، اعرض القائمة إن وُجدت حسابات
   const emailInput = $('emailInput');
   if (emailInput) emailInput.addEventListener('focus', function() {
-    if (getSavedAccounts().filter(a => a.role === 'teacher').length) {
-      toggleEmailDropdown(true);
-    }
+    if (getSavedAccounts().filter(a => a.role === 'teacher').length) toggleEmailDropdown(true);
   });
 
-  // زر الخروج
   const logoutBtn = $('logoutBtn');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', async function() {
@@ -649,21 +737,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // زر إضافة ملف
   const addFileBtn = $('addFileBtn');
   if (addFileBtn) addFileBtn.addEventListener('click', addFileInput);
 
-  // زر تحديث الدروس
   const refreshBtn = $('refreshLessonsBtn');
   if (refreshBtn) refreshBtn.addEventListener('click', loadMyLessons);
 
-  // ربط القوائم
   const yearSelect = $('yearSelect');
   if (yearSelect) yearSelect.addEventListener('change', updateSpecializations);
   const specSelect = $('specializationSelect');
   if (specSelect) specSelect.addEventListener('change', updateSubjects);
 
-  // حذف ملفات
   const container = $('filesContainer');
   if (container) {
     container.addEventListener('click', function(e) {
@@ -674,10 +758,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // نموذج الرفع
   const form = $('uploadForm');
   if (form) form.addEventListener('submit', handleUpload);
 
-  // التحقق التلقائي من الجلسة
   verifyAndShow();
 });

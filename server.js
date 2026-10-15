@@ -49,8 +49,17 @@ const useCloudinary = !!(process.env.CLOUDINARY_CLOUD_NAME &&
                           process.env.CLOUDINARY_API_KEY &&
                           process.env.CLOUDINARY_API_SECRET);
 
-if (useCloudinary) console.log('☁️ Cloudinary مفعّل');
-else console.log('📁 Cloudinary غير مفعّل - تخزين محلي');
+if (useCloudinary) {
+  console.log('☁️ Cloudinary مفعّل');
+  console.log('   cloud_name:', process.env.CLOUDINARY_CLOUD_NAME);
+  console.log('   api_key:', (process.env.CLOUDINARY_API_KEY || '').slice(0, 6) + '...');
+  console.log('   api_secret:', process.env.CLOUDINARY_API_SECRET ? 'موجود ✅' : 'مفقود ❌');
+} else {
+  console.log('📁 Cloudinary غير مفعّل - تخزين محلي');
+  console.log('   CLOUDINARY_CLOUD_NAME:', process.env.CLOUDINARY_CLOUD_NAME || 'مفقود');
+  console.log('   CLOUDINARY_API_KEY:', process.env.CLOUDINARY_API_KEY || 'مفقود');
+  console.log('   CLOUDINARY_API_SECRET:', process.env.CLOUDINARY_API_SECRET ? 'موجود' : 'مفقود');
+}
 
 // ═══════════════════════════════════════════════
 // 📁 مجلد الرفع
@@ -100,7 +109,7 @@ app.get('/', (req, res) => {
 });
 
 // ═══════════════════════════════════════════════
-// 📤 multer
+// 📤 multer للملفات (PDF, Word)
 // ═══════════════════════════════════════════════
 const storage = multer.memoryStorage();
 const upload = multer({
@@ -113,6 +122,49 @@ const upload = multer({
     else cb(new Error('نوع الملف غير مدعوم. المسموح: PDF, DOC, DOCX'));
   }
 });
+
+// ═══════════════════════════════════════════════
+// 🖼️ multer للصور
+// ═══════════════════════════════════════════════
+const photoUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024, files: 1 },
+  fileFilter: (req, file, cb) => {
+    const allowed = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (allowed.includes(ext)) cb(null, true);
+    else cb(new Error('صيغة الصورة غير مدعومة. المسموح: JPG, PNG, WEBP, GIF'));
+  }
+});
+
+// ═══════════════════════════════════════════════
+// ☁️ رفع صورة إلى Cloudinary
+// ═══════════════════════════════════════════════
+function uploadImageToCloudinary(buffer) {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        resource_type: 'image',
+        folder: 'islamic-lessons/teachers',
+        public_id: `teacher-${Date.now()}-${Math.round(Math.random() * 1e9)}`
+      },
+      (err, result) => {
+        if (err) {
+          console.error('❌ Cloudinary error:');
+          console.error('  message:', err.message);
+          console.error('  code:', err.code);
+          console.error('  http_code:', err.http_code);
+          if (err.error) console.error('  error:', JSON.stringify(err.error));
+          reject(err);
+        } else {
+          console.log('✅ Cloudinary نجح:', result.public_id);
+          resolve(result);
+        }
+      }
+    );
+    stream.end(buffer);
+  });
+}
 
 // ═══════════════════════════════════════════════
 // 🔒 Middlewares
@@ -129,12 +181,8 @@ const checkTeacher = async (req, res, next) => {
     if (req.session.user.id) {
       try {
         const t = await Teacher.findById(req.session.user.id).lean();
-        if (!t) {
-          return res.status(403).json({ error: 'الحساب غير موجود' });
-        }
-        if (!t.active) {
-          return res.status(403).json({ error: 'الحساب معطّل. تواصل مع الإدارة.' });
-        }
+        if (!t) return res.status(403).json({ error: 'الحساب غير موجود' });
+        if (!t.active) return res.status(403).json({ error: 'الحساب معطّل. تواصل مع الإدارة.' });
         req.teacher = t.name;
         req.teacherId = String(t._id);
         req.teacherEmail = t.email;
@@ -164,7 +212,7 @@ function fixEncoding(str) {
 }
 
 // ═══════════════════════════════════════════════
-// ☁️ دوال الرفع
+// ☁️ دوال الرفع (للملفات)
 // ═══════════════════════════════════════════════
 function uploadToCloudinary(buffer, originalName) {
   return new Promise((resolve, reject) => {
@@ -238,13 +286,10 @@ app.get('/auth/google/callback', async (req, res) => {
     const email = (payload.email || '').toLowerCase();
     console.log('📧 بريد Google المستلم:', email);
 
-    // ═══ 1) هل هو مدير؟ ═══
     const admins = (process.env.ADMIN_EMAILS || '')
       .split(',').map(x => x.trim().toLowerCase()).filter(Boolean);
     if (admins.includes(email)) {
-      if (from === 'teacher') {
-        return res.redirect('/teacher.html?error=wrong_role');
-      }
+      if (from === 'teacher') return res.redirect('/teacher.html?error=wrong_role');
       req.session.user = {
         email,
         name: 'المدير',
@@ -255,12 +300,9 @@ app.get('/auth/google/callback', async (req, res) => {
       return res.redirect('/admin.html');
     }
 
-    // ═══ 2) هل هو أستاذ في قاعدة البيانات؟ ═══
     const teacher = await Teacher.findOne({ email, active: true });
     if (teacher) {
-      if (from === 'admin') {
-        return res.redirect('/admin.html?error=wrong_role');
-      }
+      if (from === 'admin') return res.redirect('/admin.html?error=wrong_role');
       teacher.lastLogin = new Date();
       await teacher.save();
 
@@ -275,7 +317,6 @@ app.get('/auth/google/callback', async (req, res) => {
       return res.redirect('/teacher.html');
     }
 
-    // ═══ 3) غير مصرح ═══
     console.warn('⛔ بريد غير مصرح:', email);
     return res.redirect((from === 'teacher' ? '/teacher.html' : '/admin.html') + '?error=unauthorized');
   } catch (err) {
@@ -303,9 +344,7 @@ app.post('/auth/logout', (req, res) => {
 // ═══════════════════════════════════════════════
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
-  if (!password) {
-    return res.status(401).json({ error: 'البريد وكلمة السر مطلوبان' });
-  }
+  if (!password) return res.status(401).json({ error: 'البريد وكلمة السر مطلوبان' });
 
   if (password === ADMIN_PASSWORD) {
     if (email && process.env.ADMIN_EMAILS) {
@@ -322,7 +361,6 @@ app.post('/api/login', (req, res) => {
     };
     return res.json({ success: true, role: 'admin' });
   }
-
   res.status(401).json({ error: 'البريد أو كلمة السر غير صحيحة' });
 });
 
@@ -332,23 +370,14 @@ app.post('/api/login', (req, res) => {
 app.post('/api/teacher-login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) {
-      return res.status(401).json({ error: 'البريد وكلمة السر مطلوبان' });
-    }
+    if (!email || !password) return res.status(401).json({ error: 'البريد وكلمة السر مطلوبان' });
 
     const teacher = await Teacher.findOne({ email: email.toLowerCase().trim() });
-    if (!teacher) {
-      return res.status(401).json({ error: 'البريد أو كلمة السر غير صحيحة' });
-    }
-
-    if (!teacher.active) {
-      return res.status(403).json({ error: 'هذا الحساب معطّل. تواصل مع الإدارة.' });
-    }
+    if (!teacher) return res.status(401).json({ error: 'البريد أو كلمة السر غير صحيحة' });
+    if (!teacher.active) return res.status(403).json({ error: 'هذا الحساب معطّل. تواصل مع الإدارة.' });
 
     const ok = await bcrypt.compare(password, teacher.passwordHash);
-    if (!ok) {
-      return res.status(401).json({ error: 'البريد أو كلمة السر غير صحيحة' });
-    }
+    if (!ok) return res.status(401).json({ error: 'البريد أو كلمة السر غير صحيحة' });
 
     teacher.lastLogin = new Date();
     await teacher.save();
@@ -359,7 +388,6 @@ app.post('/api/teacher-login', async (req, res) => {
       name: teacher.name,
       role: 'teacher'
     };
-
     res.json({ success: true, role: 'teacher', name: teacher.name });
   } catch (err) {
     console.error('خطأ في teacher-login:', err);
@@ -390,6 +418,11 @@ app.get('/api/admin/teachers', checkAdmin, async (req, res) => {
       _id: String(t._id),
       email: t.email,
       name: t.name,
+      specialty: t.specialty || '',
+      rank: t.rank || '',
+      contactEmail: t.contactEmail || '',
+      bio: t.bio || '',
+      photoUrl: t.photoUrl || '',
       active: t.active,
       createdAt: t.createdAt,
       lastLogin: t.lastLogin,
@@ -404,7 +437,7 @@ app.get('/api/admin/teachers', checkAdmin, async (req, res) => {
 
 app.post('/api/admin/teachers', checkAdmin, async (req, res) => {
   try {
-    const { email, name, password } = req.body;
+    const { email, name, password, rank, specialty, contactEmail, bio } = req.body;
 
     if (!email || !name || !password) {
       return res.status(400).json({ error: 'البريد والاسم وكلمة السر مطلوبة' });
@@ -415,9 +448,7 @@ app.post('/api/admin/teachers', checkAdmin, async (req, res) => {
 
     const normalizedEmail = email.toLowerCase().trim();
     const exists = await Teacher.findOne({ email: normalizedEmail });
-    if (exists) {
-      return res.status(409).json({ error: 'هذا البريد مسجل مسبقاً' });
-    }
+    if (exists) return res.status(409).json({ error: 'هذا البريد مسجل مسبقاً' });
 
     const passwordHash = await bcrypt.hash(password, 10);
     const teacher = await Teacher.create({
@@ -426,22 +457,15 @@ app.post('/api/admin/teachers', checkAdmin, async (req, res) => {
       passwordHash,
       active: true,
       role: 'teacher',
-      createdBy: req.session.user.email || 'admin'
+      createdBy: req.session.user.email || 'admin',
+      rank: (rank || '').trim().slice(0, 80),
+      specialty: (specialty || '').trim().slice(0, 100),
+      contactEmail: (contactEmail || '').toLowerCase().trim().slice(0, 120),
+      bio: (bio || '').slice(0, 800)
     });
 
     console.log(`✅ أستاذ جديد: ${teacher.name} — ${teacher.email}`);
-
-    res.json({
-      success: true,
-      teacher: {
-        _id: String(teacher._id),
-        email: teacher.email,
-        name: teacher.name,
-        active: teacher.active,
-        lessonCount: 0,
-        createdAt: teacher.createdAt
-      }
-    });
+    res.json({ success: true, teacher: { _id: String(teacher._id), email: teacher.email, name: teacher.name } });
   } catch (err) {
     console.error('خطأ في إضافة أستاذ:', err);
     res.status(500).json({ error: err.message });
@@ -450,22 +474,23 @@ app.post('/api/admin/teachers', checkAdmin, async (req, res) => {
 
 app.put('/api/admin/teachers/:id', checkAdmin, async (req, res) => {
   try {
-    const { name, password } = req.body;
+    const { name, password, rank, specialty, contactEmail, bio } = req.body;
     const teacher = await Teacher.findById(req.params.id);
     if (!teacher) return res.status(404).json({ error: 'الأستاذ غير موجود' });
 
     if (name && name.trim()) teacher.name = name.trim();
+    if (rank !== undefined) teacher.rank = String(rank).trim().slice(0, 80);
+    if (specialty !== undefined) teacher.specialty = String(specialty).trim().slice(0, 100);
+    if (contactEmail !== undefined) teacher.contactEmail = String(contactEmail).toLowerCase().trim().slice(0, 120);
+    if (bio !== undefined) teacher.bio = String(bio).slice(0, 800);
 
     if (password) {
-      if (password.length < 6) {
-        return res.status(400).json({ error: 'كلمة السر 6 أحرف على الأقل' });
-      }
+      if (password.length < 6) return res.status(400).json({ error: 'كلمة السر 6 أحرف على الأقل' });
       teacher.passwordHash = await bcrypt.hash(password, 10);
     }
 
     await teacher.save();
     console.log(`✏️ تحديث الأستاذ: ${teacher.name}`);
-
     res.json({ success: true });
   } catch (err) {
     console.error('خطأ في تعديل الأستاذ:', err);
@@ -473,40 +498,24 @@ app.put('/api/admin/teachers/:id', checkAdmin, async (req, res) => {
   }
 });
 
-// تعطيل أستاذ (Soft Delete)
 app.post('/api/admin/teachers/:id/disable', checkAdmin, async (req, res) => {
   try {
-    const teacher = await Teacher.findByIdAndUpdate(
-      req.params.id,
-      { active: false },
-      { new: true }
-    );
+    const teacher = await Teacher.findByIdAndUpdate(req.params.id, { active: false }, { new: true });
     if (!teacher) return res.status(404).json({ error: 'الأستاذ غير موجود' });
 
     const count = await Lesson.countDocuments({ uploaderId: teacher._id });
-
     console.log(`⏸️ تعطيل الأستاذ: ${teacher.name} (${count} درس محفوظ)`);
-
-    res.json({
-      success: true,
-      message: `تم تعطيل ${teacher.name}. ${count} درس ما زالت في الموقع.`
-    });
+    res.json({ success: true, message: `تم تعطيل ${teacher.name}. ${count} درس ما زالت في الموقع.` });
   } catch (err) {
     console.error('خطأ في تعطيل الأستاذ:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// تفعيل أستاذ
 app.post('/api/admin/teachers/:id/activate', checkAdmin, async (req, res) => {
   try {
-    const teacher = await Teacher.findByIdAndUpdate(
-      req.params.id,
-      { active: true },
-      { new: true }
-    );
+    const teacher = await Teacher.findByIdAndUpdate(req.params.id, { active: true }, { new: true });
     if (!teacher) return res.status(404).json({ error: 'الأستاذ غير موجود' });
-
     console.log(`▶️ تفعيل الأستاذ: ${teacher.name}`);
     res.json({ success: true });
   } catch (err) {
@@ -515,26 +524,19 @@ app.post('/api/admin/teachers/:id/activate', checkAdmin, async (req, res) => {
   }
 });
 
-// 🗑️ حذف أستاذ نهائياً + كل دروسه + ملفاته
 app.delete('/api/admin/teachers/:id', checkAdmin, async (req, res) => {
   try {
     const teacher = await Teacher.findById(req.params.id);
     if (!teacher) return res.status(404).json({ error: 'الأستاذ غير موجود' });
 
-    // 1) اجلب كل دروس الأستاذ
     const lessons = await Lesson.find({ uploaderId: teacher._id });
     const lessonsCount = lessons.length;
-
-    // 2) احذف الملفات من Cloudinary أو محلي
     let filesDeleted = 0;
+
     for (const lesson of lessons) {
       if (lesson.storage === 'cloudinary' && lesson.storedName) {
-        try {
-          await cloudinary.uploader.destroy(lesson.storedName, { resource_type: 'raw' });
-          filesDeleted++;
-        } catch (err) {
-          console.error('خطأ في حذف Cloudinary:', lesson.storedName, err.message);
-        }
+        try { await cloudinary.uploader.destroy(lesson.storedName, { resource_type: 'raw' }); filesDeleted++; }
+        catch (err) { console.error('خطأ في حذف Cloudinary:', lesson.storedName, err.message); }
       } else if (lesson.storedName) {
         const filePath = path.join(UPLOAD_DIR, lesson.storedName);
         if (fs.existsSync(filePath)) {
@@ -544,16 +546,15 @@ app.delete('/api/admin/teachers/:id', checkAdmin, async (req, res) => {
       }
     }
 
-    // 3) احذف كل الدروس من قاعدة البيانات
-    if (lessonsCount > 0) {
-      await Lesson.deleteMany({ uploaderId: teacher._id });
+    if (lessonsCount > 0) await Lesson.deleteMany({ uploaderId: teacher._id });
+
+    if (teacher.photoStoredName) {
+      try { await cloudinary.uploader.destroy(teacher.photoStoredName, { resource_type: 'image' }); } catch (e) {}
     }
 
-    // 4) احذف الأستاذ
     await Teacher.deleteOne({ _id: teacher._id });
 
     console.log(`🗑️ حذف الأستاذ: ${teacher.name} — ${lessonsCount} درس — ${filesDeleted} ملف`);
-
     res.json({
       success: true,
       deletedLessons: lessonsCount,
@@ -562,6 +563,218 @@ app.delete('/api/admin/teachers/:id', checkAdmin, async (req, res) => {
     });
   } catch (err) {
     console.error('خطأ في حذف الأستاذ:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ═══════════════════════════════════════════════
+// 👥 بطاقات الأساتذة (عام)
+// ═══════════════════════════════════════════════
+app.get('/api/teachers/public', async (req, res) => {
+  try {
+    const teachers = await Teacher.find({ active: true, role: 'teacher' })
+      .select('name specialty rank bio photoUrl')
+      .lean();
+
+    const counts = await Lesson.aggregate([
+      { $match: { uploader: 'teacher', status: 'approved' } },
+      { $group: { _id: '$uploaderId', count: { $sum: 1 } } }
+    ]);
+    const countMap = {};
+    counts.forEach(c => { countMap[String(c._id)] = c.count; });
+
+    const result = teachers.map(t => ({
+      _id: String(t._id),
+      name: t.name,
+      specialty: t.specialty || '',
+      rank: t.rank || '',
+      bio: t.bio || '',
+      photoUrl: t.photoUrl || '',
+      lessonCount: countMap[String(t._id)] || 0
+    })).filter(t => t.lessonCount > 0 || t.bio || t.specialty);
+
+    result.sort((a, b) => b.lessonCount - a.lessonCount);
+    res.json(result);
+  } catch (err) {
+    console.error('خطأ في جلب الأساتذة:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/teachers/public/:id', async (req, res) => {
+  try {
+    const t = await Teacher.findOne({
+      _id: req.params.id,
+      active: true,
+      role: 'teacher'
+    }).select('name specialty rank bio photoUrl contactEmail').lean();
+
+    if (!t) return res.status(404).json({ error: 'الأستاذ غير موجود' });
+
+    const lessons = await Lesson.find({
+      uploader: 'teacher',
+      uploaderId: t._id,
+      status: 'approved'
+    }).sort({ date: -1 }).lean();
+
+    res.json({
+      teacher: {
+        _id: String(t._id),
+        name: t.name,
+        specialty: t.specialty || '',
+        rank: t.rank || '',
+        bio: t.bio || '',
+        photoUrl: t.photoUrl || '',
+        contactEmail: t.contactEmail || ''
+      },
+      lessons,
+      lessonCount: lessons.length
+    });
+  } catch (err) {
+    console.error('خطأ:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ═══════════════════════════════════════════════
+// ✏️ الأستاذ يعدّل بطاقته
+// ═══════════════════════════════════════════════
+app.get('/api/teacher/me/profile', checkTeacher, async (req, res) => {
+  try {
+    if (!req.teacherId) return res.json({ bio: '', specialty: '', rank: '', contactEmail: '', photoUrl: '' });
+    const t = await Teacher.findById(req.teacherId)
+      .select('bio specialty rank contactEmail photoUrl').lean();
+    if (!t) return res.status(404).json({ error: 'غير موجود' });
+    res.json(t);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put('/api/teacher/profile', checkTeacher, async (req, res) => {
+  try {
+    if (!req.teacherId) return res.status(400).json({ error: 'الحساب غير مرتبط ببطاقة' });
+    const { bio, specialty, rank, contactEmail } = req.body;
+    const t = await Teacher.findById(req.teacherId);
+    if (!t) return res.status(404).json({ error: 'غير موجود' });
+
+    if (bio !== undefined) t.bio = String(bio).slice(0, 800);
+    if (specialty !== undefined) t.specialty = String(specialty).trim().slice(0, 100);
+    if (rank !== undefined) t.rank = String(rank).trim().slice(0, 80);
+    if (contactEmail !== undefined) t.contactEmail = String(contactEmail).toLowerCase().trim().slice(0, 120);
+
+    await t.save();
+    res.json({ success: true });
+  } catch (err) {
+    console.error('خطأ:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ═══════════════════════════════════════════════
+// 📸 رفع صورة البطاقة (مع تشخيص كامل)
+// ═══════════════════════════════════════════════
+app.post('/api/teacher/profile/photo', checkTeacher, (req, res, next) => {
+  photoUpload.single('photo')(req, res, function (err) {
+    if (err) {
+      console.error('❌ خطأ في multer:', err.message);
+      return res.status(400).json({ error: err.message });
+    }
+    next();
+  });
+}, async (req, res) => {
+  console.log('═══════════════════════════════════════');
+  console.log('📸 محاولة رفع صورة');
+  console.log('  teacherId:', req.teacherId);
+  console.log('  useCloudinary:', useCloudinary);
+  console.log('  req.file:', req.file ? {
+    originalname: req.file.originalname,
+    mimetype: req.file.mimetype,
+    size: req.file.size
+  } : 'null');
+
+  try {
+    if (!req.teacherId) {
+      console.warn('❌ لا يوجد teacherId');
+      return res.status(400).json({ error: 'الحساب غير مرتبط ببطاقة' });
+    }
+    if (!req.file) {
+      console.warn('❌ لا يوجد ملف');
+      return res.status(400).json({ error: 'لم يتم إرسال صورة' });
+    }
+    if (!useCloudinary) {
+      console.warn('❌ Cloudinary غير مضبوط');
+      return res.status(500).json({
+        error: 'Cloudinary غير مضبوط. تحقق من متغيرات البيئة.'
+      });
+    }
+
+    const t = await Teacher.findById(req.teacherId);
+    if (!t) {
+      console.warn('❌ الأستاذ غير موجود');
+      return res.status(404).json({ error: 'غير موجود' });
+    }
+
+    // احذف الصورة القديمة إن وُجدت
+    if (t.photoStoredName) {
+      try {
+        await cloudinary.uploader.destroy(t.photoStoredName, { resource_type: 'image' });
+        console.log('🗑️ حذف الصورة القديمة:', t.photoStoredName);
+      } catch (e) {
+        console.warn('⚠️ فشل حذف الصورة القديمة:', e.message);
+      }
+    }
+
+    console.log('⬆️ جارٍ الرفع إلى Cloudinary...');
+    const result = await uploadImageToCloudinary(req.file.buffer);
+    console.log('✅ Cloudinary رفع:', result.public_id);
+    console.log('   secure_url:', result.secure_url);
+
+    const transformedUrl = result.secure_url.replace(
+      '/upload/',
+      '/upload/w_400,h_400,c_fill,g_auto,q_auto,f_auto/'
+    );
+
+    t.photoUrl = transformedUrl;
+    t.photoStoredName = result.public_id;
+    await t.save();
+
+    console.log('💾 تم الحفظ:', transformedUrl);
+    console.log('═══════════════════════════════════════');
+
+    res.json({ success: true, photoUrl: transformedUrl });
+
+  } catch (err) {
+    console.error('═══════════════════════════════════════');
+    console.error('❌ خطأ في رفع الصورة:');
+    console.error('  message:', err.message);
+    console.error('  code:', err.code);
+    console.error('  http_code:', err.http_code);
+    if (err.error) console.error('  error:', JSON.stringify(err.error));
+    console.error('  stack:', err.stack);
+    console.error('═══════════════════════════════════════');
+    res.status(500).json({
+      error: err.message || 'فشل رفع الصورة',
+      code: err.code,
+      details: err.error ? JSON.stringify(err.error) : undefined
+    });
+  }
+});
+
+app.delete('/api/teacher/profile/photo', checkTeacher, async (req, res) => {
+  try {
+    if (!req.teacherId) return res.status(400).json({ error: 'الحساب غير مرتبط ببطاقة' });
+    const t = await Teacher.findById(req.teacherId);
+    if (!t) return res.status(404).json({ error: 'غير موجود' });
+
+    if (t.photoStoredName) {
+      try { await cloudinary.uploader.destroy(t.photoStoredName, { resource_type: 'image' }); } catch (e) {}
+    }
+    t.photoUrl = '';
+    t.photoStoredName = '';
+    await t.save();
+    res.json({ success: true });
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
@@ -611,12 +824,8 @@ app.post('/api/teacher/batch', checkTeacher, upload.array('files', 10), async (r
     const teacherId = req.teacherId;
     const teacherEmail = req.teacherEmail || '';
 
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ error: 'لم يتم إرسال ملفات' });
-    }
-    if (!year || !specialization || !subject) {
-      return res.status(400).json({ error: 'يجب اختيار السنة والتخصص والمادة' });
-    }
+    if (!req.files || req.files.length === 0) return res.status(400).json({ error: 'لم يتم إرسال ملفات' });
+    if (!year || !specialization || !subject) return res.status(400).json({ error: 'يجب اختيار السنة والتخصص والمادة' });
 
     const titles = Array.isArray(req.body.titles) ? req.body.titles : [req.body.titles].filter(Boolean);
     const uploaded = [];
@@ -628,7 +837,6 @@ app.post('/api/teacher/batch', checkTeacher, upload.array('files', 10), async (r
         const fileData = await uploadFile(file);
         const fixedName = fixEncoding(file.originalname);
         const title = (titles[i] && titles[i].trim()) || path.parse(fixedName).name;
-
         const lesson = await Lesson.create({
           id: Date.now().toString() + '-' + i,
           title, year, specialization, subject,
@@ -651,17 +859,8 @@ app.post('/api/teacher/batch', checkTeacher, upload.array('files', 10), async (r
         errors.push({ filename: file.originalname, error: err.message });
       }
     }
-
-    res.json({
-      success: true,
-      uploaded: uploaded.length,
-      failed: errors.length,
-      lessons: uploaded,
-      errors
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+    res.json({ success: true, uploaded: uploaded.length, failed: errors.length, lessons: uploaded, errors });
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.get('/api/teacher/my-lessons', checkTeacher, async (req, res) => {
@@ -671,9 +870,7 @@ app.get('/api/teacher/my-lessons', checkTeacher, async (req, res) => {
       : { uploader: 'teacher', uploaderName: req.teacher };
     const lessons = await Lesson.find(query).sort({ date: -1 });
     res.json(lessons);
-  } catch (err) {
-    res.status(500).json({ error: 'تعذر جلب الدروس' });
-  }
+  } catch (err) { res.status(500).json({ error: 'تعذر جلب الدروس' }); }
 });
 
 app.delete('/api/teacher/lessons/:id', checkTeacher, async (req, res) => {
@@ -693,9 +890,7 @@ app.delete('/api/teacher/lessons/:id', checkTeacher, async (req, res) => {
     }
     await Lesson.deleteOne({ id: req.params.id });
     res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 // ═══════════════════════════════════════════════
@@ -740,9 +935,7 @@ app.post('/api/student/submit', upload.array('files', 5), async (req, res) => {
       }
     }
     res.json({ success: true, submitted: uploaded.length, failed: errors.length, errors });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 // ═══════════════════════════════════════════════
@@ -754,18 +947,14 @@ app.get('/api/lessons', async (req, res) => {
       $or: [{ status: 'approved' }, { status: { $exists: false } }, { status: null }]
     }).sort({ date: -1 });
     res.json(lessons);
-  } catch (err) {
-    res.status(500).json({ error: 'تعذر جلب الدروس' });
-  }
+  } catch (err) { res.status(500).json({ error: 'تعذر جلب الدروس' }); }
 });
 
 app.get('/api/pending', checkReview, async (req, res) => {
   try {
     const pending = await Lesson.find({ status: 'pending' }).sort({ date: -1 });
     res.json(pending);
-  } catch (err) {
-    res.status(500).json({ error: 'تعذر جلب المعلّقة' });
-  }
+  } catch (err) { res.status(500).json({ error: 'تعذر جلب المعلّقة' }); }
 });
 
 app.post('/api/pending/:id/approve', checkReview, async (req, res) => {
@@ -777,9 +966,7 @@ app.post('/api/pending/:id/approve', checkReview, async (req, res) => {
     lesson.reviewNote = req.body.note || 'تمت الموافقة';
     await lesson.save();
     res.json({ success: true, lesson });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.post('/api/pending/:id/reject', checkReview, async (req, res) => {
@@ -791,9 +978,7 @@ app.post('/api/pending/:id/reject', checkReview, async (req, res) => {
     }
     await Lesson.deleteOne({ id: req.params.id });
     res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.delete('/api/lessons/:id', checkAdmin, async (req, res) => {
@@ -808,13 +993,11 @@ app.delete('/api/lessons/:id', checkAdmin, async (req, res) => {
     }
     await Lesson.deleteOne({ id: req.params.id });
     res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 // ═══════════════════════════════════════════════
-// 🔄 Migration: نقل الأساتذة من TEACHERS_JSON
+// 🔄 Migrations
 // ═══════════════════════════════════════════════
 async function migrateTeachers() {
   try {
@@ -844,36 +1027,24 @@ async function migrateTeachers() {
           });
           migrated++;
         } catch (e) {
-          if (e.code !== 11000) {
-            console.error(`خطأ في ترحيل ${key}:`, e.message);
-          }
+          if (e.code !== 11000) console.error(`خطأ في ترحيل ${key}:`, e.message);
         }
       }
     }
 
-    if (migrated > 0) {
-      console.log(`🔄 تم ترحيل ${migrated} أستاذ من TEACHERS_JSON إلى قاعدة البيانات`);
-    } else {
-      console.log('ℹ️ لا يوجد أساتذة لترحيلهم');
-    }
+    if (migrated > 0) console.log(`🔄 تم ترحيل ${migrated} أستاذ من TEACHERS_JSON`);
+    else console.log('ℹ️ لا يوجد أساتذة لترحيلهم');
   } catch (err) {
     console.error('خطأ في ترحيل الأساتذة:', err.message);
   }
 }
 
-// ═══════════════════════════════════════════════
-// 🔄 Migration: ربط الدروس القديمة بالأساتذة
-// ═══════════════════════════════════════════════
 async function migrateLessonOwners() {
   try {
     const orphans = await Lesson.countDocuments({
       uploader: 'teacher',
-      $or: [
-        { uploaderId: { $exists: false } },
-        { uploaderId: null }
-      ]
+      $or: [{ uploaderId: { $exists: false } }, { uploaderId: null }]
     });
-
     if (orphans === 0) return;
 
     console.log(`🔄 ترحيل ${orphans} درس قديم (بدون uploaderId)...`);
@@ -898,9 +1069,7 @@ async function migrateLessonOwners() {
     });
 
     console.log(`✅ تم ربط ${linked} درس بالأستاذ الصحيح`);
-    if (unlinked > 0) {
-      console.log(`⚠️ ${unlinked} درس لم نجد له أستاذاً مطابقاً`);
-    }
+    if (unlinked > 0) console.log(`⚠️ ${unlinked} درس لم نجد له أستاذاً مطابقاً`);
   } catch (err) {
     console.error('خطأ في ربط الدروس:', err.message);
   }
@@ -923,9 +1092,7 @@ mongoose
         { $set: { status: 'approved', uploader: 'admin' } }
       );
       if (result.modifiedCount > 0) console.log(`🔄 تم تحديث ${result.modifiedCount} درس قديم`);
-    } catch (err) {
-      console.error('خطأ Migration:', err);
-    }
+    } catch (err) { console.error('خطأ Migration:', err); }
 
     app.listen(PORT, () => {
       console.log(`✅ الموقع يعمل على http://localhost:${PORT}`);

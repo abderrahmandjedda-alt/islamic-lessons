@@ -71,7 +71,6 @@ async function checkSession() {
     const res = await fetch(API + '/me', { credentials: 'same-origin' });
     if (res.ok) {
       const user = await res.json();
-      // ⚠️ لا تعرض لوحة المدير لغير المدير
       if (user.role !== 'admin') return false;
       currentUser = user;
       showPanel();
@@ -208,7 +207,7 @@ window.updateSpecializations = updateSpecializations;
 window.updateSubjects = updateSubjects;
 
 // ═══════════════════════════════════════════════
-// 🎨 نافذة تأكيد مخصصة
+// 🎨 نافذة تأكيد
 // ═══════════════════════════════════════════════
 function customConfirm(options) {
   return new Promise(function (resolve) {
@@ -225,29 +224,21 @@ function customConfirm(options) {
       '<div class="modal-backdrop" id="confirmBackdrop">' +
         '<div class="modal-card confirm-card confirm-' + variant + '" onclick="event.stopPropagation()">' +
           '<div class="confirm-icon">' +
-            (variant === 'danger'
-              ? '<i data-lucide="alert-triangle"></i>'
-              : variant === 'warning'
-              ? '<i data-lucide="alert-circle"></i>'
+            (variant === 'danger' ? '<i data-lucide="alert-triangle"></i>'
+              : variant === 'warning' ? '<i data-lucide="alert-circle"></i>'
               : '<i data-lucide="help-circle"></i>') +
           '</div>' +
           '<h3 class="confirm-title">' + escapeHtml(title) + '</h3>' +
           (message ? '<p class="confirm-message">' + escapeHtml(message) + '</p>' : '') +
           (lines.length
-            ? '<ul class="confirm-lines">' +
-                lines.map(function (line) {
-                  return '<li>' + escapeHtml(line) + '</li>';
-                }).join('') +
-              '</ul>'
+            ? '<ul class="confirm-lines">' + lines.map(function (line) {
+                return '<li>' + escapeHtml(line) + '</li>';
+              }).join('') + '</ul>'
             : '') +
           (opt.hint ? '<p class="confirm-hint">' + escapeHtml(opt.hint) + '</p>' : '') +
           '<div class="confirm-actions">' +
-            '<button type="button" class="btn-modal secondary" id="confirmCancelBtn">' +
-              escapeHtml(cancelText) +
-            '</button>' +
-            '<button type="button" class="btn-modal ' + variant + '" id="confirmOkBtn">' +
-              escapeHtml(confirmText) +
-            '</button>' +
+            '<button type="button" class="btn-modal secondary" id="confirmCancelBtn">' + escapeHtml(cancelText) + '</button>' +
+            '<button type="button" class="btn-modal ' + variant + '" id="confirmOkBtn">' + escapeHtml(confirmText) + '</button>' +
           '</div>' +
         '</div>' +
       '</div>';
@@ -276,7 +267,7 @@ function customConfirm(options) {
 window.customConfirm = customConfirm;
 
 // ═══════════════════════════════════════════════
-// 🪟 نافذة Modal عامة
+// 🪟 Modal عام
 // ═══════════════════════════════════════════════
 function openModal(html) {
   const root = $('modalRoot');
@@ -294,7 +285,7 @@ function closeModal() {
 window.closeModal = closeModal;
 
 // ═══════════════════════════════════════════════
-// 📤 رفع درس (الأدمن)
+// 📤 رفع درس
 // ═══════════════════════════════════════════════
 async function handleUpload(e) {
   e.preventDefault();
@@ -367,7 +358,6 @@ async function deleteLesson(id) {
     hint: 'لا يمكن التراجع!'
   });
   if (!ok) return;
-
   try {
     const res = await fetch(API + '/lessons/' + id, { method: 'DELETE', credentials: 'same-origin' });
     if (res.ok) { showToast('تم الحذف'); loadAdminLessons(); }
@@ -382,7 +372,6 @@ window.deleteLesson = deleteLesson;
 async function loadTeachers() {
   const container = $('teachersList');
   if (!container) return;
-
   container.innerHTML = '<div class="teachers-empty">جارٍ التحميل...</div>';
 
   try {
@@ -415,8 +404,11 @@ async function loadTeachers() {
             const toggleIcon = t.active ? 'pause-circle' : 'play-circle';
             const toggleTitle = t.active ? 'تعطيل' : 'تفعيل';
             const toggleClass = t.active ? 'danger' : 'success';
+            const subLine = t.specialty
+              ? '<br><small style="color:var(--text-light);font-size:0.8rem">' + escapeHtml(t.specialty) + '</small>'
+              : '';
             return '<tr class="' + (t.active ? '' : 'inactive') + '">' +
-              '<td><strong>' + escapeHtml(t.name) + '</strong></td>' +
+              '<td><strong>' + escapeHtml(t.name) + '</strong>' + subLine + '</td>' +
               '<td dir="ltr" style="text-align:left">' + escapeHtml(t.email) + '</td>' +
               '<td>' + t.lessonCount + '</td>' +
               '<td>' + statusBadge + '</td>' +
@@ -450,29 +442,45 @@ window.loadTeachers = loadTeachers;
 function openAddTeacher() {
   openModal(
     '<h3 class="modal-title"><i data-lucide="user-plus"></i> إضافة أستاذ جديد</h3>' +
-    '<div class="modal-field">' +
-      '<label for="tName">الاسم الكامل</label>' +
-      '<input type="text" id="tName" placeholder="مثال: أ. أحمد محمد" autocomplete="off">' +
+    '<div class="modal-body">' +
+      '<div class="modal-field">' +
+        '<label for="tName">الاسم الكامل</label>' +
+        '<input type="text" id="tName" placeholder="مثال: أ. أحمد محمد" autocomplete="off">' +
+      '</div>' +
+      '<div class="modal-field">' +
+        '<label for="tEmail">البريد الإلكتروني</label>' +
+        '<input type="email" id="tEmail" placeholder="teacher@example.com" dir="ltr" autocomplete="off">' +
+      '</div>' +
+      '<div class="modal-field">' +
+        '<label for="tRank">الرتبة العلمية (اختياري)</label>' +
+        '<input type="text" id="tRank" placeholder="أستاذ محاضر أ" maxlength="80">' +
+      '</div>' +
+      '<div class="modal-field">' +
+        '<label for="tSpecialty">التخصص (اختياري)</label>' +
+        '<input type="text" id="tSpecialty" placeholder="أصول الفقه" maxlength="100">' +
+      '</div>' +
+      '<div class="modal-field">' +
+        '<label for="tContactEmail">بريد للتواصل (اختياري)</label>' +
+        '<input type="email" id="tContactEmail" placeholder="teacher@univ.dz" dir="ltr" maxlength="120">' +
+      '</div>' +
+      '<div class="modal-field">' +
+        '<label for="tBio">نبذة شخصية (اختياري)</label>' +
+        '<textarea id="tBio" rows="3" maxlength="800" placeholder="نبذة قصيرة عن الأستاذ..."></textarea>' +
+      '</div>' +
+      '<div class="modal-field">' +
+        '<label for="tPassword">كلمة السر</label>' +
+        '<input type="text" id="tPassword" placeholder="6 أحرف على الأقل" dir="ltr" autocomplete="off">' +
+        '<div class="modal-hint">انسخها وأرسلها للأستاذ. يمكنه تغييرها لاحقاً.</div>' +
+      '</div>' +
+      '<p class="modal-error" id="modalErr"></p>' +
     '</div>' +
-    '<div class="modal-field">' +
-      '<label for="tEmail">البريد الإلكتروني</label>' +
-      '<input type="email" id="tEmail" placeholder="teacher@example.com" dir="ltr" autocomplete="off">' +
-    '</div>' +
-    '<div class="modal-field">' +
-      '<label for="tPassword">كلمة السر</label>' +
-      '<input type="text" id="tPassword" placeholder="6 أحرف على الأقل" dir="ltr" autocomplete="off">' +
-      '<div class="modal-hint">انسخها وأرسلها للأستاذ. يمكنه تغييرها لاحقاً.</div>' +
-    '</div>' +
-    '<p class="modal-error" id="modalErr"></p>' +
     '<div class="modal-actions">' +
       '<button class="btn-modal secondary" type="button" onclick="closeModal()">إلغاء</button>' +
       '<button class="btn-modal primary" type="button" id="saveTeacherBtn">حفظ</button>' +
     '</div>'
   );
 
-  $('saveTeacherBtn').addEventListener('click', function () {
-    saveTeacher(null);
-  });
+  $('saveTeacherBtn').addEventListener('click', function () { saveTeacher(null); });
 }
 window.openAddTeacher = openAddTeacher;
 
@@ -483,29 +491,45 @@ function openEditTeacher(id) {
 
   openModal(
     '<h3 class="modal-title"><i data-lucide="pencil"></i> تعديل أستاذ</h3>' +
-    '<div class="modal-field">' +
-      '<label>البريد الإلكتروني</label>' +
-      '<input type="email" value="' + escapeHtml(t.email) + '" dir="ltr" disabled>' +
-      '<div class="modal-hint">البريد غير قابل للتعديل.</div>' +
+    '<div class="modal-body">' +
+      '<div class="modal-field">' +
+        '<label>البريد الإلكتروني</label>' +
+        '<input type="email" value="' + escapeHtml(t.email) + '" dir="ltr" disabled>' +
+        '<div class="modal-hint">البريد غير قابل للتعديل.</div>' +
+      '</div>' +
+      '<div class="modal-field">' +
+        '<label for="tName">الاسم الكامل</label>' +
+        '<input type="text" id="tName" value="' + escapeHtml(t.name) + '">' +
+      '</div>' +
+      '<div class="modal-field">' +
+        '<label for="tRank">الرتبة العلمية</label>' +
+        '<input type="text" id="tRank" value="' + escapeHtml(t.rank || '') + '" placeholder="أستاذ محاضر أ" maxlength="80">' +
+      '</div>' +
+      '<div class="modal-field">' +
+        '<label for="tSpecialty">التخصص</label>' +
+        '<input type="text" id="tSpecialty" value="' + escapeHtml(t.specialty || '') + '" placeholder="أصول الفقه" maxlength="100">' +
+      '</div>' +
+      '<div class="modal-field">' +
+        '<label for="tContactEmail">بريد للتواصل (اختياري)</label>' +
+        '<input type="email" id="tContactEmail" value="' + escapeHtml(t.contactEmail || '') + '" dir="ltr" maxlength="120">' +
+      '</div>' +
+      '<div class="modal-field">' +
+        '<label for="tBio">نبذة شخصية</label>' +
+        '<textarea id="tBio" rows="4" maxlength="800">' + escapeHtml(t.bio || '') + '</textarea>' +
+      '</div>' +
+      '<div class="modal-field">' +
+        '<label for="tPassword">كلمة سر جديدة (اتركها فارغة لعدم التغيير)</label>' +
+        '<input type="text" id="tPassword" placeholder="6 أحرف على الأقل" dir="ltr">' +
+      '</div>' +
+      '<p class="modal-error" id="modalErr"></p>' +
     '</div>' +
-    '<div class="modal-field">' +
-      '<label for="tName">الاسم الكامل</label>' +
-      '<input type="text" id="tName" value="' + escapeHtml(t.name) + '">' +
-    '</div>' +
-    '<div class="modal-field">' +
-      '<label for="tPassword">كلمة سر جديدة (اتركها فارغة لعدم التغيير)</label>' +
-      '<input type="text" id="tPassword" placeholder="6 أحرف على الأقل" dir="ltr">' +
-    '</div>' +
-    '<p class="modal-error" id="modalErr"></p>' +
     '<div class="modal-actions">' +
       '<button class="btn-modal secondary" type="button" onclick="closeModal()">إلغاء</button>' +
       '<button class="btn-modal primary" type="button" id="saveTeacherBtn">حفظ التغييرات</button>' +
     '</div>'
   );
 
-  $('saveTeacherBtn').addEventListener('click', function () {
-    saveTeacher(id);
-  });
+  $('saveTeacherBtn').addEventListener('click', function () { saveTeacher(id); });
 }
 window.openEditTeacher = openEditTeacher;
 
@@ -515,6 +539,10 @@ async function saveTeacher(id) {
   const name = $('tName').value.trim();
   const pwdEl = $('tPassword');
   const password = pwdEl ? pwdEl.value : '';
+  const rank = ($('tRank') && $('tRank').value.trim()) || '';
+  const specialty = ($('tSpecialty') && $('tSpecialty').value.trim()) || '';
+  const contactEmail = ($('tContactEmail') && $('tContactEmail').value.trim()) || '';
+  const bio = ($('tBio') && $('tBio').value) || '';
 
   if (!name) { errEl.textContent = 'الاسم مطلوب'; return; }
   if (!id && !password) { errEl.textContent = 'كلمة السر مطلوبة'; return; }
@@ -533,7 +561,7 @@ async function saveTeacher(id) {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin',
-        body: JSON.stringify({ name, password: password || undefined })
+        body: JSON.stringify({ name, password: password || undefined, rank, specialty, contactEmail, bio })
       });
     } else {
       const email = $('tEmail').value.trim();
@@ -542,10 +570,9 @@ async function saveTeacher(id) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin',
-        body: JSON.stringify({ email, name, password })
+        body: JSON.stringify({ email, name, password, rank, specialty, contactEmail, bio })
       });
     }
-
     const json = await res.json();
     if (res.ok) {
       showToast(id ? 'تم تحديث الأستاذ' : 'تمت إضافة الأستاذ');
@@ -574,9 +601,8 @@ async function toggleTeacherStatus(id, activate) {
       message: 'هل تريد تعطيل هذا الحساب؟',
       lines: [
         'لن يستطيع الأستاذ الدخول',
-        t.lessonCount > 0
-          ? 'دروسه (' + t.lessonCount + ') ستبقى ظاهرة للطلاب'
-          : 'يمكنك إعادة تفعيله في أي وقت'
+        t.lessonCount > 0 ? 'دروسه (' + t.lessonCount + ') ستبقى ظاهرة للطلاب'
+                          : 'يمكنك إعادة تفعيله في أي وقت'
       ],
       confirmText: 'تعطيل',
       variant: 'warning'
@@ -587,8 +613,7 @@ async function toggleTeacherStatus(id, activate) {
   const action = activate ? 'activate' : 'disable';
   try {
     const res = await fetch(API + '/admin/teachers/' + id + '/' + action, {
-      method: 'POST',
-      credentials: 'same-origin'
+      method: 'POST', credentials: 'same-origin'
     });
     const json = await res.json();
     if (res.ok) {
@@ -597,13 +622,11 @@ async function toggleTeacherStatus(id, activate) {
     } else {
       showToast(json.error || 'فشل التغيير');
     }
-  } catch (err) {
-    showToast('خطأ في الاتصال');
-  }
+  } catch (err) { showToast('خطأ في الاتصال'); }
 }
 window.toggleTeacherStatus = toggleTeacherStatus;
 
-// 🗑️ حذف نهائي
+// 🗑️ حذف
 async function tryDeleteTeacher(id) {
   const t = teachersCache.find(x => x._id === id);
   if (!t) return;
@@ -616,9 +639,7 @@ async function tryDeleteTeacher(id) {
 
   const ok = await customConfirm({
     title: 'حذف حساب ' + t.name,
-    message: t.lessonCount > 0
-      ? '⚠️ سيتم حذف:'
-      : 'لا يوجد لديه دروس حالياً.',
+    message: t.lessonCount > 0 ? '⚠️ سيتم حذف:' : 'لا يوجد لديه دروس حالياً.',
     lines: lines,
     confirmText: 'حذف نهائي',
     cancelText: 'إلغاء',
@@ -631,8 +652,7 @@ async function tryDeleteTeacher(id) {
 
   try {
     const res = await fetch(API + '/admin/teachers/' + id, {
-      method: 'DELETE',
-      credentials: 'same-origin'
+      method: 'DELETE', credentials: 'same-origin'
     });
     const json = await res.json();
     if (res.ok) {
@@ -642,9 +662,7 @@ async function tryDeleteTeacher(id) {
     } else {
       showToast(json.error || 'فشل الحذف');
     }
-  } catch (err) {
-    showToast('خطأ في الاتصال');
-  }
+  } catch (err) { showToast('خطأ في الاتصال'); }
 }
 window.tryDeleteTeacher = tryDeleteTeacher;
 
@@ -876,13 +894,11 @@ function removeSavedAccount(email) {
 function renderSavedAccounts() {
   const dropdown = $('emailDropdown');
   if (!dropdown) return;
-
   const accounts = getSavedAccounts();
   if (!accounts.length) {
     dropdown.innerHTML = '<div class="email-empty">لا توجد حسابات محفوظة بعد</div>';
     return;
   }
-
   dropdown.innerHTML = accounts.map(function (a) {
     const initial = (a.name || a.email || '?').trim().charAt(0).toUpperCase();
     const roleLabel = a.role === 'admin' ? 'مدير'
@@ -898,7 +914,6 @@ function renderSavedAccounts() {
       '</button>' +
     '</div>';
   }).join('');
-
   if (window.lucide) window.lucide.createIcons();
 
   dropdown.querySelectorAll('.email-item').forEach(function (item) {
@@ -910,12 +925,10 @@ function renderSavedAccounts() {
       setTimeout(() => $('passwordInput').focus(), 50);
     });
   });
-
   dropdown.querySelectorAll('[data-remove]').forEach(function (btn) {
     btn.addEventListener('click', function (ev) {
       ev.stopPropagation();
-      const email = btn.getAttribute('data-remove');
-      removeSavedAccount(email);
+      removeSavedAccount(btn.getAttribute('data-remove'));
     });
   });
 }
@@ -924,12 +937,8 @@ function toggleEmailDropdown(show) {
   const dropdown = $('emailDropdown');
   if (!dropdown) return;
   const willShow = show !== undefined ? show : dropdown.style.display === 'none';
-  if (willShow) {
-    renderSavedAccounts();
-    dropdown.style.display = 'block';
-  } else {
-    dropdown.style.display = 'none';
-  }
+  if (willShow) { renderSavedAccounts(); dropdown.style.display = 'block'; }
+  else dropdown.style.display = 'none';
 }
 
 document.addEventListener('click', function (e) {
@@ -939,8 +948,6 @@ document.addEventListener('click', function (e) {
 
 if (window.PasswordCredential && navigator.credentials) {
   window.addEventListener('load', async () => {
-    try {
-      await navigator.credentials.get({ password: true, mediation: 'optional' });
-    } catch (e) {}
+    try { await navigator.credentials.get({ password: true, mediation: 'optional' }); } catch (e) {}
   });
 }

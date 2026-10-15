@@ -76,7 +76,6 @@
     .btn-add-teacher:hover { box-shadow: 0 8px 24px rgba(13, 95, 74, 0.4); }
     .btn-add-teacher svg { width: 18px; height: 18px; }
 
-    /* ✨ قائمة الأساتذة: تمرير داخلي عند الكثرة */
     #teachersList {
       max-height: 60vh; overflow-y: auto; overflow-x: hidden;
       border-radius: 10px; scroll-behavior: smooth;
@@ -179,25 +178,70 @@
     .modal-card {
       background: var(--card); color: var(--text);
       border-radius: 20px; width: 100%; max-width: 460px;
-      padding: 28px;
       box-shadow: 0 20px 60px rgba(0,0,0,.3), 0 0 0 2px var(--border-gold);
       animation: modalIn .25s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
+      display: flex;
+      flex-direction: column;
+      max-height: 88vh;
+      overflow: hidden;
+      padding: 0;
     }
+
+    .modal-card.confirm-card {
+      max-height: none;
+      overflow: visible;
+      display: block;
+    }
+
     @keyframes modalIn {
       from { opacity: 0; transform: translateY(14px) scale(0.97); }
       to   { opacity: 1; transform: translateY(0) scale(1); }
     }
 
+    /* العنوان — ثابت أعلى النافذة */
     .modal-title {
       display: flex; align-items: center; gap: 10px;
-      margin: 0 0 22px; font-family: 'Amiri', serif;
+      margin: 0;
+      font-family: 'Amiri', serif;
       font-size: 1.25rem; color: var(--emerald);
-      padding-bottom: 14px; border-bottom: 2px solid var(--border-gold);
+      background: var(--card);
+      padding: 22px 28px 16px;
+      border-bottom: 2px solid var(--border-gold);
+      flex-shrink: 0;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
     }
     html[data-theme="dark"] .modal-title { color: var(--gold); }
-    .modal-title svg { width: 22px; height: 22px; color: var(--gold-dark); }
+    .modal-title svg { width: 22px; height: 22px; color: var(--gold-dark); flex-shrink: 0; }
     html[data-theme="dark"] .modal-title svg { color: var(--gold); }
+
+    /* منطقة المحتوى — الوحيدة التي تتمرر */
+    .modal-body {
+      padding: 20px 28px 0;
+      flex: 1 1 auto;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: thin;
+      scrollbar-color: var(--emerald) var(--bg-alt);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .modal-body::-webkit-scrollbar { width: 8px; }
+    .modal-body::-webkit-scrollbar-track {
+      background: var(--bg-alt); border-radius: 4px;
+    }
+    .modal-body::-webkit-scrollbar-thumb {
+      background: linear-gradient(var(--emerald), var(--emerald-dark));
+      border-radius: 4px;
+    }
+    .modal-body::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+    [data-theme="dark"] .modal-body::-webkit-scrollbar-track {
+      background: rgba(255,255,255,.05);
+    }
+    [data-theme="dark"] .modal-body::-webkit-scrollbar-thumb {
+      background: linear-gradient(var(--emerald-light), var(--emerald));
+    }
 
     .modal-field { margin-bottom: 16px; }
     .modal-field label {
@@ -205,13 +249,16 @@
       font-size: 0.9rem; font-weight: 700;
       color: var(--text-light); margin-bottom: 8px;
     }
-    .modal-field input {
+    .modal-field input,
+    .modal-field textarea {
       width: 100%; padding: 14px 16px; border-radius: 12px;
       border: 2px solid var(--border); font-family: 'Tajawal', sans-serif;
       font-size: 0.95rem; background: var(--bg); color: var(--text);
       box-sizing: border-box; transition: all 0.3s ease; outline: none;
     }
-    .modal-field input:focus {
+    .modal-field textarea { resize: vertical; min-height: 80px; }
+    .modal-field input:focus,
+    .modal-field textarea:focus {
       border-color: var(--gold);
       box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.15);
       background: var(--card);
@@ -221,8 +268,15 @@
       opacity: 0.6; cursor: not-allowed; background: var(--bg-alt);
     }
 
+    /* أزرار الحفظ / الإلغاء — ثابتة أسفل النافذة */
     .modal-actions {
-      display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px;
+      display: flex; gap: 10px; justify-content: flex-end;
+      background: var(--card);
+      padding: 16px 28px 22px;
+      border-top: 2px solid var(--border-gold);
+      flex-shrink: 0;
+      border-bottom-left-radius: 20px;
+      border-bottom-right-radius: 20px;
     }
 
     .btn-modal {
@@ -261,11 +315,10 @@
     }
 
     /* ═══════════════════════════════════════════ */
-    /* 🎨 نافذة التأكيد المخصصة */
+    /* 🎨 نافذة التأكيد */
     /* ═══════════════════════════════════════════ */
     .confirm-card {
       max-width: 480px; text-align: center;
-      padding: 32px 28px 24px;
       border-top: 5px solid var(--emerald);
     }
     .confirm-card.confirm-danger { border-top-color: #dc2626; }
@@ -273,7 +326,7 @@
     .confirm-card.confirm-primary { border-top-color: var(--emerald); }
 
     .confirm-icon {
-      width: 70px; height: 70px; margin: 0 auto 18px;
+      width: 70px; height: 70px; margin: 32px auto 18px;
       border-radius: 50%; display: flex;
       align-items: center; justify-content: center;
       background: var(--bg-alt);
@@ -300,15 +353,17 @@
 
     .confirm-title {
       font-family: 'Amiri', serif; font-size: 1.35rem;
-      color: var(--text); margin-bottom: 14px;
+      color: var(--text); margin: 0 28px 14px;
       padding: 0; border: none;
     }
     .confirm-message {
       font-family: 'Tajawal', sans-serif; font-size: 1rem;
-      color: var(--text-light); line-height: 1.6; margin-bottom: 14px;
+      color: var(--text-light); line-height: 1.6;
+      margin: 0 28px 14px;
     }
     .confirm-lines {
-      list-style: none; padding: 14px 18px; margin: 14px 0;
+      list-style: none; padding: 14px 18px;
+      margin: 14px 28px;
       background: var(--bg-alt); border-radius: 12px;
       text-align: right; display: flex; flex-direction: column; gap: 8px;
     }
@@ -327,23 +382,29 @@
 
     .confirm-hint {
       font-family: 'Tajawal', sans-serif; font-size: 0.85rem;
-      color: var(--text-muted); margin-top: 12px;
+      color: var(--text-muted); margin: 12px 28px 0;
       padding: 10px 14px;
       background: linear-gradient(135deg, rgba(212, 165, 116, 0.08), rgba(212, 165, 116, 0.03));
       border-right: 3px solid var(--gold);
       border-radius: 8px; text-align: right; line-height: 1.5;
     }
     .confirm-actions {
-      display: flex; gap: 10px; margin-top: 22px; justify-content: center;
+      display: flex; gap: 10px;
+      justify-content: center;
+      padding: 22px 28px 28px;
+      background: transparent;
+      border: none;
     }
     .confirm-actions .btn-modal { min-width: 110px; justify-content: center; }
 
     @media (max-width: 480px) {
-      .confirm-card { padding: 26px 20px 20px; }
-      .confirm-icon { width: 60px; height: 60px; }
+      .confirm-icon { width: 60px; height: 60px; margin-top: 26px; }
       .confirm-icon svg { width: 30px; height: 30px; }
-      .confirm-title { font-size: 1.15rem; }
-      .confirm-actions { flex-direction: column-reverse; }
+      .confirm-title { font-size: 1.15rem; margin: 0 20px 12px; }
+      .confirm-message { margin: 0 20px 12px; }
+      .confirm-lines { margin: 12px 20px; }
+      .confirm-hint { margin: 12px 20px 0; }
+      .confirm-actions { padding: 18px 20px 22px; flex-direction: column-reverse; }
       .confirm-actions .btn-modal { width: 100%; }
     }
 
@@ -356,9 +417,12 @@
       .teachers-table thead th,
       .teachers-table tbody td { padding: 10px 8px; }
       .btn-icon-sm { width: 32px; height: 32px; }
-      .modal-card { padding: 22px 18px; }
-      .modal-actions { flex-direction: column-reverse; }
-      .btn-modal { width: 100%; justify-content: center; }
+
+      .modal-card { max-width: calc(100% - 20px); max-height: 92vh; }
+      .modal-title { padding: 18px 20px 14px; font-size: 1.1rem; }
+      .modal-body { padding: 16px 20px 0; }
+      .modal-actions { padding: 14px 20px 18px; flex-direction: column-reverse; }
+      .modal-actions .btn-modal { width: 100%; justify-content: center; }
     }
   </style>
 </head>

@@ -9,22 +9,13 @@
 <link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
-  /* ── حقول الدخول ─────────── */
-  .login-fields {
-    display: flex; flex-direction: column; gap: 14px;
-    text-align: right; margin-top: 12px;
-  }
-  .login-fields label {
-    font-size: 13px; color: var(--text-light, #888);
-    margin-bottom: 6px; display: block;
-  }
+  .login-fields { display: flex; flex-direction: column; gap: 14px; text-align: right; margin-top: 12px; }
+  .login-fields label { font-size: 13px; color: var(--text-light, #888); margin-bottom: 6px; display: block; }
   .login-fields input[type="email"],
   .login-fields input[type="password"] {
-    width: 100%; padding: 14px 16px;
-    border-radius: 10px; border: 1px solid #ddd;
-    font-family: inherit; font-size: 15px;
-    background: #fff; color: #222;
-    box-sizing: border-box;
+    width: 100%; padding: 14px 16px; border-radius: 10px;
+    border: 1px solid #ddd; font-family: inherit; font-size: 15px;
+    background: #fff; color: #222; box-sizing: border-box;
   }
   [data-theme="dark"] .login-fields input[type="email"],
   [data-theme="dark"] .login-fields input[type="password"] {
@@ -32,13 +23,10 @@
   }
   .login-fields input[type="email"] { direction: ltr; text-align: left; padding-left: 42px; }
 
-  /* ── قائمة الحسابات المحفوظة ─────────── */
   .email-field-wrap { position: relative; width: 100%; }
   .email-drop-toggle {
-    position: absolute; left: 8px; top: 50%;
-    transform: translateY(-50%);
-    background: transparent; border: none;
-    cursor: pointer; color: #888;
+    position: absolute; left: 8px; top: 50%; transform: translateY(-50%);
+    background: transparent; border: none; cursor: pointer; color: #888;
     padding: 6px; border-radius: 6px;
     display: flex; align-items: center; justify-content: center;
   }
@@ -46,21 +34,17 @@
   [data-theme="dark"] .email-drop-toggle:hover { background: rgba(255,255,255,.08); }
 
   .email-dropdown {
-    position: absolute; top: calc(100% + 6px);
-    right: 0; left: 0;
-    background: #fff; border: 1px solid #ddd;
-    border-radius: 10px;
+    position: absolute; top: calc(100% + 6px); right: 0; left: 0;
+    background: #fff; border: 1px solid #ddd; border-radius: 10px;
     box-shadow: 0 8px 24px rgba(0,0,0,.12);
-    z-index: 100; max-height: 240px;
-    overflow-y: auto; padding: 6px;
+    z-index: 100; max-height: 240px; overflow-y: auto; padding: 6px;
     text-align: right;
   }
   [data-theme="dark"] .email-dropdown { background: #2a2a2a; border-color: #444; }
   .email-item {
     display: flex; align-items: center; gap: 10px;
-    padding: 10px 12px; border-radius: 8px;
-    cursor: pointer; font-size: 14px;
-    color: inherit; transition: background .12s;
+    padding: 10px 12px; border-radius: 8px; cursor: pointer;
+    font-size: 14px; color: inherit; transition: background .12s;
   }
   .email-item:hover { background: rgba(0,0,0,.05); }
   [data-theme="dark"] .email-item:hover { background: rgba(255,255,255,.08); }
@@ -77,9 +61,7 @@
     direction: ltr; text-align: left;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
-  .email-item .info .role {
-    display: block; font-size: 12px; color: #888;
-  }
+  .email-item .info .role { display: block; font-size: 12px; color: #888; }
   .email-item .remove-btn {
     background: transparent; border: none; cursor: pointer;
     color: #888; padding: 4px; border-radius: 6px;
@@ -87,32 +69,23 @@
   .email-item .remove-btn:hover { color: #b42318; background: rgba(180,35,24,.08); }
   .email-empty { padding: 14px; text-align: center; color: #888; font-size: 13px; }
 
-  /* ── الفاصل وزر Google ─────────── */
   .login-divider {
     display: flex; align-items: center; gap: 12px;
-    margin: 6px 0;
-    color: #999; font-size: 13px;
+    margin: 6px 0; color: #999; font-size: 13px;
   }
   .login-divider::before, .login-divider::after {
     content: ''; flex: 1; height: 1px; background: currentColor; opacity: .3;
   }
-
   .google-login-btn {
     display: inline-flex; align-items: center; justify-content: center;
-    gap: 10px; width: 100%;
-    padding: 12px 16px;
-    background: #fff; color: #333;
-    border: 1px solid #dadce0; border-radius: 10px;
-    font-weight: 700; font-size: 15px;
+    gap: 10px; width: 100%; padding: 12px 16px;
+    background: #fff; color: #333; border: 1px solid #dadce0;
+    border-radius: 10px; font-weight: 700; font-size: 15px;
     text-decoration: none; cursor: pointer;
     transition: box-shadow .15s, background .15s;
-    font-family: inherit;
-    box-sizing: border-box;
+    font-family: inherit; box-sizing: border-box;
   }
-  .google-login-btn:hover {
-    background: #f8f9fa;
-    box-shadow: 0 1px 3px rgba(0,0,0,.1);
-  }
+  .google-login-btn:hover { background: #f8f9fa; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
   .google-login-btn svg { flex-shrink: 0; }
   [data-theme="dark"] .google-login-btn {
     background: #2a2a2a; color: #eee; border-color: #444;
@@ -122,9 +95,6 @@
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════════ -->
-<!-- 🏛️ الشريط العلوي                              -->
-<!-- ═══════════════════════════════════════════════ -->
 <header class="navbar">
   <div class="container nav-wrap">
     <div class="logo" onclick="window.location.href='index.html'" title="العودة للرئيسية">
@@ -136,6 +106,7 @@
     </div>
     <nav>
       <a href="index.html"><i data-lucide="house"></i> الرئيسية</a>
+      <a href="teachers.html"><i data-lucide="users"></i> هيئة التدريس</a>
       <button id="logoutBtn" class="btn-logout" style="display:none;" title="تسجيل الخروج">
         <i data-lucide="log-out"></i> خروج
       </button>
@@ -144,9 +115,6 @@
   </div>
 </header>
 
-<!-- ═══════════════════════════════════════════════ -->
-<!-- 🎨 Hero                                        -->
-<!-- ═══════════════════════════════════════════════ -->
 <section class="teacher-hero">
   <div class="container">
     <div class="teacher-hero-content">
@@ -165,9 +133,6 @@
   </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════ -->
-<!-- 🔐 شاشة الدخول                                 -->
-<!-- ═══════════════════════════════════════════════ -->
 <div id="loginScreen" class="container section">
   <div class="login-box">
     <div class="login-icon"><i data-lucide="lock-keyhole"></i></div>
@@ -178,14 +143,9 @@
       <div>
         <label for="emailInput">البريد الإلكتروني</label>
         <div class="email-field-wrap">
-          <input
-            type="email"
-            id="emailInput"
-            name="email"
-            placeholder="example@gmail.com"
-            autocomplete="username email"
-            required
-          >
+          <input type="email" id="emailInput" name="email"
+                 placeholder="example@gmail.com"
+                 autocomplete="username email" required>
           <button type="button" id="emailDropdownToggle" class="email-drop-toggle" aria-label="عرض الحسابات المحفوظة">
             <i data-lucide="chevron-down"></i>
           </button>
@@ -195,14 +155,8 @@
 
       <div>
         <label for="passwordInput">كلمة السر</label>
-        <input
-          type="password"
-          id="passwordInput"
-          name="password"
-          placeholder="••••••••"
-          autocomplete="current-password"
-          required
-        >
+        <input type="password" id="passwordInput" name="password"
+               placeholder="••••••••" autocomplete="current-password" required>
       </div>
 
       <button id="loginBtn" class="btn-primary" type="submit">
@@ -212,7 +166,6 @@
       <p id="loginError" class="error" role="alert"></p>
 
       <div class="login-divider"><span>أو</span></div>
-
       <a href="/auth/google?from=teacher" class="google-login-btn">
         <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
           <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
@@ -231,12 +184,64 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════ -->
-<!-- 📤 لوحة الأستاذ                                -->
-<!-- ═══════════════════════════════════════════════ -->
 <div id="teacherPanel" class="container section" style="display:none;">
 
   <div id="welcomeTeacher" style="display:none;" class="teacher-welcome"></div>
+
+  <!-- 🎴 بطاقة الأستاذ -->
+  <div id="profileCard" class="upload-card" style="display:none;">
+    <div class="upload-card-header">
+      <div class="upload-card-title">
+        <span class="upload-card-icon"><i data-lucide="user-round"></i></span>
+        <div>
+          <h3>بطاقتي الشخصية</h3>
+          <p class="upload-card-subtitle">تظهر هذه المعلومات لزوار الموقع</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding: 28px;">
+      <div style="display:flex; gap:20px; align-items:center; flex-wrap:wrap; margin-bottom:24px;">
+        <div id="profileAvatar" style="width:110px;height:110px;border-radius:50%;background:var(--gradient-emerald);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Amiri',serif;font-size:2.5rem;font-weight:700;overflow:hidden;box-shadow:0 8px 24px rgba(13,95,74,.25);border:3px solid var(--gold-light);flex-shrink:0;"></div>
+        <div style="flex:1;min-width:200px;">
+          <input type="file" id="profilePhotoInput" accept="image/png,image/jpeg,image/webp" style="display:none;">
+          <button type="button" id="uploadPhotoBtn" class="btn-primary" style="width:auto;padding:10px 18px;">
+            <i data-lucide="image-plus"></i> اختيار صورة
+          </button>
+          <button type="button" id="removePhotoBtn" class="btn-refresh" style="margin-top:8px;display:none;">
+            <i data-lucide="trash-2"></i> حذف الصورة
+          </button>
+          <p style="font-size:0.8rem;color:var(--text-muted);margin-top:8px;">JPG / PNG / WEBP — بحد أقصى 3 MB</p>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label><i data-lucide="graduation-cap"></i> الرتبة العلمية</label>
+        <input type="text" id="profileRank" placeholder="مثال: أستاذ محاضر أ" maxlength="80">
+      </div>
+
+      <div class="form-group" style="margin-top:14px;">
+        <label><i data-lucide="book-open"></i> التخصص</label>
+        <input type="text" id="profileSpecialty" placeholder="مثال: أصول الفقه" maxlength="100">
+      </div>
+
+      <div class="form-group" style="margin-top:14px;">
+        <label><i data-lucide="mail"></i> بريد للتواصل (اختياري)</label>
+        <input type="email" id="profileContactEmail" placeholder="teacher@univ.dz" dir="ltr" maxlength="120">
+      </div>
+
+      <div class="form-group" style="margin-top:14px;">
+        <label><i data-lucide="file-text"></i> نبذة شخصية</label>
+        <textarea id="profileBio" rows="5" maxlength="800" placeholder="اكتب نبذة عن خبرتك، مؤلفاتك، اهتماماتك العلمية..." style="width:100%;padding:14px 18px;border-radius:12px;border:2px solid var(--border);font-family:'Tajawal',sans-serif;font-size:0.95rem;background:var(--bg);color:var(--text);outline:none;resize:vertical;"></textarea>
+        <div style="text-align:left;font-size:0.75rem;color:var(--text-muted);margin-top:4px;"><span id="bioCount">0</span> / 800</div>
+      </div>
+
+      <button type="button" id="saveProfileBtn" class="btn-primary" style="margin-top:20px;">
+        <i data-lucide="save"></i> حفظ بطاقتي
+      </button>
+      <p id="profileSaveStatus" class="status" style="margin-top:12px;"></p>
+    </div>
+  </div>
 
   <div class="upload-card teacher-upload-card">
     <div class="upload-card-header">
@@ -250,7 +255,6 @@
     </div>
 
     <form id="uploadForm" enctype="multipart/form-data">
-
       <div class="form-section">
         <h4 class="form-section-title">
           <span><i data-lucide="clipboard-list"></i></span>
@@ -325,7 +329,6 @@
       </div>
 
       <p id="uploadStatus" class="status" role="status"></p>
-
     </form>
   </div>
 
@@ -358,9 +361,6 @@
 
 </div>
 
-<!-- ═══════════════════════════════════════════════ -->
-<!-- 📄 التذييل                                     -->
-<!-- ═══════════════════════════════════════════════ -->
 <footer>
   <div class="container">
     <p class="footer-line">

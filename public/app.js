@@ -1,4 +1,3 @@
-
 'use strict';
 
 // ═══════════════════════════════════════════════
@@ -11,13 +10,38 @@ let allLessons = [];
 const FAVORITES_KEY = 'islamic_lessons_favorites';
 
 // ═══════════════════════════════════════════════
+// 🧭 ذاكرة موضع التمرير لكل قسم
+// ═══════════════════════════════════════════════
+const scrollMemory = {};
+let currentViewKey = 'home';
+
+function saveCurrentScroll() {
+  scrollMemory[currentViewKey] = window.scrollY || window.pageYOffset || 0;
+}
+
+function setView(key) {
+  currentViewKey = key;
+}
+
+function scrollToView(key) {
+  const hasSaved = Object.prototype.hasOwnProperty.call(scrollMemory, key);
+  const pos = hasSaved ? scrollMemory[key] : 0;
+
+  // ننتظر إطارين حتى يكتمل الرسم ثم نمرر
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      window.scrollTo(0, pos);
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════
 // 🎨 نظام الأيقونات - Lucide
 // ═══════════════════════════════════════════════
 
 function icon(name, cls = '') {
   const safeName = String(name || 'book-open').replace(/[^a-z0-9-]/gi, '');
   const safeClass = cls ? ` class="${cls}"` : '';
-
   return `<i data-lucide="${safeName}"${safeClass} aria-hidden="true"></i>`;
 }
 
@@ -27,33 +51,23 @@ function refreshIcons() {
   }
 }
 
-// تحديث الأيقونات بعد إنشاء المحتوى
 (function watchIcons() {
   if (!window.lucide || !document.body) return;
-
   let scheduled = false;
-
   const observer = new MutationObserver(() => {
     if (scheduled) return;
-
     scheduled = true;
-
     requestAnimationFrame(() => {
       scheduled = false;
       refreshIcons();
     });
   });
-
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true
-  });
-
+  observer.observe(document.body, { childList: true, subtree: true });
   refreshIcons();
 })();
 
 // ═══════════════════════════════════════════════
-// 📅 أيقونات السنوات الدراسية
+// 📅 أيقونات السنوات
 // ═══════════════════════════════════════════════
 
 const YEAR_ICONS = {
@@ -101,20 +115,10 @@ function getSpecializationIcon(spec) {
   return SPECIALIZATION_ICONS[spec] || 'graduation-cap';
 }
 
-// ═══════════════════════════════════════════════
-// 📚 أيقونات المواد
-// تعتمد على SUBJECT_ICONS الموجودة في data.js
-// ═══════════════════════════════════════════════
-
 function getSubjectIcon(subject) {
-  if (
-    typeof SUBJECT_ICONS !== 'undefined' &&
-    SUBJECT_ICONS &&
-    SUBJECT_ICONS[subject]
-  ) {
+  if (typeof SUBJECT_ICONS !== 'undefined' && SUBJECT_ICONS && SUBJECT_ICONS[subject]) {
     return SUBJECT_ICONS[subject];
   }
-
   return 'book-open';
 }
 
@@ -125,71 +129,49 @@ function getSubjectIcon(subject) {
 function getFavorites() {
   try {
     const stored = JSON.parse(localStorage.getItem(FAVORITES_KEY));
-
     return {
-      specializations: Array.isArray(stored?.specializations)
-        ? stored.specializations
-        : [],
-      lessons: Array.isArray(stored?.lessons)
-        ? stored.lessons
-        : []
+      specializations: Array.isArray(stored?.specializations) ? stored.specializations : [],
+      lessons: Array.isArray(stored?.lessons) ? stored.lessons : []
     };
   } catch (err) {
-    return {
-      specializations: [],
-      lessons: []
-    };
+    return { specializations: [], lessons: [] };
   }
 }
 
 function saveFavorites(favs) {
-  try {
-    localStorage.setItem(FAVORITES_KEY, JSON.stringify(favs));
-  } catch (err) {
-    console.error('خطأ في حفظ المفضلة:', err);
-  }
+  try { localStorage.setItem(FAVORITES_KEY, JSON.stringify(favs)); }
+  catch (err) { console.error('خطأ في حفظ المفضلة:', err); }
 }
 
 function toggleFavoriteSpecialization(yearId, spec) {
   const favs = getFavorites();
-
   const index = favs.specializations.findIndex(
     item => item.year === yearId && item.spec === spec
   );
-
   if (index >= 0) {
     favs.specializations.splice(index, 1);
     showToast('تمت الإزالة من المفضلة', 'trash-2');
     saveFavorites(favs);
     return false;
   }
-
-  favs.specializations.push({
-    year: yearId,
-    spec
-  });
-
+  favs.specializations.push({ year: yearId, spec });
   saveFavorites(favs);
   showToast('تمت الإضافة للمفضلة', 'star');
-
   return true;
 }
 
 function toggleFavoriteLesson(lessonId) {
   const favs = getFavorites();
   const index = favs.lessons.indexOf(lessonId);
-
   if (index >= 0) {
     favs.lessons.splice(index, 1);
     saveFavorites(favs);
     showToast('تمت الإزالة من المفضلة', 'trash-2');
     return false;
   }
-
   favs.lessons.push(lessonId);
   saveFavorites(favs);
   showToast('تمت الإضافة للمفضلة', 'heart');
-
   return true;
 }
 
@@ -210,53 +192,36 @@ function isLessonFavorite(lessonId) {
 const themeToggle = document.getElementById('themeToggle');
 
 let savedTheme = 'light';
-
-try {
-  savedTheme = localStorage.getItem('theme') || 'light';
-} catch (err) {
-  console.warn('تعذر قراءة إعداد الوضع الليلي.');
-}
+try { savedTheme = localStorage.getItem('theme') || 'light'; }
+catch (err) { console.warn('تعذر قراءة إعداد الوضع الليلي.'); }
 
 document.documentElement.setAttribute('data-theme', savedTheme);
 
 function setThemeIcon(theme) {
   if (!themeToggle) return;
-
   themeToggle.innerHTML = icon(theme === 'dark' ? 'sun' : 'moon');
   refreshIcons();
 }
-
 setThemeIcon(savedTheme);
 
 if (themeToggle) {
   themeToggle.addEventListener('click', () => {
     const current = document.documentElement.getAttribute('data-theme');
     const next = current === 'dark' ? 'light' : 'dark';
-
     document.documentElement.setAttribute('data-theme', next);
-
-    try {
-      localStorage.setItem('theme', next);
-    } catch (err) {
-      console.warn('تعذر حفظ إعداد الوضع الليلي.');
-    }
-
+    try { localStorage.setItem('theme', next); } catch (err) {}
     setThemeIcon(next);
   });
 }
 
 // ═══════════════════════════════════════════════
-// 🔄 جلب الدروس من الخادم
+// 🔄 جلب الدروس
 // ═══════════════════════════════════════════════
 
 async function fetchLessons() {
   try {
     const response = await fetch(`${API}/lessons`);
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
     allLessons = Array.isArray(data) ? data : [];
   } catch (err) {
@@ -266,22 +231,14 @@ async function fetchLessons() {
 }
 
 // ═══════════════════════════════════════════════
-// 🎯 إظهار وإخفاء الأقسام
+// 🎯 إظهار/إخفاء الأقسام
 // ═══════════════════════════════════════════════
 
 function hideAllSections() {
-  [
-    'yearsSection',
-    'specializationsSection',
-    'subjectsSection',
-    'lessonsSection',
-    'searchResultsSection'
-  ].forEach(id => {
+  ['yearsSection', 'specializationsSection', 'subjectsSection',
+   'lessonsSection', 'searchResultsSection'].forEach(id => {
     const section = document.getElementById(id);
-
-    if (section) {
-      section.style.display = 'none';
-    }
+    if (section) section.style.display = 'none';
   });
 }
 
@@ -290,41 +247,31 @@ function hideAllSections() {
 // ═══════════════════════════════════════════════
 
 function goHome() {
+  saveCurrentScroll();
   hideAllSections();
 
   const yearsSection = document.getElementById('yearsSection');
-
-  if (yearsSection) {
-    yearsSection.style.display = 'block';
-  }
+  if (yearsSection) yearsSection.style.display = 'block';
 
   const breadcrumb = document.getElementById('breadcrumb');
-
-  if (breadcrumb) {
-    breadcrumb.innerHTML = '';
-  }
+  if (breadcrumb) breadcrumb.innerHTML = '';
 
   renderYears();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  setView('home');
+  scrollToView('home');
 }
 
 function renderYears() {
   const grid = document.getElementById('yearsGrid');
-
   if (!grid || typeof YEARS === 'undefined') return;
 
   grid.innerHTML = YEARS.map(year => {
     const specs = SPECIALIZATIONS[year.id] || [];
     const yearIcon = YEAR_ICONS[year.id] || 'book-open';
-
     return `
       <div class="year-card" onclick="selectYear('${year.id}')">
-        <span class="year-icon">
-          ${icon(yearIcon)}
-        </span>
-
+        <span class="year-icon">${icon(yearIcon)}</span>
         <h4>${escapeHtml(year.name)}</h4>
-
         <span class="count">${specs.length} تخصص</span>
       </div>
     `;
@@ -342,6 +289,8 @@ let currentSpecialization = null;
 let currentSubject = null;
 
 function selectYear(yearId) {
+  saveCurrentScroll();
+
   currentYear = yearId;
   currentSpecialization = null;
   currentSubject = null;
@@ -349,17 +298,12 @@ function selectYear(yearId) {
   hideAllSections();
 
   const section = document.getElementById('specializationsSection');
-
-  if (section) {
-    section.style.display = 'block';
-  }
+  if (section) section.style.display = 'block';
 
   const yearObj = YEARS.find(year => year.id === yearId);
-
   if (!yearObj) return;
 
-  document.getElementById('specTitle').textContent =
-    `تخصصات ${yearObj.name}`;
+  document.getElementById('specTitle').textContent = `تخصصات ${yearObj.name}`;
 
   document.getElementById('breadcrumb').innerHTML = `
     <span onclick="goHome()" class="crumb-link">
@@ -372,7 +316,9 @@ function selectYear(yearId) {
   renderSpecializations(yearId);
   refreshIcons();
 
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  const key = 'year:' + yearId;
+  setView(key);
+  scrollToView(key);
 }
 
 // ═══════════════════════════════════════════════
@@ -381,57 +327,35 @@ function selectYear(yearId) {
 
 function renderSpecializations(yearId) {
   const grid = document.getElementById('specializationsGrid');
-
   if (!grid) return;
 
   const specs = SPECIALIZATIONS[yearId] || [];
-
   if (!specs.length) {
     grid.innerHTML = '<p class="empty">لا توجد تخصصات في هذه السنة بعد.</p>';
     return;
   }
 
   grid.innerHTML = specs.map(spec => {
-    const subjects =
-      (SUBJECTS[yearId] && SUBJECTS[yearId][spec]) || [];
-
+    const subjects = (SUBJECTS[yearId] && SUBJECTS[yearId][spec]) || [];
     const lessonsCount = allLessons.filter(lesson =>
-      lesson.year === yearId &&
-      lesson.specialization === spec
+      lesson.year === yearId && lesson.specialization === spec
     ).length;
-
     const isFav = isSpecFavorite(yearId, spec);
     const specJson = JSON.stringify(spec);
 
     return `
       <div class="specialization-card">
-        <div
-          class="spec-header"
-          onclick='selectSpecialization(${specJson})'
-        >
-          <span class="spec-icon">
-            ${icon(getSpecializationIcon(spec))}
-          </span>
-
+        <div class="spec-header" onclick='selectSpecialization(${specJson})'>
+          <span class="spec-icon">${icon(getSpecializationIcon(spec))}</span>
           <h4>${escapeHtml(spec)}</h4>
         </div>
-
         <div class="spec-meta">
-          <span>
-            ${icon('library')} ${subjects.length} مادة
-          </span>
-
-          <span>
-            ${icon('file-text')} ${lessonsCount} درس
-          </span>
-
-          <button
-            type="button"
-            class="fav-btn ${isFav ? 'active' : ''}"
+          <span>${icon('library')} ${subjects.length} مادة</span>
+          <span>${icon('file-text')} ${lessonsCount} درس</span>
+          <button type="button" class="fav-btn ${isFav ? 'active' : ''}"
             onclick='handleSpecFavorite(event, ${JSON.stringify(yearId)}, ${specJson})'
             title="${isFav ? 'إزالة من المفضلة' : 'أضف للمفضلة'}"
-            aria-label="${isFav ? 'إزالة من المفضلة' : 'أضف للمفضلة'}"
-          >
+            aria-label="${isFav ? 'إزالة من المفضلة' : 'أضف للمفضلة'}">
             ${icon('star')}
           </button>
         </div>
@@ -444,10 +368,8 @@ function renderSpecializations(yearId) {
 
 function handleSpecFavorite(event, yearId, spec) {
   event.stopPropagation();
-
   const added = toggleFavoriteSpecialization(yearId, spec);
   const button = event.currentTarget;
-
   button.classList.toggle('active', added);
   button.title = added ? 'إزالة من المفضلة' : 'أضف للمفضلة';
   button.setAttribute('aria-label', button.title);
@@ -458,6 +380,8 @@ function handleSpecFavorite(event, yearId, spec) {
 // ═══════════════════════════════════════════════
 
 function selectSpecialization(spec) {
+  saveCurrentScroll();
+
   currentSpecialization = spec;
   currentSubject = null;
 
@@ -469,42 +393,32 @@ function selectSpecialization(spec) {
   const yearObj = YEARS.find(year => year.id === currentYear);
 
   document.getElementById('breadcrumb').innerHTML = `
-    <span onclick="goHome()" class="crumb-link">
-      ${icon('landmark')} الرئيسية
-    </span>
-
+    <span onclick="goHome()" class="crumb-link">${icon('landmark')} الرئيسية</span>
     <span class="crumb-sep">›</span>
-
-    <span
-      onclick="selectYear(${JSON.stringify(currentYear)})"
-      class="crumb-link"
-    >
+    <span onclick="selectYear(${JSON.stringify(currentYear)})" class="crumb-link">
       ${escapeHtml(yearObj ? yearObj.name : currentYear)}
     </span>
-
     <span class="crumb-sep">›</span>
-
     <span class="crumb-current">${escapeHtml(spec)}</span>
   `;
 
   renderSubjects();
   refreshIcons();
 
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  const key = 'spec:' + currentYear + ':' + spec;
+  setView(key);
+  scrollToView(key);
 }
 
 // ═══════════════════════════════════════════════
-// 🧾 عرض المواد بأيقونات مخصصة
+// 🧾 عرض المواد
 // ═══════════════════════════════════════════════
 
 function renderSubjects() {
   const grid = document.getElementById('subjectsGrid');
-
   if (!grid) return;
 
-  const subjects =
-    (SUBJECTS[currentYear] &&
-      SUBJECTS[currentYear][currentSpecialization]) || [];
+  const subjects = (SUBJECTS[currentYear] && SUBJECTS[currentYear][currentSpecialization]) || [];
 
   if (!subjects.length) {
     grid.innerHTML = '<p class="empty">لا توجد مواد في هذا التخصص بعد.</p>';
@@ -512,28 +426,18 @@ function renderSubjects() {
   }
 
   grid.innerHTML = subjects.map(subject => {
-    const subjectName =
-      typeof subject === 'string' ? subject : subject.name;
-
+    const subjectName = typeof subject === 'string' ? subject : subject.name;
     const lessonsCount = allLessons.filter(lesson =>
       lesson.year === currentYear &&
       lesson.specialization === currentSpecialization &&
       lesson.subject === subjectName
     ).length;
-
     const subjectIcon = getSubjectIcon(subjectName);
 
     return `
-      <div
-        class="subject-card"
-        onclick='selectSubject(${JSON.stringify(subjectName)})'
-      >
-        <span class="icon">
-          ${icon(subjectIcon)}
-        </span>
-
+      <div class="subject-card" onclick='selectSubject(${JSON.stringify(subjectName)})'>
+        <span class="icon">${icon(subjectIcon)}</span>
         <h4>${escapeHtml(subjectName)}</h4>
-
         <span class="count">${lessonsCount} درس</span>
       </div>
     `;
@@ -547,41 +451,28 @@ function renderSubjects() {
 // ═══════════════════════════════════════════════
 
 function selectSubject(subjectName) {
+  saveCurrentScroll();
+
   currentSubject = subjectName;
 
   hideAllSections();
 
   document.getElementById('lessonsSection').style.display = 'block';
-  document.getElementById('lessonsTitle').textContent =
-    `دروس ${subjectName}`;
+  document.getElementById('lessonsTitle').textContent = `دروس ${subjectName}`;
 
   const yearObj = YEARS.find(year => year.id === currentYear);
 
   document.getElementById('breadcrumb').innerHTML = `
-    <span onclick="goHome()" class="crumb-link">
-      ${icon('landmark')} الرئيسية
-    </span>
-
+    <span onclick="goHome()" class="crumb-link">${icon('landmark')} الرئيسية</span>
     <span class="crumb-sep">›</span>
-
-    <span
-      onclick="selectYear(${JSON.stringify(currentYear)})"
-      class="crumb-link"
-    >
+    <span onclick="selectYear(${JSON.stringify(currentYear)})" class="crumb-link">
       ${escapeHtml(yearObj ? yearObj.name : currentYear)}
     </span>
-
     <span class="crumb-sep">›</span>
-
-    <span
-      onclick='selectSpecialization(${JSON.stringify(currentSpecialization)})'
-      class="crumb-link"
-    >
+    <span onclick='selectSpecialization(${JSON.stringify(currentSpecialization)})' class="crumb-link">
       ${escapeHtml(currentSpecialization)}
     </span>
-
     <span class="crumb-sep">›</span>
-
     <span class="crumb-current">${escapeHtml(subjectName)}</span>
   `;
 
@@ -594,7 +485,9 @@ function selectSubject(subjectName) {
   renderLessons(filtered, 'lessonsGrid', 'emptyMsg');
   refreshIcons();
 
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  const key = 'subject:' + currentYear + ':' + currentSpecialization + ':' + subjectName;
+  setView(key);
+  scrollToView(key);
 }
 
 // ═══════════════════════════════════════════════
@@ -602,55 +495,67 @@ function selectSubject(subjectName) {
 // ═══════════════════════════════════════════════
 
 function backToSpecializations() {
-  if (currentYear) {
-    selectYear(currentYear);
-  } else {
-    goHome();
-  }
+  if (currentYear) selectYear(currentYear);
+  else goHome();
 }
 
 function backToSubjects() {
-  if (currentSpecialization) {
-    selectSpecialization(currentSpecialization);
-  } else {
-    goHome();
-  }
+  if (currentSpecialization) selectSpecialization(currentSpecialization);
+  else goHome();
 }
 
 // ═══════════════════════════════════════════════
-// 🧰 أدوات مساعدة
+// 🧰 أدوات
 // ═══════════════════════════════════════════════
 
 function formatSize(bytes) {
   const size = Number(bytes) || 0;
-
   if (size < 1024) return `${size} B`;
   if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
-
   return `${(size / (1024 * 1024)).toFixed(2)} MB`;
 }
 
 function formatDate(value) {
   if (!value) return 'غير محدد';
-
   const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return 'غير محدد';
-  }
-
+  if (Number.isNaN(date.getTime())) return 'غير محدد';
   return date.toLocaleDateString('ar-DZ', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
+    year: 'numeric', month: 'long', day: 'numeric'
   });
 }
 
 function escapeHtml(value) {
   const div = document.createElement('div');
   div.textContent = value == null ? '' : String(value);
-
   return div.innerHTML;
+}
+
+// ═══════════════════════════════════════════════
+// 👤 شريط اسم الأستاذ
+// ═══════════════════════════════════════════════
+
+function buildTeacherLine(lesson) {
+  if (lesson.uploader !== 'teacher') return '';
+  if (!lesson.uploaderName) return '';
+
+  const name = escapeHtml(lesson.uploaderName);
+
+  if (lesson.uploaderId) {
+    const teacherUrl = 'teacher-profile.html?id=' + encodeURIComponent(String(lesson.uploaderId));
+    return `
+      <a href="${teacherUrl}" class="lesson-teacher" onclick="event.stopPropagation()">
+        ${icon('user-round')}
+        <span>${name}</span>
+      </a>
+    `;
+  }
+
+  return `
+    <span class="lesson-teacher no-link">
+      ${icon('user-round')}
+      <span>${name}</span>
+    </span>
+  `;
 }
 
 // ═══════════════════════════════════════════════
@@ -678,28 +583,26 @@ function renderLessons(lessons, gridId, emptyId) {
     const lessonUrl = escapeHtml(lesson.url || '#');
     const lessonTitle = escapeHtml(lesson.title || 'درس بدون عنوان');
     const fileName = escapeHtml(lesson.filename || 'lesson');
+    const teacherLine = buildTeacherLine(lesson);
 
     return `
       <div class="lesson-card">
         <div class="lesson-header">
           <h4>${lessonTitle}</h4>
-
           <div class="lesson-badges">
             <span class="file-badge ${lesson.type === 'pdf' ? 'pdf' : 'doc'}">
               ${escapeHtml(String(lesson.type || 'file').toUpperCase())}
             </span>
-
-            <button
-              type="button"
-              class="fav-btn lesson-fav ${isFav ? 'active' : ''}"
+            <button type="button" class="fav-btn lesson-fav ${isFav ? 'active' : ''}"
               onclick='handleLessonFavorite(event, ${lessonIdJson})'
               title="${isFav ? 'إزالة من المفضلة' : 'أضف للمفضلة'}"
-              aria-label="${isFav ? 'إزالة من المفضلة' : 'أضف للمفضلة'}"
-            >
+              aria-label="${isFav ? 'إزالة من المفضلة' : 'أضف للمفضلة'}">
               ${icon('heart')}
             </button>
           </div>
         </div>
+
+        ${teacherLine}
 
         ${
           lesson.description
@@ -708,30 +611,15 @@ function renderLessons(lessons, gridId, emptyId) {
         }
 
         <div class="lesson-meta">
-          <span>
-            ${icon('calendar')} ${formatDate(lesson.date)}
-          </span>
-
-          <span>
-            ${icon('hard-drive')} ${formatSize(lesson.size)}
-          </span>
+          <span>${icon('calendar')} ${formatDate(lesson.date)}</span>
+          <span>${icon('hard-drive')} ${formatSize(lesson.size)}</span>
         </div>
 
         <div class="lesson-actions">
-          <a
-            href="${lessonUrl}"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="btn btn-view"
-          >
+          <a href="${lessonUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-view">
             ${icon('eye')} فتح
           </a>
-
-          <a
-            href="${lessonUrl}"
-            download="${fileName}"
-            class="btn btn-download"
-          >
+          <a href="${lessonUrl}" download="${fileName}" class="btn btn-download">
             ${icon('download')} تحميل
           </a>
         </div>
@@ -744,10 +632,8 @@ function renderLessons(lessons, gridId, emptyId) {
 
 function handleLessonFavorite(event, lessonId) {
   event.stopPropagation();
-
   const added = toggleFavoriteLesson(lessonId);
   const button = event.currentTarget;
-
   button.classList.toggle('active', added);
   button.title = added ? 'إزالة من المفضلة' : 'أضف للمفضلة';
   button.setAttribute('aria-label', button.title);
@@ -763,35 +649,22 @@ if (searchInput) {
   searchInput.addEventListener('input', event => {
     const query = event.target.value.trim().toLowerCase();
 
-    if (!query) {
-      goHome();
-      return;
-    }
+    if (!query) { goHome(); return; }
 
+    saveCurrentScroll();
     hideAllSections();
-
     document.getElementById('searchResultsSection').style.display = 'block';
 
     document.getElementById('breadcrumb').innerHTML = `
-      <span onclick="goHome()" class="crumb-link">
-        ${icon('landmark')} الرئيسية
-      </span>
-
+      <span onclick="goHome()" class="crumb-link">${icon('landmark')} الرئيسية</span>
       <span class="crumb-sep">›</span>
-
       <span class="crumb-current">نتائج البحث</span>
     `;
 
     const filtered = allLessons.filter(lesson => {
-      const fields = [
-        lesson.title,
-        lesson.subject,
-        lesson.specialization,
-        lesson.year,
-        lesson.description,
-        lesson.filename
-      ];
-
+      const fields = [lesson.title, lesson.subject, lesson.specialization,
+                      lesson.year, lesson.description, lesson.filename,
+                      lesson.uploaderName];
       return fields.some(value =>
         String(value || '').toLowerCase().includes(query)
       );
@@ -799,6 +672,10 @@ if (searchInput) {
 
     renderLessons(filtered, 'searchResultsGrid', 'searchEmptyMsg');
     refreshIcons();
+
+    // عند البحث الجديد، نذهب للأعلى دائماً
+    setView('search');
+    scrollToView('search');
   });
 }
 
@@ -807,51 +684,36 @@ if (searchInput) {
 // ═══════════════════════════════════════════════
 
 const homeBtn = document.getElementById('homeBtn');
-
 if (homeBtn) {
   homeBtn.addEventListener('click', event => {
     event.preventDefault();
-
-    if (searchInput) {
-      searchInput.value = '';
-    }
-
+    if (searchInput) searchInput.value = '';
     goHome();
   });
 }
 
 // ═══════════════════════════════════════════════
-// 💬 إشعارات Toast
+// 💬 Toast
 // ═══════════════════════════════════════════════
 
 function showToast(message, iconName) {
   const existing = document.querySelector('.toast-notification');
-
-  if (existing) {
-    existing.remove();
-  }
+  if (existing) existing.remove();
 
   const toast = document.createElement('div');
   toast.className = 'toast-notification';
 
-  if (iconName) {
-    toast.insertAdjacentHTML('beforeend', icon(iconName));
-  }
+  if (iconName) toast.insertAdjacentHTML('beforeend', icon(iconName));
 
   const text = document.createElement('span');
   text.textContent = message;
-
   toast.appendChild(text);
   document.body.appendChild(toast);
-
   refreshIcons();
 
   setTimeout(() => {
     toast.classList.add('toast-hide');
-
-    setTimeout(() => {
-      toast.remove();
-    }, 300);
+    setTimeout(() => toast.remove(), 300);
   }, 2500);
 }
 
@@ -862,20 +724,16 @@ function showToast(message, iconName) {
 (function initMenu() {
   const menuToggle = document.getElementById('menuToggle');
   const menuDropdown = document.getElementById('menuDropdown');
-
   if (!menuToggle || !menuDropdown) return;
 
   menuToggle.addEventListener('click', event => {
     event.stopPropagation();
-
     const isOpen = menuDropdown.classList.toggle('open');
     menuToggle.classList.toggle('active', isOpen);
     menuToggle.setAttribute('aria-expanded', String(isOpen));
   });
 
-  menuDropdown.addEventListener('click', event => {
-    event.stopPropagation();
-  });
+  menuDropdown.addEventListener('click', event => event.stopPropagation());
 
   document.addEventListener('click', () => {
     menuDropdown.classList.remove('open');
@@ -901,22 +759,19 @@ function showToast(message, iconName) {
 })();
 
 // ═══════════════════════════════════════════════
-// 🔐 إظهار رابط لوحة التحكم بعد 5 ضغطات على الشعار
+// 🔐 الشعار السري
 // ═══════════════════════════════════════════════
 
 (function initSecretAdmin() {
   const logo = document.getElementById('secretLogo');
   const adminBtn = document.getElementById('adminBtn');
-
   if (!logo || !adminBtn) return;
 
   try {
     if (sessionStorage.getItem('showAdmin') === '1') {
       adminBtn.classList.remove('admin-hidden');
     }
-  } catch (err) {
-    // يستمر الموقع حتى إن تعذر استخدام sessionStorage.
-  }
+  } catch (err) {}
 
   let clicks = 0;
   let timer;
@@ -924,20 +779,11 @@ function showToast(message, iconName) {
   logo.addEventListener('click', () => {
     clicks++;
     clearTimeout(timer);
-
-    timer = setTimeout(() => {
-      clicks = 0;
-    }, 2000);
+    timer = setTimeout(() => { clicks = 0; }, 2000);
 
     if (clicks >= 5) {
       adminBtn.classList.remove('admin-hidden');
-
-      try {
-        sessionStorage.setItem('showAdmin', '1');
-      } catch (err) {
-        // لا يمنع ذلك إظهار الرابط في الجلسة الحالية.
-      }
-
+      try { sessionStorage.setItem('showAdmin', '1'); } catch (err) {}
       clicks = 0;
       showToast('تم إظهار رابط لوحة التحكم', 'shield-check');
     }
@@ -945,7 +791,7 @@ function showToast(message, iconName) {
 })();
 
 // ═══════════════════════════════════════════════
-// 🔗 الانتقال من صفحة المفضلة إلى التخصص
+// 🔗 استعادة التنقل
 // ═══════════════════════════════════════════════
 
 function restoreFavoriteNavigation() {
@@ -955,31 +801,24 @@ function restoreFavoriteNavigation() {
   try {
     gotoYear = sessionStorage.getItem('goto_year');
     gotoSpec = sessionStorage.getItem('goto_spec');
-
     if (gotoYear && gotoSpec) {
       sessionStorage.removeItem('goto_year');
       sessionStorage.removeItem('goto_spec');
     }
   } catch (err) {
-    console.warn('تعذر استعادة الانتقال من صفحة المفضلة.');
+    console.warn('تعذر استعادة الانتقال.');
   }
 
-  if (!gotoYear || !gotoSpec) {
-    goHome();
-    return;
-  }
+  if (!gotoYear || !gotoSpec) { goHome(); return; }
 
-  if (
-    !YEARS.some(year => year.id === gotoYear) ||
-    !(SPECIALIZATIONS[gotoYear] || []).includes(gotoSpec)
-  ) {
+  if (!YEARS.some(year => year.id === gotoYear) ||
+      !(SPECIALIZATIONS[gotoYear] || []).includes(gotoSpec)) {
     goHome();
     return;
   }
 
   currentYear = gotoYear;
   currentSpecialization = gotoSpec;
-
   selectSpecialization(gotoSpec);
 }
 
@@ -989,8 +828,6 @@ function restoreFavoriteNavigation() {
 
 (async function startApp() {
   await fetchLessons();
-
   restoreFavoriteNavigation();
-
   refreshIcons();
 })();
