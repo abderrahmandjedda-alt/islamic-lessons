@@ -5,31 +5,44 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>سياسة الخصوصية - كلية العلوم الإسلامية</title>
 <meta name="description" content="سياسة الخصوصية لمنصة الدروس الجامعية - كلية العلوم الإسلامية، جامعة وهران 1">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0e5742">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
-<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
 
 <header class="navbar">
   <div class="container nav-wrap">
-    <div class="logo" onclick="window.location.href='index.html'">
-      <img src="lion.png" alt="جامعة وهران 1" class="logo-img">
-      <div>
-        <h1>كلية العلوم الإسلامية</h1>
-        <p>جامعة وهران 1 أحمد بن بلة</p>
-      </div>
-    </div>
-    <nav>
-      <a href="index.html"><i data-lucide="house"></i> الرئيسية</a>
+    <a class="logo" href="index.html" title="العودة للرئيسية">
+      <span class="logo-mark"><img src="lion.png" alt="شعار كلية العلوم الإسلامية" class="logo-img"></span>
+      <span class="logo-text">
+        <strong>كلية العلوم الإسلامية</strong>
+        <small>جامعة وهران 1 أحمد بن بلة</small>
+      </span>
+    </a>
+    <nav class="nav-menu" aria-label="التنقل الرئيسي">
+      <a href="index.html" class="nav-link">الرئيسية</a>
+      <a href="teachers.html" class="nav-link">هيئة التدريس</a>
+      <a href="favorites.html" class="nav-link">مفضلتي</a>
+      <a href="contact.html" class="nav-link">تواصل</a>
+      <button id="themeToggle" class="theme-btn" type="button" aria-label="تبديل الوضع"></button>
     </nav>
   </div>
 </header>
 
-<section class="contact-hero">
+<section class="page-hero">
   <div class="container">
-    <span class="contact-hero-icon"><i data-lucide="shield-check"></i></span>
-    <h1>سياسة الخصوصية</h1>
-    <p>آخر تحديث: أكتوبر 2026</p>
+    <div class="page-hero-card">
+      <div class="page-hero-content">
+        <span class="page-hero-icon"><i data-lucide="shield-check"></i></span>
+        <h1>سياسة الخصوصية</h1>
+        <p>آخر تحديث: أكتوبر 2026</p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -94,9 +107,23 @@
 
 <script src="lucide.min.js"></script>
 <script>
-// الوضع الليلي/النهاري كما اختاره الزائر
 document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
+const themeToggle = document.getElementById('themeToggle');
+function paintThemeIcon(theme) {
+  if (window.lucide) {
+    themeToggle.innerHTML = '<i data-lucide="' + (theme === 'dark' ? 'sun' : 'moon') + '"></i>';
+    lucide.createIcons();
+  }
+}
+paintThemeIcon(document.documentElement.getAttribute('data-theme'));
+themeToggle.addEventListener('click', () => {
+  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  paintThemeIcon(next);
+});
 if (window.lucide) lucide.createIcons();
 </script>
+<script src="modern-ui.js"></script>
 </body>
 </html>

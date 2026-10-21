@@ -856,7 +856,7 @@ async function rejectPending(id) {
 window.rejectPending = rejectPending;
 
 // ═══════════════════════════════════════════════
-// 🎯 الأحداث
+//  الأحداث
 // ═══════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', async function () {
   await checkSession();

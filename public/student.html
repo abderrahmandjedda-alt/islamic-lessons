@@ -6,57 +6,54 @@
 <title>بوابة الطلبة - كلية العلوم الإسلامية</title>
 <meta name="description" content="بوابة الطلبة لرفع الدروس للمراجعة">
 <meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0e5742">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
-<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════════ -->
-<!-- 🏛️ الشريط العلوي                              -->
-<!-- ═══════════════════════════════════════════════ -->
 <header class="navbar">
   <div class="container nav-wrap">
-    <div class="logo" onclick="window.location.href='index.html'" title="العودة للرئيسية">
-      <img src="lion.png" alt="جامعة وهران 1" class="logo-img">
-      <div>
-        <h1>كلية العلوم الإسلامية</h1>
-        <p>جامعة وهران 1 أحمد بن بلة</p>
-      </div>
-    </div>
-    <nav>
-      <a href="index.html"><i data-lucide="house"></i> الرئيسية</a>
-      <button id="themeToggle" class="theme-btn" aria-label="الوضع الليلي"></button>
+    <a class="logo" href="index.html" title="العودة للرئيسية">
+      <span class="logo-mark"><img src="lion.png" alt="شعار كلية العلوم الإسلامية" class="logo-img"></span>
+      <span class="logo-text">
+        <strong>كلية العلوم الإسلامية</strong>
+        <small>جامعة وهران 1 أحمد بن بلة</small>
+      </span>
+    </a>
+    <nav class="nav-menu" aria-label="التنقل الرئيسي">
+      <a href="index.html" class="nav-link">الرئيسية</a>
+      <a href="teachers.html" class="nav-link">هيئة التدريس</a>
+      <a href="contact.html" class="nav-link">تواصل</a>
+      <button id="themeToggle" class="theme-btn" type="button" aria-label="الوضع الليلي"></button>
     </nav>
   </div>
 </header>
 
-<!-- ═══════════════════════════════════════════════ -->
-<!-- 🎨 Hero                                        -->
-<!-- ═══════════════════════════════════════════════ -->
-<section class="student-hero">
+<section class="page-hero">
   <div class="container">
-    <div class="student-hero-content">
-      <span class="student-hero-icon"><i data-lucide="graduation-cap"></i></span>
-      <h1>بوابة الطلبة</h1>
-      <p class="student-hero-subtitle">
-        شاركنا دروسك وملفاتك العلمية — سنراجعها وننشرها للجميع
-      </p>
-      <div class="student-hero-features">
-        <span class="feature-chip"><i data-lucide="upload"></i> رفع حتى 5 ملفات</span>
-        <span class="feature-chip"><i data-lucide="hourglass"></i> مراجعة سريعة</span>
-        <span class="feature-chip"><i data-lucide="user-check"></i> نشر باسمك</span>
-        <span class="feature-chip"><i data-lucide="sparkles"></i> إثراء المحتوى</span>
+    <div class="page-hero-card">
+      <div class="page-hero-content">
+        <span class="page-hero-icon"><i data-lucide="graduation-cap"></i></span>
+        <h1>بوابة الطلبة</h1>
+        <p>شاركنا دروسك وملفاتك العلمية — سنراجعها وننشرها للجميع</p>
+        <div class="auth-features" style="justify-content:center; margin-top:18px;">
+          <span class="feature-chip"><i data-lucide="upload"></i> رفع حتى 5 ملفات</span>
+          <span class="feature-chip"><i data-lucide="hourglass"></i> مراجعة سريعة</span>
+          <span class="feature-chip"><i data-lucide="user-check"></i> نشر باسمك</span>
+          <span class="feature-chip"><i data-lucide="sparkles"></i> إثراء المحتوى</span>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════ -->
-<!-- 📤 لوحة الطالب                                -->
-<!-- ═══════════════════════════════════════════════ -->
 <div class="container section">
 
-  <!-- تنبيه: بدون كلمة سر -->
   <div class="student-notice">
     <span class="notice-icon"><i data-lucide="lightbulb"></i></span>
     <div class="notice-text">
@@ -65,9 +62,8 @@
     </div>
   </div>
 
-  <!-- بطاقة الرفع -->
   <div class="upload-card student-upload-card">
-    
+
     <div class="upload-card-header student-header">
       <div class="upload-card-title">
         <span class="upload-card-icon"><i data-lucide="upload"></i></span>
@@ -79,79 +75,60 @@
     </div>
 
     <form id="uploadForm" enctype="multipart/form-data">
-      
-      <!-- معلوماتك -->
+
       <div class="form-section">
         <h4 class="form-section-title">
           <span><i data-lucide="user"></i></span>
           <span>معلوماتك</span>
         </h4>
-        
+
         <div class="form-row">
           <div class="form-group">
             <label for="studentName">
-              <i data-lucide="user"></i> اسمك
-              <span class="required">*</span>
+              <i data-lucide="user"></i> اسمك <span class="required">*</span>
             </label>
-            <input 
-              type="text" 
-              name="studentName" 
-              id="studentName"
-              placeholder="مثال: محمد أحمد"
-              maxlength="100"
-              required
-            >
+            <input type="text" name="studentName" id="studentName"
+                   placeholder="مثال: محمد أحمد" maxlength="100" required>
           </div>
-          
+
           <div class="form-group">
             <label for="studentEmail">
               <i data-lucide="mail"></i> بريدك الإلكتروني (اختياري)
             </label>
-            <input 
-              type="email" 
-              name="studentEmail" 
-              id="studentEmail"
-              placeholder="مثال: student@example.com"
-              maxlength="150"
-            >
+            <input type="email" name="studentEmail" id="studentEmail"
+                   placeholder="مثال: student@example.com" maxlength="150">
           </div>
         </div>
       </div>
 
-      <!-- معلومات الدرس -->
       <div class="form-section">
         <h4 class="form-section-title">
           <span><i data-lucide="clipboard-list"></i></span>
           <span>معلومات الدرس</span>
         </h4>
-        
-        <div class="form-row">
+
+        <div class="field-capsule">
           <div class="form-group">
             <label for="yearSelect">
-              <i data-lucide="calendar"></i> السنة الدراسية
-              <span class="required">*</span>
+              <i data-lucide="calendar"></i> السنة الدراسية <span class="required">*</span>
             </label>
             <select name="year" id="yearSelect" required>
               <option value="">— اختر السنة —</option>
             </select>
           </div>
-          
+
           <div class="form-group">
             <label for="specializationSelect">
-              <i data-lucide="graduation-cap"></i> التخصص
-              <span class="required">*</span>
+              <i data-lucide="graduation-cap"></i> التخصص <span class="required">*</span>
             </label>
             <select name="specialization" id="specializationSelect" required>
               <option value="">— اختر السنة أولاً —</option>
             </select>
           </div>
-        </div>
 
-        <div class="form-row">
           <div class="form-group">
             <label for="subjectSelect">
-              <i data-lucide="library"></i> المادة
-              <span class="required">*</span>
+              <i data-lucide="library"></i> المادة <span class="required">*</span>
             </label>
             <select name="subject" id="subjectSelect" required>
               <option value="">— اختر التخصص أولاً —</option>
@@ -160,7 +137,6 @@
         </div>
       </div>
 
-      <!-- الملفات -->
       <div class="form-section">
         <h4 class="form-section-title">
           <span><i data-lucide="file-text"></i></span>
@@ -186,25 +162,19 @@
         </div>
       </div>
 
-      <!-- ملاحظة -->
       <div class="form-section">
         <h4 class="form-section-title">
           <span><i data-lucide="message-square"></i></span>
           <span>ملاحظة للإدارة (اختياري)</span>
         </h4>
-        
+
         <div class="form-group">
-          <textarea 
-            name="note" 
-            id="noteInput"
-            rows="3"
-            placeholder="مثال: هذه محاضرات إضافية من الكتاب المقرر..."
-            maxlength="500"
-          ></textarea>
+          <textarea name="note" id="noteInput" rows="3"
+                    placeholder="مثال: هذه محاضرات إضافية من الكتاب المقرر..."
+                    maxlength="500"></textarea>
         </div>
       </div>
 
-      <!-- زر الإرسال -->
       <div class="form-actions">
         <button type="submit" class="btn-primary btn-upload-submit student-submit-btn">
           <i data-lucide="send"></i>
@@ -217,7 +187,6 @@
     </form>
   </div>
 
-  <!-- نتائج الإرسال -->
   <div id="uploadResults" class="upload-results" style="display:none;">
     <div class="results-header">
       <span class="results-icon"><i data-lucide="clipboard-check"></i></span>
@@ -228,21 +197,20 @@
 
 </div>
 
-<!-- ═══════════════════════════════════════════════ -->
-<!-- 📄 التذييل                                     -->
-<!-- ═══════════════════════════════════════════════ -->
 <footer>
   <div class="container">
-    <p class="footer-line">
-      © 2025 — كلية العلوم الإسلامية | جامعة وهران 1 أحمد بن بلة
-    </p>
+    <p class="footer-line">© 2025 — كلية العلوم الإسلامية | جامعة وهران 1 أحمد بن بلة</p>
     <p class="footer-author">إعداد: جدة عبد الرحمن</p>
   </div>
 </footer>
 
-<!-- ✏️ جديد: مكتبة الأيقونات (قبل student.js) -->
 <script src="lucide.min.js"></script>
 <script src="data.js"></script>
 <script src="student.js"></script>
+<script src="modern-ui.js"></script>
+<script>
+  // تعبئة قائمة السنوات في نموذج الطالب حتى قبل تسجيل الدخول
+  if (typeof fillYears === 'function') fillYears();
+</script>
 </body>
 </html>

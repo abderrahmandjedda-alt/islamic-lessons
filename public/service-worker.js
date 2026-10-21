@@ -5,7 +5,7 @@
 // ⚠️ مهم: عند أي تعديل، زيّد رقم الإصدار!
 // ═══════════════════════════════════════════════
 
-const VERSION = 'v1.0.19';
+const VERSION = 'v1.0.28';
 const CACHE_NAME = `islamic-lessons-${VERSION}`;
 const STATIC_CACHE = `islamic-lessons-static-${VERSION}`;
 const DYNAMIC_CACHE = `islamic-lessons-dynamic-${VERSION}`;
@@ -16,11 +16,19 @@ const STATIC_FILES = [
   '/index.html',
   '/favorites.html',
   '/contact.html',
+  '/privacy.html',
+  '/teachers.html',
+  '/teacher-profile.html',
   '/teacher.html',
   '/student.html',
+  '/admin.html',
   '/style.css',
+  '/theme.css',
   '/data.js',
   '/app.js',
+  '/modern-ui.js',
+  '/lucide.min.js',
+  '/lion.png',
   '/manifest.json'
 ];
 

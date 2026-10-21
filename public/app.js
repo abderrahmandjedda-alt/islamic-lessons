@@ -3,16 +3,13 @@
 // ═══════════════════════════════════════════════
 // ⚙️ الإعدادات العامة
 // ═══════════════════════════════════════════════
-
 const API = '/api';
 let allLessons = [];
-
 const FAVORITES_KEY = 'islamic_lessons_favorites';
 
 // ═══════════════════════════════════════════════
 // 🧭 ذاكرة موضع التمرير لكل قسم
 // ═══════════════════════════════════════════════
-
 if ('scrollRestoration' in history) {
   history.scrollRestoration = 'manual';
 }
@@ -36,11 +33,10 @@ function setView(key) {
 function scrollToView(key) {
   const hasSaved = Object.prototype.hasOwnProperty.call(scrollMemory, key);
   const pos = hasSaved ? scrollMemory[key] : 0;
-
   const delays = [0, 30, 100, 250, 500];
   delays.forEach(function (d) {
     setTimeout(function () {
-      window.scrollTo(0, pos);
+      window.scrollTo({ top: pos, behavior: 'smooth' });
     }, d);
   });
 }
@@ -52,7 +48,6 @@ window.addEventListener('beforeunload', function () {
 // ═══════════════════════════════════════════════
 // 🎨 الأيقونات
 // ═══════════════════════════════════════════════
-
 function icon(name, cls = '') {
   const safeName = String(name || 'book-open').replace(/[^a-z0-9-]/gi, '');
   const safeClass = cls ? ` class="${cls}"` : '';
@@ -81,9 +76,8 @@ function refreshIcons() {
 })();
 
 // ═══════════════════════════════════════════════
-// 📅 أيقونات السنوات
+// 📅 أيقونات السنوات والتخصصات
 // ═══════════════════════════════════════════════
-
 const YEAR_ICONS = {
   L1: 'sprout',
   L2: 'book-open',
@@ -91,10 +85,6 @@ const YEAR_ICONS = {
   M1: 'graduation-cap',
   M2: 'award'
 };
-
-// ═══════════════════════════════════════════════
-// 🎓 أيقونات التخصصات
-// ═══════════════════════════════════════════════
 
 const SPECIALIZATION_ICONS = {
   'جذع مشترك علوم إسلامية': 'book-open',
@@ -139,7 +129,6 @@ function getSubjectIcon(subject) {
 // ═══════════════════════════════════════════════
 // ⭐ المفضلة
 // ═══════════════════════════════════════════════
-
 function getFavorites() {
   try {
     const stored = JSON.parse(localStorage.getItem(FAVORITES_KEY));
@@ -202,9 +191,7 @@ function isLessonFavorite(lessonId) {
 // ═══════════════════════════════════════════════
 // 🌙 الوضع الليلي
 // ═══════════════════════════════════════════════
-
 const themeToggle = document.getElementById('themeToggle');
-
 let savedTheme = 'light';
 try { savedTheme = localStorage.getItem('theme') || 'light'; }
 catch (err) { console.warn('تعذر قراءة إعداد الوضع الليلي.'); }
@@ -231,7 +218,6 @@ if (themeToggle) {
 // ═══════════════════════════════════════════════
 // 🔄 جلب الدروس
 // ═══════════════════════════════════════════════
-
 async function fetchLessons() {
   try {
     const response = await fetch(`${API}/lessons`);
@@ -247,7 +233,6 @@ async function fetchLessons() {
 // ═══════════════════════════════════════════════
 // 🎯 إظهار/إخفاء الأقسام
 // ═══════════════════════════════════════════════
-
 function hideAllSections() {
   ['yearsSection', 'specializationsSection', 'subjectsSection',
    'lessonsSection', 'searchResultsSection'].forEach(id => {
@@ -259,7 +244,6 @@ function hideAllSections() {
 // ═══════════════════════════════════════════════
 // 🏠 الصفحة الرئيسية
 // ═══════════════════════════════════════════════
-
 function goHome() {
   saveCurrentScroll();
   hideAllSections();
@@ -283,7 +267,7 @@ function renderYears() {
     const specs = SPECIALIZATIONS[year.id] || [];
     const yearIcon = YEAR_ICONS[year.id] || 'book-open';
     return `
-      <div class="year-card" onclick="selectYear('${year.id}')">
+      <div class="year-card ripple-surface" onclick="selectYear('${year.id}')">
         <span class="year-icon">${icon(yearIcon)}</span>
         <h4>${escapeHtml(year.name)}</h4>
         <span class="count">${specs.length} تخصص</span>
@@ -295,9 +279,8 @@ function renderYears() {
 }
 
 // ═══════════════════════════════════════════════
-// 📅 اختيار السنة
+// 📅 اختيار السنة والتخصصات والمواد
 // ═══════════════════════════════════════════════
-
 let currentYear = null;
 let currentSpecialization = null;
 let currentSubject = null;
@@ -335,10 +318,6 @@ function selectYear(yearId) {
   scrollToView(key);
 }
 
-// ═══════════════════════════════════════════════
-// 🎓 عرض التخصصات
-// ═══════════════════════════════════════════════
-
 function renderSpecializations(yearId) {
   const grid = document.getElementById('specializationsGrid');
   if (!grid) return;
@@ -358,10 +337,12 @@ function renderSpecializations(yearId) {
     const specJson = JSON.stringify(spec);
 
     return `
-      <div class="specialization-card">
-        <div class="spec-header" onclick='selectSpecialization(${specJson})'>
-          <span class="spec-icon">${icon(getSpecializationIcon(spec))}</span>
-          <h4>${escapeHtml(spec)}</h4>
+      <div class="specialization-card ripple-surface">
+        <div class="spec-header" onclick='selectSpecialization(${specJson})' style="cursor: pointer;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span class="spec-icon">${icon(getSpecializationIcon(spec))}</span>
+            <h4>${escapeHtml(spec)}</h4>
+          </div>
         </div>
         <div class="spec-meta">
           <span>${icon('library')} ${subjects.length} مادة</span>
@@ -388,10 +369,6 @@ function handleSpecFavorite(event, yearId, spec) {
   button.title = added ? 'إزالة من المفضلة' : 'أضف للمفضلة';
   button.setAttribute('aria-label', button.title);
 }
-
-// ═══════════════════════════════════════════════
-// 📚 اختيار التخصص
-// ═══════════════════════════════════════════════
 
 function selectSpecialization(spec) {
   saveCurrentScroll();
@@ -424,10 +401,6 @@ function selectSpecialization(spec) {
   scrollToView(key);
 }
 
-// ═══════════════════════════════════════════════
-// 🧾 عرض المواد
-// ═══════════════════════════════════════════════
-
 function renderSubjects() {
   const grid = document.getElementById('subjectsGrid');
   if (!grid) return;
@@ -449,7 +422,7 @@ function renderSubjects() {
     const subjectIcon = getSubjectIcon(subjectName);
 
     return `
-      <div class="subject-card" onclick='selectSubject(${JSON.stringify(subjectName)})'>
+      <div class="subject-card ripple-surface" onclick='selectSubject(${JSON.stringify(subjectName)})'>
         <span class="icon">${icon(subjectIcon)}</span>
         <h4>${escapeHtml(subjectName)}</h4>
         <span class="count">${lessonsCount} درس</span>
@@ -460,13 +433,8 @@ function renderSubjects() {
   refreshIcons();
 }
 
-// ═══════════════════════════════════════════════
-// 📖 اختيار المادة
-// ═══════════════════════════════════════════════
-
 function selectSubject(subjectName) {
   saveCurrentScroll();
-
   currentSubject = subjectName;
 
   hideAllSections();
@@ -504,10 +472,6 @@ function selectSubject(subjectName) {
   scrollToView(key);
 }
 
-// ═══════════════════════════════════════════════
-// 🔙 الرجوع
-// ═══════════════════════════════════════════════
-
 function backToSpecializations() {
   if (currentYear) selectYear(currentYear);
   else goHome();
@@ -517,10 +481,6 @@ function backToSubjects() {
   if (currentSpecialization) selectSpecialization(currentSpecialization);
   else goHome();
 }
-
-// ═══════════════════════════════════════════════
-// 🧰 أدوات
-// ═══════════════════════════════════════════════
 
 function formatSize(bytes) {
   const size = Number(bytes) || 0;
@@ -544,16 +504,10 @@ function escapeHtml(value) {
   return div.innerHTML;
 }
 
-// ═══════════════════════════════════════════════
-// 👤 شريط اسم الأستاذ
-// ═══════════════════════════════════════════════
-
 function buildTeacherLine(lesson) {
   if (lesson.uploader !== 'teacher') return '';
   if (!lesson.uploaderName) return '';
-
   const name = escapeHtml(lesson.uploaderName);
-
   if (lesson.uploaderId) {
     const teacherUrl = 'teacher-profile.html?id=' + encodeURIComponent(String(lesson.uploaderId));
     return `
@@ -563,7 +517,6 @@ function buildTeacherLine(lesson) {
       </a>
     `;
   }
-
   return `
     <span class="lesson-teacher no-link">
       ${icon('user-round')}
@@ -572,14 +525,9 @@ function buildTeacherLine(lesson) {
   `;
 }
 
-// ═══════════════════════════════════════════════
-// 📄 عرض بطاقات الدروس
-// ═══════════════════════════════════════════════
-
 function renderLessons(lessons, gridId, emptyId) {
   const grid = document.getElementById(gridId);
   const empty = document.getElementById(emptyId);
-
   if (!grid || !empty) return;
 
   if (!lessons.length) {
@@ -600,7 +548,7 @@ function renderLessons(lessons, gridId, emptyId) {
     const teacherLine = buildTeacherLine(lesson);
 
     return `
-      <div class="lesson-card">
+      <div class="lesson-card ripple-surface">
         <div class="lesson-header">
           <h4>${lessonTitle}</h4>
           <div class="lesson-badges">
@@ -618,11 +566,7 @@ function renderLessons(lessons, gridId, emptyId) {
 
         ${teacherLine}
 
-        ${
-          lesson.description
-            ? `<p class="lesson-desc">${escapeHtml(lesson.description)}</p>`
-            : ''
-        }
+        ${lesson.description ? `<p class="lesson-desc">${escapeHtml(lesson.description)}</p>` : ''}
 
         <div class="lesson-meta">
           <span>${icon('calendar')} ${formatDate(lesson.date)}</span>
@@ -656,7 +600,6 @@ function handleLessonFavorite(event, lessonId) {
 // ═══════════════════════════════════════════════
 // 🔎 البحث
 // ═══════════════════════════════════════════════
-
 const searchInput = document.getElementById('searchInput');
 
 if (searchInput) {
@@ -695,7 +638,6 @@ if (searchInput) {
 // ═══════════════════════════════════════════════
 // 🏠 زر الرئيسية
 // ═══════════════════════════════════════════════
-
 const homeBtn = document.getElementById('homeBtn');
 if (homeBtn) {
   homeBtn.addEventListener('click', event => {
@@ -708,7 +650,6 @@ if (homeBtn) {
 // ═══════════════════════════════════════════════
 // 💬 Toast
 // ═══════════════════════════════════════════════
-
 function showToast(message, iconName) {
   const existing = document.querySelector('.toast-notification');
   if (existing) existing.remove();
@@ -733,7 +674,6 @@ function showToast(message, iconName) {
 // ═══════════════════════════════════════════════
 // ☰ القائمة المنسدلة
 // ═══════════════════════════════════════════════
-
 (function initMenu() {
   const menuToggle = document.getElementById('menuToggle');
   const menuDropdown = document.getElementById('menuDropdown');
@@ -774,7 +714,6 @@ function showToast(message, iconName) {
 // ═══════════════════════════════════════════════
 // 🔐 الشعار السري
 // ═══════════════════════════════════════════════
-
 (function initSecretAdmin() {
   const logo = document.getElementById('secretLogo');
   const adminBtn = document.getElementById('adminBtn');
@@ -806,7 +745,6 @@ function showToast(message, iconName) {
 // ═══════════════════════════════════════════════
 // 🔗 استعادة التنقل
 // ═══════════════════════════════════════════════
-
 function restoreFavoriteNavigation() {
   let gotoYear = null;
   let gotoSpec = null;
@@ -838,7 +776,6 @@ function restoreFavoriteNavigation() {
 // ═══════════════════════════════════════════════
 // 🌟 نافذة الترحيب + تسجيل دخول موحّد
 // ═══════════════════════════════════════════════
-
 (function initWelcomeModal() {
   const modal = document.getElementById('welcomeModal');
   if (!modal) return;
@@ -887,7 +824,6 @@ function restoreFavoriteNavigation() {
 
   if (closeBtn) closeBtn.addEventListener('click', setGuestMode);
 
-  // زر الدخول في الشريط العلوي — يتحول إلى "خروج" بعد الدخول
   if (openLoginBtn) {
     openLoginBtn.addEventListener('click', function () {
       if (isLoggedIn) {
@@ -900,7 +836,6 @@ function restoreFavoriteNavigation() {
     });
   }
 
-  // النموذج
   if (form) {
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
@@ -942,20 +877,16 @@ function restoreFavoriteNavigation() {
     });
   }
 
-  // رسالة خطأ من Google
   const params = new URLSearchParams(location.search);
   const googleError = params.get('error');
 
-  // فحص الجلسة
   fetch('/api/me', { credentials: 'same-origin' })
     .then(function (res) {
       return res.ok ? res.json() : null;
     })
     .then(function (user) {
       if (user && (user.role === 'admin' || user.role === 'teacher' || user.role === 'student')) {
-        // مسجّل — نحوّل زر "دخول" إلى "خروج" + شارة الدور
         isLoggedIn = true;
-
         if (openLoginBtn) {
           const roleLabels = { admin: 'مدير', teacher: 'أستاذ', student: 'طالب' };
           const roleLabel = roleLabels[user.role] || 'زائر';
@@ -970,12 +901,8 @@ function restoreFavoriteNavigation() {
 
           if (window.lucide) window.lucide.createIcons();
         }
-
-        // أخفِ الشارة العائمة (لأن الدور ظاهر في الزر)
         if (chip) chip.style.display = 'none';
-
       } else {
-        // غير مسجّل
         if (googleError) {
           openModal();
           const messages = {
@@ -997,9 +924,64 @@ function restoreFavoriteNavigation() {
 })();
 
 // ═══════════════════════════════════════════════
+// 🌊 تفعيل التموج والانسيابية (Wave / Ripple)
+// ═══════════════════════════════════════════════
+document.addEventListener('click', function (e) {
+  const target = e.target.closest('.btn, .btn-primary, .search-btn-circle, .year-card, .subject-card, .back-btn');
+  if (!target) return;
+
+  const circle = document.createElement('span');
+  const diameter = Math.max(target.clientWidth, target.clientHeight);
+  const radius = diameter / 2;
+  const rect = target.getBoundingClientRect();
+
+  circle.style.width = circle.style.height = `${diameter}px`;
+  circle.style.left = `${e.clientX - rect.left - radius}px`;
+  circle.style.top = `${e.clientY - rect.top - radius}px`;
+  circle.classList.add('ripple-wave');
+
+  const prev = target.getElementsByClassName('ripple-wave')[0];
+  if (prev) prev.remove();
+
+  target.appendChild(circle);
+});
+
+// تفعيل الفلتر السريع في كبسولة البحث
+const quickYearFilter = document.getElementById('quickYearFilter');
+if (quickYearFilter) {
+  quickYearFilter.addEventListener('change', function (e) {
+    const val = e.target.value;
+    if (val) {
+      selectYear(val);
+      const targetSec = document.getElementById('specializationsSection');
+      if (targetSec) {
+        window.scrollTo({ top: targetSec.offsetTop - 80, behavior: 'smooth' });
+      }
+    } else {
+      goHome();
+    }
+  });
+}
+
+// تفعيل زر البحث الدائري في الكبسولة
+const searchActionBtn = document.getElementById('searchActionBtn');
+if (searchActionBtn) {
+  searchActionBtn.addEventListener('click', function () {
+    const query = (document.getElementById('searchInput')?.value || '').trim();
+    if (query) {
+      const searchSec = document.getElementById('searchResultsSection');
+      if (searchSec) {
+        window.scrollTo({ top: searchSec.offsetTop - 80, behavior: 'smooth' });
+      }
+    } else {
+      document.getElementById('searchInput')?.focus();
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════
 // 🚀 بدء التطبيق
 // ═══════════════════════════════════════════════
-
 (async function startApp() {
   await fetchLessons();
   restoreFavoriteNavigation();

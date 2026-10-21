@@ -6,8 +6,8 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0d5f4a",
-  "theme_color": "#0d5f4a",
+  "background_color": "#f6f2e8",
+  "theme_color": "#0e5742",
   "lang": "ar",
   "dir": "rtl",
   "categories": ["education", "books"],
@@ -23,12 +23,6 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
-    },
-    {
-      "src": "splash-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
     }
   ],
   "shortcuts": [

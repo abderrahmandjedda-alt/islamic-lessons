@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>كلية العلوم الإسلامية - منصة الدروس الجامعية | جامعة وهران 1</title>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 📱 PWA - تطبيق ويب تقدمي                       -->
+<!-- ═══════════════════════════════════════════════ -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0e5742">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="الدروس الجامعية">
+<meta name="application-name" content="الدروس الجامعية">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 🔤 الخطوط + الأنماط                             -->
+<!-- ═══════════════════════════════════════════════ -->
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="theme.css">
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 🔍 SEO - تحسين محركات البحث                    -->
+<!-- ═══════════════════════════════════════════════ -->
+<meta name="description" content="منصة الدروس الجامعية لكلية العلوم الإسلامية - جامعة وهران 1 أحمد بن بلة. دروس PDF و Word في 40 تخصصاً و 400+ مادة للسنة الأولى والثانية ماستر وليسانس.">
+<meta name="keywords" content="كلية العلوم الإسلامية, جامعة وهران 1, دروس جامعية, ماستر, ليسانس, اللغة والدراسات القرآنية, الحديث وعلومه, العقيدة والفكر الإسلامي, الفقه وأصوله, دروس PDF, بحوث جامعية, وهران, الجزائر, أحمد بن بلة">
+<meta name="author" content="جدة عبد الرحمن">
+<meta name="robots" content="index, follow">
+<meta name="language" content="Arabic">
+<meta http-equiv="content-language" content="ar">
+
+<!-- Open Graph -->
+<meta property="og:title" content="منصة الدروس الجامعية - كلية العلوم الإسلامية">
+<meta property="og:description" content="دروس PDF و Word لكل تخصصات كلية العلوم الإسلامية - جامعة وهران 1">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://islamic-lessons.onrender.com">
+<meta property="og:locale" content="ar_DZ">
+<meta property="og:site_name" content="الدروس الجامعية - كلية العلوم الإسلامية">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="منصة الدروس الجامعية - كلية العلوم الإسلامية">
+<meta name="twitter:description" content="دروس PDF و Word لكل التخصصات - جامعة وهران 1">
+
+<link rel="canonical" href="https://islamic-lessons.onrender.com/">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  "name": "منصة الدروس الجامعية - كلية العلوم الإسلامية",
+  "alternateName": "Islamic Studies Lessons Platform",
+  "url": "https://islamic-lessons.onrender.com",
+  "description": "منصة تعليمية تجمع دروس كلية العلوم الإسلامية - جامعة وهران 1 أحمد بن بلة",
+  "inLanguage": "ar",
+  "address": { "@type": "PostalAddress", "addressCountry": "DZ", "addressLocality": "وهران" },
+  "parentOrganization": { "@type": "CollegeOrUniversity", "name": "جامعة وهران 1 أحمد بن بلة" },
+  "founder": { "@type": "Person", "name": "جدة عبد الرحمن" }
+}
+</script>
+</head>
+<body>
+
+<!-- ═══════════ الشريط العلوي ═══════════ -->
+<header class="navbar">
+  <div class="container nav-wrap">
+    <a class="logo" id="secretLogo" href="index.html" title="كلية العلوم الإسلامية">
+      <span class="logo-mark"><img src="lion.png" alt="شعار كلية العلوم الإسلامية" class="logo-img"></span>
+      <span class="logo-text">
+        <strong>كلية العلوم الإسلامية</strong>
+        <small>جامعة وهران 1 أحمد بن بلة</small>
+      </span>
+    </a>
+
+    <nav class="nav-menu" aria-label="التنقل الرئيسي">
+      <a href="index.html" id="homeBtn" class="nav-link">الرئيسية</a>
+      <a href="teachers.html" class="nav-link">هيئة التدريس</a>
+      <a href="favorites.html" class="nav-link">مفضلتي</a>
+      <a href="contact.html" class="nav-link">تواصل</a>
+      <a href="admin.html" class="nav-link btn-admin admin-hidden" id="adminBtn">لوحة التحكم</a>
+
+      <button id="themeToggle" class="theme-btn" type="button" aria-label="تبديل الوضع"></button>
+      <button id="menuToggle" class="icon-btn menu-toggle" type="button" aria-label="القائمة" aria-expanded="false">
+        <i data-lucide="menu"></i>
+      </button>
+      <button id="openLoginBtn" class="nav-cta" type="button" title="دخول">
+        دخول <i data-lucide="arrow-left"></i>
+      </button>
+
+      <!-- القائمة المنسدلة -->
+      <div id="menuDropdown" class="menu-dropdown">
+        <a href="favorites.html" class="menu-item">
+          <span class="menu-icon"><i data-lucide="star"></i></span>
+          <span>مفضلتي</span>
+        </a>
+        <div class="menu-divider"></div>
+        <div class="menu-group-title">
+          <span class="menu-icon"><i data-lucide="upload"></i></span>
+          <span>رفع الدروس</span>
+        </div>
+        <a href="teacher.html" class="menu-item menu-sub">
+          <span class="menu-icon"><i data-lucide="presentation"></i></span>
+          <span>بوابة الأساتذة</span>
+        </a>
+        <a href="student.html" class="menu-item menu-sub">
+          <span class="menu-icon"><i data-lucide="graduation-cap"></i></span>
+          <span>بوابة الطلبة</span>
+        </a>
+        <div class="menu-divider"></div>
+        <a href="contact.html" class="menu-item">
+          <span class="menu-icon"><i data-lucide="phone"></i></span>
+          <span>تواصل مع الإدارة</span>
+        </a>
+        <div class="menu-divider"></div>
+        <button id="installAppBtn" class="menu-item install-btn" type="button" style="display:none;">
+          <span class="menu-icon"><i data-lucide="smartphone"></i></span>
+          <span>تثبيت التطبيق</span>
+        </button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<!-- ═══════════ الواجهة الرئيسية ═══════════ -->
+<section class="hero">
+  <div class="container">
+
+    <div class="hero-card">
+      <div class="hero-media" aria-hidden="true"></div>
+      <div class="hero-glow" aria-hidden="true"></div>
+      <span class="hero-basmala" aria-hidden="true">﷽</span>
+
+      <div class="hero-content">
+        <span class="hero-eyebrow">
+          <i data-lucide="sparkles"></i>
+          كلية العلوم الإسلامية · جامعة وهران 1
+        </span>
+        <h1 class="hero-title">منصة الدروس <em>الجامعية</em></h1>
+        <p class="hero-sub">
+          كل محاضراتك وملفاتك في مكان واحد. اختر السنة، ثم التخصص، ثم المادة —
+          وابدأ المراجعة في ثوانٍ.
+        </p>
+      </div>
+    </div>
+
+    <!-- الحفظة العائمة -->
+    <div class="hero-capsule">
+      <form class="search-capsule" role="search" onsubmit="return false">
+        <div class="capsule-seg">
+          <i data-lucide="calendar"></i>
+          <select id="quickYearFilter" aria-label="السنة الدراسية">
+            <option value="">كل السنوات</option>
+          </select>
+        </div>
+        <span class="capsule-sep" aria-hidden="true"></span>
+
+        <div class="capsule-seg">
+          <i data-lucide="graduation-cap"></i>
+          <select id="quickSpecFilter" aria-label="التخصص" disabled>
+            <option value="">كل التخصصات</option>
+          </select>
+        </div>
+        <span class="capsule-sep" aria-hidden="true"></span>
+
+        <div class="capsule-seg">
+          <i data-lucide="search"></i>
+          <input type="text" id="searchInput" placeholder="ابحث عن درس أو مادة أو ملف..." autocomplete="off" aria-label="بحث">
+        </div>
+
+        <button class="capsule-btn" id="searchActionBtn" type="button" aria-label="بحث">
+          <i data-lucide="arrow-left"></i>
+        </button>
+      </form>
+    </div>
+
+    <div class="trust">
+      <p class="trust-label">موثوق به من طرف طلبة وأساتذة الكلية</p>
+      <div class="trust-stats">
+        <div class="trust-stat"><b data-count="5" data-stat="years">5</b><span>سنوات دراسية</span></div>
+        <div class="trust-stat"><b data-count="40" data-stat="specs">40</b><span>تخصصاً جامعياً</span></div>
+        <div class="trust-stat"><b data-count="400" data-stat="subjects">400</b><span>مادة علمية</span></div>
+        <div class="trust-stat"><b>PDF</b><span>ملفات Word</span></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="container">
+  <div id="breadcrumb" class="breadcrumb"></div>
+</div>
+
+<!-- ═══════════ الأقسام ═══════════ -->
+<section id="yearsSection" class="container section">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">ابدأ من هنا</span>
+      <h2 class="section-title">اختر السنة الدراسية</h2>
+    </div>
+    <p class="section-hint">ليسانس · ماستر</p>
+  </div>
+  <div id="yearsGrid" class="years-grid"></div>
+</section>
+
+<section id="specializationsSection" class="container section" style="display:none;">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">الخطوة الثانية</span>
+      <h2 class="section-title" id="specTitle">اختر التخصص</h2>
+    </div>
+    <button class="back-btn" type="button" onclick="goHome()">
+      <i data-lucide="arrow-right"></i> رجوع إلى السنوات
+    </button>
+  </div>
+  <div id="specializationsGrid" class="specializations-grid"></div>
+</section>
+
+<section id="subjectsSection" class="container section" style="display:none;">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">الخطوة الثالثة</span>
+      <h2 class="section-title" id="subjectTitle">اختر المادة</h2>
+    </div>
+    <button class="back-btn" type="button" onclick="backToSpecializations()">
+      <i data-lucide="arrow-right"></i> رجوع إلى التخصصات
+    </button>
+  </div>
+  <div id="subjectsGrid" class="subjects-grid"></div>
+</section>
+
+<section id="lessonsSection" class="container section" style="display:none;">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">المحتوى</span>
+      <h2 class="section-title" id="lessonsTitle">الدروس</h2>
+    </div>
+    <button class="back-btn" type="button" onclick="backToSubjects()">
+      <i data-lucide="arrow-right"></i> رجوع إلى المواد
+    </button>
+  </div>
+  <div id="lessonsGrid" class="lessons-grid"></div>
+  <div id="emptyMsg" class="empty" style="display:none;">
+    <i data-lucide="book-open" class="empty-ico"></i>
+    لا توجد دروس في هذه المادة بعد.
+  </div>
+</section>
+
+<section id="searchResultsSection" class="container section" style="display:none;">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">البحث</span>
+      <h2 class="section-title">نتائج البحث</h2>
+    </div>
+    <button class="back-btn" type="button" onclick="goHome()">
+      <i data-lucide="arrow-right"></i> رجوع
+    </button>
+  </div>
+  <div id="searchResultsGrid" class="lessons-grid"></div>
+  <div id="searchEmptyMsg" class="empty" style="display:none;">
+    <i data-lucide="search-x" class="empty-ico"></i>
+    لا توجد نتائج مطابقة لبحثك.
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p class="footer-line">© 2025 — كلية العلوم الإسلامية | جامعة وهران 1 أحمد بن بلة</p>
+    <p class="footer-author">إعداد: جدة عبد الرحمن</p>
+  </div>
+</footer>
+
+<!-- ═══════════ نافذة الترحيب ═══════════ -->
+<div id="welcomeModalX" class="welcome-backdrop" style="display:none;">
+  <div class="welcome-card" onclick="event.stopPropagation()" role="dialog" aria-modal="true" aria-label="تسجيل الدخول">
+    <button type="button" id="welcomeCloseBtn" class="welcome-close" aria-label="إغلاق">
+      <i data-lucide="x"></i>
+    </button>
+
+    <div class="welcome-icon-wrap">
+      <i data-lucide="shield-check"></i>
+    </div>
+
+    <h2 class="welcome-title">مرحباً بك في المنصة</h2>
+
+    <form id="welcomeForm" autocomplete="on">
+      <div class="welcome-field">
+        <label for="welcomeEmail">البريد الإلكتروني</label>
+        <div class="welcome-input-wrap">
+          <i data-lucide="mail"></i>
+          <input type="email" id="welcomeEmail" name="email"
+                 placeholder="example@gmail.com" dir="ltr"
+                 autocomplete="username email" required>
+        </div>
+      </div>
+
+      <div class="welcome-field">
+        <label for="welcomePassword">كلمة السر</label>
+        <div class="welcome-input-wrap">
+          <i data-lucide="lock"></i>
+          <input type="password" id="welcomePassword" name="password"
+                 placeholder="••••••••" autocomplete="current-password" required>
+        </div>
+      </div>
+
+      <p id="welcomeError" class="welcome-error"></p>
+
+      <button type="submit" class="welcome-btn-primary" id="welcomeLoginBtn">
+        <i data-lucide="log-in"></i> دخول
+      </button>
+    </form>
+
+    <div class="welcome-divider"><span>أو</span></div>
+
+    <a href="/auth/google?from=any" class="welcome-btn-google">
+      <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+      </svg>
+      <span>الدخول بحساب Google</span>
+    </a>
+
+    <p class="welcome-guest-hint">
+      للتصفح كزائر: أغلق النافذة بالضغط على زر الإغلاق ✕
+    </p>
+
+    <div id="loggedInChip" class="logged-chip" style="display:none;">
+      <span class="logged-chip-icon"><i data-lucide="user-round"></i></span>
+      <span id="loggedChipLabel" class="logged-chip-label"></span>
+      <a id="loggedChipLink" href="#" class="logged-chip-action">صفحتي</a>
+      <button type="button" id="loggedChipLogout" class="logged-chip-logout" title="خروج">
+        <i data-lucide="log-out"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// PWA: تسجيل Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then((registration) => console.log('✅ PWA: Service Worker مسجّل —', registration.scope))
+      .catch((err) => console.error('❌ PWA: فشل التسجيل:', err));
+  });
+}
+
+// زر تثبيت التطبيق
+let deferredPrompt = null;
+const installBtn = document.getElementById('installAppBtn');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (installBtn) installBtn.style.display = 'flex';
+});
+
+if (installBtn) {
+  installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) {
+      alert('✅ التطبيق مثبّت بالفعل على جهازك!');
+      return;
+    }
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+  });
+}
+
+window.addEventListener('appinstalled', () => {
+  deferredPrompt = null;
+  if (installBtn) installBtn.style.display = 'none';
+});
+</script>
+
+<script src="lucide.min.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script src="modern-ui.js"></script>
+<script>
+setTimeout(function(){
+  if (typeof selectYear === 'function') selectYear('M2');
+  setTimeout(function(){
+    var cards = document.querySelectorAll('#specializationsGrid .specialization-card');
+    var out = [];
+    cards.forEach(function(c){
+      var ic = c.querySelector('.spec-icon');
+      var svg = ic ? ic.querySelector('svg') : null;
+      var i = ic ? ic.querySelector('i') : null;
+      var name = c.querySelector('h4') ? c.querySelector('h4').textContent.slice(0,20) : '?';
+      out.push(name + '>svg:' + (svg?1:0) + ',i:' + (i?i.getAttribute('data-lucide'):'-') + ',cls:' + (svg?svg.getAttribute('class'):'-'));
+    });
+    var d=document.createElement('div'); d.id='diagout'; d.textContent = out.join(' || ');
+    document.body.appendChild(d);
+  }, 1500);
+}, 1500);
+</script></body>
+</html>
+

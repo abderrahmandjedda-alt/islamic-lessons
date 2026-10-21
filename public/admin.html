@@ -5,499 +5,123 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>لوحة التحكم — رفع الدروس</title>
   <meta name="robots" content="noindex, nofollow">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0e5742">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
-  <style>
-    .admin-icon { width: 1.2em; height: 1.2em; stroke-width: 1.9; flex-shrink: 0; vertical-align: middle; }
-    .navbar nav a, .theme-btn, .btn-refresh, .btn-primary, .pending-btn,
-    .btn-view, .btn-delete, .review-title, .upload-card h3, .manage-card h3,
-    .login-box h3, .review-login-box h4 {
-      display: inline-flex; align-items: center; gap: 8px;
-    }
-    .theme-btn { justify-content: center; }
-    .btn-view, .btn-delete { justify-content: center; }
-    .btn-delete svg, .pending-btn.reject svg { color: #b42318; }
-    .pending-btn.approve svg { color: var(--emerald); }
-    .review-title > i, .upload-card h3 svg, .manage-card h3 svg { color: var(--gold-dark); }
-    [data-theme="dark"] .review-title > i,
-    [data-theme="dark"] .upload-card h3 svg,
-    [data-theme="dark"] .manage-card h3 svg { color: var(--gold); }
-
-    .user-chip {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 6px 10px; border-radius: 999px;
-      background: rgba(0,0,0,.05); font-size: 14px; margin-inline-start: 8px;
-    }
-    [data-theme="dark"] .user-chip { background: rgba(255,255,255,.08); }
-    .user-name { font-weight: 700; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .user-chip .btn-refresh { padding: 4px 10px; font-size: 13px; cursor: pointer; }
-
-    .login-field-label {
-      display: block; text-align: right; margin-bottom: 6px;
-      font-size: 13px; color: var(--text-light);
-    }
-    #loginForm input { margin-bottom: 14px; }
-
-    /* ═══════════════════════════════════════════ */
-    /* 👥 إدارة الأساتذة */
-    /* ═══════════════════════════════════════════ */
-    .teachers-card {
-      background: var(--card); border-radius: 24px; padding: 32px;
-      margin-bottom: 32px; border: 2px solid var(--border-gold);
-      box-shadow: var(--shadow); position: relative; overflow: hidden;
-    }
-    .teachers-card::before {
-      content: ''; position: absolute; top: 0; right: 0;
-      width: 100%; height: 5px; background: var(--gradient-gold);
-    }
-
-    .teachers-header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 24px; gap: 16px; flex-wrap: wrap;
-      padding-bottom: 20px; border-bottom: 2px dashed var(--border-gold);
-    }
-    .teachers-header h3 {
-      display: inline-flex; align-items: center; gap: 12px;
-      font-family: 'Amiri', serif; font-size: 1.5rem;
-      color: var(--emerald); margin: 0;
-    }
-    html[data-theme="dark"] .teachers-header h3 { color: var(--gold); }
-    .teachers-header h3 svg { width: 28px; height: 28px; color: var(--gold-dark); }
-    html[data-theme="dark"] .teachers-header h3 svg { color: var(--gold); }
-
-    .btn-add-teacher {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 12px 22px; border-radius: 12px;
-      background: var(--gradient-emerald); color: #fff;
-      border: none; cursor: pointer; font-family: 'Tajawal', sans-serif;
-      font-weight: 700; font-size: 0.95rem;
-      transition: all 0.3s ease; box-shadow: 0 4px 16px rgba(13, 95, 74, 0.25);
-    }
-    .btn-add-teacher:hover { box-shadow: 0 8px 24px rgba(13, 95, 74, 0.4); }
-    .btn-add-teacher svg { width: 18px; height: 18px; }
-
-    #teachersList {
-      max-height: 60vh; overflow-y: auto; overflow-x: hidden;
-      border-radius: 10px; scroll-behavior: smooth;
-      padding-inline-end: 4px; position: relative;
-    }
-    #teachersList::-webkit-scrollbar { width: 8px; }
-    #teachersList::-webkit-scrollbar-track { background: rgba(0,0,0,.03); border-radius: 4px; }
-    #teachersList::-webkit-scrollbar-thumb {
-      background: linear-gradient(var(--emerald), var(--emerald-dark));
-      border-radius: 4px;
-    }
-    #teachersList::-webkit-scrollbar-thumb:hover { background: var(--gold); }
-    [data-theme="dark"] #teachersList::-webkit-scrollbar-track { background: rgba(255,255,255,.05); }
-    [data-theme="dark"] #teachersList::-webkit-scrollbar-thumb {
-      background: linear-gradient(var(--emerald-light), var(--emerald));
-    }
-
-    .teachers-table {
-      width: 100%; border-collapse: separate; border-spacing: 0;
-      font-family: 'Tajawal', sans-serif; font-size: 0.95rem;
-    }
-    .teachers-table thead th {
-      position: sticky; top: 0; z-index: 2;
-      padding: 14px 12px; text-align: right;
-      font-weight: 700; font-size: 0.9rem; color: var(--text-light);
-      background: var(--bg-alt); border-bottom: 2px solid var(--border-gold);
-      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-    }
-    html[data-theme="dark"] .teachers-table thead th { background: #1a3a2c; }
-    .teachers-table tbody td {
-      padding: 16px 12px; text-align: right;
-      border-bottom: 1px solid var(--border); transition: background .2s;
-    }
-    .teachers-table tbody tr { transition: background .2s; }
-    .teachers-table tbody tr:hover td { background: var(--card-hover); }
-    .teachers-table tbody tr.inactive td { opacity: 0.55; }
-
-    .teacher-badge {
-      display: inline-block; padding: 4px 12px; border-radius: 999px;
-      font-size: 0.78rem; font-weight: 700; white-space: nowrap;
-    }
-    .teacher-badge.active {
-      background: linear-gradient(135deg, #c9ecd0, #a8ddb6); color: #0d4d1e;
-    }
-    .teacher-badge.inactive {
-      background: linear-gradient(135deg, #f0d5d3, #e5b8b3); color: #7a2018;
-    }
-    [data-theme="dark"] .teacher-badge.active {
-      background: linear-gradient(135deg, #0d4d1e, #134e22); color: #c9ecd0;
-    }
-    [data-theme="dark"] .teacher-badge.inactive {
-      background: linear-gradient(135deg, #7a2018, #5c1710); color: #f0d5d3;
-    }
-
-    .teacher-actions { display: flex; gap: 6px; justify-content: flex-end; }
-
-    .btn-icon-sm {
-      background: var(--bg-alt); border: 1px solid var(--border);
-      width: 36px; height: 36px; border-radius: 10px;
-      display: inline-flex; align-items: center; justify-content: center;
-      cursor: pointer; transition: all 0.2s ease;
-      color: var(--text-light); font-family: inherit; padding: 0;
-    }
-    .btn-icon-sm:hover {
-      background: var(--card); border-color: var(--gold);
-      color: var(--emerald); transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(13, 95, 74, 0.15);
-    }
-    html[data-theme="dark"] .btn-icon-sm:hover {
-      color: var(--gold); border-color: var(--gold);
-      box-shadow: 0 4px 12px rgba(212, 165, 116, 0.15);
-    }
-    .btn-icon-sm.danger:hover {
-      color: #dc2626; border-color: #dc2626; background: rgba(220, 38, 38, 0.08);
-    }
-    .btn-icon-sm.success:hover {
-      color: #059669; border-color: #059669; background: rgba(5, 150, 105, 0.08);
-    }
-    .btn-icon-sm svg { width: 16px; height: 16px; stroke-width: 2; }
-
-    .teachers-empty {
-      text-align: center; padding: 50px 24px;
-      color: var(--text-light); font-family: 'Tajawal', sans-serif;
-      font-size: 1rem; border: 2px dashed var(--border-gold);
-      border-radius: 14px; background: var(--bg-alt);
-    }
-
-    /* ═══════════════════════════════════════════ */
-    /* 🪟 النافذة المنبثقة */
-    /* ═══════════════════════════════════════════ */
-    .modal-backdrop {
-      position: fixed; inset: 0; background: rgba(0,0,0,.55);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 9999; padding: 20px;
-      backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-      animation: modalFadeIn 0.2s ease;
-    }
-    @keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-    .modal-card {
-      background: var(--card); color: var(--text);
-      border-radius: 20px; width: 100%; max-width: 460px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.3), 0 0 0 2px var(--border-gold);
-      animation: modalIn .25s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      max-height: 88vh;
-      overflow: hidden;
-      padding: 0;
-    }
-
-    .modal-card.confirm-card {
-      max-height: none;
-      overflow: visible;
-      display: block;
-    }
-
-    @keyframes modalIn {
-      from { opacity: 0; transform: translateY(14px) scale(0.97); }
-      to   { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    /* العنوان — ثابت أعلى النافذة */
-    .modal-title {
-      display: flex; align-items: center; gap: 10px;
-      margin: 0;
-      font-family: 'Amiri', serif;
-      font-size: 1.25rem; color: var(--emerald);
-      background: var(--card);
-      padding: 22px 28px 16px;
-      border-bottom: 2px solid var(--border-gold);
-      flex-shrink: 0;
-      border-top-left-radius: 20px;
-      border-top-right-radius: 20px;
-    }
-    html[data-theme="dark"] .modal-title { color: var(--gold); }
-    .modal-title svg { width: 22px; height: 22px; color: var(--gold-dark); flex-shrink: 0; }
-    html[data-theme="dark"] .modal-title svg { color: var(--gold); }
-
-    /* منطقة المحتوى — الوحيدة التي تتمرر */
-    .modal-body {
-      padding: 20px 28px 0;
-      flex: 1 1 auto;
-      overflow-y: auto;
-      overflow-x: hidden;
-      scrollbar-width: thin;
-      scrollbar-color: var(--emerald) var(--bg-alt);
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .modal-body::-webkit-scrollbar { width: 8px; }
-    .modal-body::-webkit-scrollbar-track {
-      background: var(--bg-alt); border-radius: 4px;
-    }
-    .modal-body::-webkit-scrollbar-thumb {
-      background: linear-gradient(var(--emerald), var(--emerald-dark));
-      border-radius: 4px;
-    }
-    .modal-body::-webkit-scrollbar-thumb:hover { background: var(--gold); }
-    [data-theme="dark"] .modal-body::-webkit-scrollbar-track {
-      background: rgba(255,255,255,.05);
-    }
-    [data-theme="dark"] .modal-body::-webkit-scrollbar-thumb {
-      background: linear-gradient(var(--emerald-light), var(--emerald));
-    }
-
-    .modal-field { margin-bottom: 16px; }
-    .modal-field label {
-      display: block; font-family: 'Tajawal', sans-serif;
-      font-size: 0.9rem; font-weight: 700;
-      color: var(--text-light); margin-bottom: 8px;
-    }
-    .modal-field input,
-    .modal-field textarea {
-      width: 100%; padding: 14px 16px; border-radius: 12px;
-      border: 2px solid var(--border); font-family: 'Tajawal', sans-serif;
-      font-size: 0.95rem; background: var(--bg); color: var(--text);
-      box-sizing: border-box; transition: all 0.3s ease; outline: none;
-    }
-    .modal-field textarea { resize: vertical; min-height: 80px; }
-    .modal-field input:focus,
-    .modal-field textarea:focus {
-      border-color: var(--gold);
-      box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.15);
-      background: var(--card);
-    }
-    .modal-field input[dir="ltr"] { text-align: left; }
-    .modal-field input:disabled {
-      opacity: 0.6; cursor: not-allowed; background: var(--bg-alt);
-    }
-
-    /* أزرار الحفظ / الإلغاء — ثابتة أسفل النافذة */
-    .modal-actions {
-      display: flex; gap: 10px; justify-content: flex-end;
-      background: var(--card);
-      padding: 16px 28px 22px;
-      border-top: 2px solid var(--border-gold);
-      flex-shrink: 0;
-      border-bottom-left-radius: 20px;
-      border-bottom-right-radius: 20px;
-    }
-
-    .btn-modal {
-      padding: 12px 22px; border-radius: 12px;
-      font-family: 'Tajawal', sans-serif; font-size: 0.95rem;
-      font-weight: 700; cursor: pointer; border: none;
-      transition: all 0.3s ease;
-      display: inline-flex; align-items: center; gap: 6px;
-    }
-    .btn-modal:hover { opacity: 0.92; transform: translateY(-1px); }
-    .btn-modal:active { transform: translateY(0); }
-    .btn-modal.primary {
-      background: var(--gradient-emerald); color: #fff;
-      box-shadow: 0 4px 16px rgba(13, 95, 74, 0.25);
-    }
-    .btn-modal.secondary {
-      background: var(--bg-alt); color: var(--text); border: 2px solid var(--border);
-    }
-    .btn-modal.danger {
-      background: linear-gradient(135deg, #dc2626, #b91c1c); color: #fff;
-      box-shadow: 0 4px 16px rgba(220, 38, 38, 0.25);
-    }
-    .btn-modal.warning {
-      background: linear-gradient(135deg, #d4a574, #b8935a); color: #fff;
-      box-shadow: 0 4px 16px rgba(212, 165, 116, 0.25);
-    }
-
-    .modal-error {
-      color: #dc2626; font-family: 'Tajawal', sans-serif;
-      font-size: 0.9rem; font-weight: 600;
-      margin-top: 10px; min-height: 20px;
-    }
-    .modal-hint {
-      font-family: 'Tajawal', sans-serif;
-      font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;
-    }
-
-    /* ═══════════════════════════════════════════ */
-    /* 🎨 نافذة التأكيد */
-    /* ═══════════════════════════════════════════ */
-    .confirm-card {
-      max-width: 480px; text-align: center;
-      border-top: 5px solid var(--emerald);
-    }
-    .confirm-card.confirm-danger { border-top-color: #dc2626; }
-    .confirm-card.confirm-warning { border-top-color: var(--gold); }
-    .confirm-card.confirm-primary { border-top-color: var(--emerald); }
-
-    .confirm-icon {
-      width: 70px; height: 70px; margin: 32px auto 18px;
-      border-radius: 50%; display: flex;
-      align-items: center; justify-content: center;
-      background: var(--bg-alt);
-    }
-    .confirm-card.confirm-danger .confirm-icon {
-      background: linear-gradient(135deg, #fee2e2, #fecaca); color: #dc2626;
-    }
-    .confirm-card.confirm-warning .confirm-icon {
-      background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e;
-    }
-    .confirm-card.confirm-primary .confirm-icon {
-      background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: var(--emerald);
-    }
-    [data-theme="dark"] .confirm-card.confirm-danger .confirm-icon {
-      background: linear-gradient(135deg, #5c1710, #7a2018); color: #f0d5d3;
-    }
-    [data-theme="dark"] .confirm-card.confirm-warning .confirm-icon {
-      background: linear-gradient(135deg, #5a3f00, #7a5500); color: #fef3c7;
-    }
-    [data-theme="dark"] .confirm-card.confirm-primary .confirm-icon {
-      background: linear-gradient(135deg, #0d4d1e, #134e22); color: #c9ecd0;
-    }
-    .confirm-icon svg { width: 36px; height: 36px; stroke-width: 2; }
-
-    .confirm-title {
-      font-family: 'Amiri', serif; font-size: 1.35rem;
-      color: var(--text); margin: 0 28px 14px;
-      padding: 0; border: none;
-    }
-    .confirm-message {
-      font-family: 'Tajawal', sans-serif; font-size: 1rem;
-      color: var(--text-light); line-height: 1.6;
-      margin: 0 28px 14px;
-    }
-    .confirm-lines {
-      list-style: none; padding: 14px 18px;
-      margin: 14px 28px;
-      background: var(--bg-alt); border-radius: 12px;
-      text-align: right; display: flex; flex-direction: column; gap: 8px;
-    }
-    .confirm-lines li {
-      font-family: 'Tajawal', sans-serif; font-size: 0.95rem;
-      color: var(--text); padding-right: 24px;
-      position: relative; line-height: 1.5;
-    }
-    .confirm-lines li::before {
-      content: '•'; position: absolute; right: 6px;
-      color: var(--gold-dark); font-weight: 900;
-      font-size: 1.3rem; top: -4px;
-    }
-    .confirm-card.confirm-danger .confirm-lines li::before { color: #dc2626; }
-    .confirm-card.confirm-warning .confirm-lines li::before { color: var(--gold-dark); }
-
-    .confirm-hint {
-      font-family: 'Tajawal', sans-serif; font-size: 0.85rem;
-      color: var(--text-muted); margin: 12px 28px 0;
-      padding: 10px 14px;
-      background: linear-gradient(135deg, rgba(212, 165, 116, 0.08), rgba(212, 165, 116, 0.03));
-      border-right: 3px solid var(--gold);
-      border-radius: 8px; text-align: right; line-height: 1.5;
-    }
-    .confirm-actions {
-      display: flex; gap: 10px;
-      justify-content: center;
-      padding: 22px 28px 28px;
-      background: transparent;
-      border: none;
-    }
-    .confirm-actions .btn-modal { min-width: 110px; justify-content: center; }
-
-    @media (max-width: 480px) {
-      .confirm-icon { width: 60px; height: 60px; margin-top: 26px; }
-      .confirm-icon svg { width: 30px; height: 30px; }
-      .confirm-title { font-size: 1.15rem; margin: 0 20px 12px; }
-      .confirm-message { margin: 0 20px 12px; }
-      .confirm-lines { margin: 12px 20px; }
-      .confirm-hint { margin: 12px 20px 0; }
-      .confirm-actions { padding: 18px 20px 22px; flex-direction: column-reverse; }
-      .confirm-actions .btn-modal { width: 100%; }
-    }
-
-    @media (max-width: 768px) {
-      .teachers-card { padding: 22px 18px; }
-      .teachers-header { flex-direction: column; align-items: stretch; }
-      .btn-add-teacher { width: 100%; justify-content: center; }
-      #teachersList { max-height: 55vh; }
-      .teachers-table { font-size: 0.85rem; }
-      .teachers-table thead th,
-      .teachers-table tbody td { padding: 10px 8px; }
-      .btn-icon-sm { width: 32px; height: 32px; }
-
-      .modal-card { max-width: calc(100% - 20px); max-height: 92vh; }
-      .modal-title { padding: 18px 20px 14px; font-size: 1.1rem; }
-      .modal-body { padding: 16px 20px 0; }
-      .modal-actions { padding: 14px 20px 18px; flex-direction: column-reverse; }
-      .modal-actions .btn-modal { width: 100%; justify-content: center; }
-    }
-  </style>
+  <link rel="stylesheet" href="theme.css">
 </head>
 <body>
 
 <header class="navbar">
   <div class="container nav-wrap">
-    <div class="logo">
-      <img src="lion.png" alt="جامعة وهران 1" class="logo-img">
-      <div><h1>لوحة التحكم</h1><p>رفع وإدارة الدروس</p></div>
-    </div>
-    <nav>
-      <a href="index.html"><i data-lucide="house" class="admin-icon"></i> الرئيسية</a>
+    <a class="logo" href="index.html" title="العودة للرئيسية">
+      <span class="logo-mark"><img src="lion.png" alt="شعار كلية العلوم الإسلامية" class="logo-img"></span>
+      <span class="logo-text">
+        <strong>لوحة التحكم</strong>
+        <small>رفع وإدارة الدروس</small>
+      </span>
+    </a>
+    <nav class="nav-menu" aria-label="التنقل">
+      <a href="index.html" class="nav-link">الرئيسية</a>
       <div id="userChip" class="user-chip" style="display:none;">
         <span id="userNameLabel" class="user-name"></span>
         <button id="logoutBtn" class="btn-refresh" type="button">
-          <i data-lucide="log-out" class="admin-icon"></i> خروج
+          <i data-lucide="log-out"></i> خروج
         </button>
       </div>
       <button id="themeToggle" class="theme-btn" type="button" aria-label="تبديل الوضع الليلي">
-        <i data-lucide="moon" class="admin-icon"></i>
+        <i data-lucide="moon"></i>
       </button>
     </nav>
   </div>
 </header>
 
-<!-- شاشة الدخول -->
-<div id="loginScreen" class="container section">
-  <div class="login-box">
-    <h3><i data-lucide="shield-check" class="admin-icon"></i> الدخول إلى لوحة التحكم</h3>
-    <p>أدخل بريدك وكلمة السر</p>
+<!-- ═══════════ شاشة الدخول ═══════════ -->
+<div id="loginScreen" class="auth-wrap">
+  <div class="auth-card">
 
-    <form id="loginForm" autocomplete="on">
-      <label class="login-field-label" for="emailInput">البريد الإلكتروني</label>
-      <div class="email-field-wrap">
-        <input type="email" id="emailInput" name="email" placeholder="example@gmail.com"
-               autocomplete="username email" dir="ltr" required>
-        <button type="button" id="emailDropdownToggle" class="email-drop-toggle" aria-label="عرض الحسابات المحفوظة">
-          <i data-lucide="chevron-down" class="admin-icon"></i>
-        </button>
-        <div id="emailDropdown" class="email-dropdown" style="display:none;"></div>
+    <div class="auth-visual">
+      <div>
+        <span class="auth-visual-icon"><i data-lucide="shield-check"></i></span>
+        <h2>إدارة المنصة</h2>
+        <p>صلاحيات كاملة لرفع الدروس، مراجعة مساهمات الطلبة، وإدارة حسابات الأساتذة.</p>
       </div>
+      <div class="auth-features">
+        <span class="feature-chip"><i data-lucide="users"></i> إدارة الأساتذة</span>
+        <span class="feature-chip"><i data-lucide="inbox"></i> المراجعة</span>
+        <span class="feature-chip"><i data-lucide="library-big"></i> المكتبة</span>
+      </div>
+    </div>
 
-      <label class="login-field-label" for="passwordInput">كلمة السر</label>
-      <input type="password" id="passwordInput" name="password"
-             placeholder="••••••••" autocomplete="current-password" required>
+    <div class="auth-form">
+      <h3>الدخول إلى لوحة التحكم</h3>
+      <p>أدخل بريدك الإلكتروني وكلمة السر</p>
 
-      <button id="loginBtn" class="btn-primary" type="submit">
-        <i data-lucide="log-in" class="admin-icon"></i> دخول
-      </button>
-      <p id="loginError" class="error"></p>
+      <form id="loginForm" autocomplete="on" class="login-fields">
+        <div>
+          <label class="login-field-label" for="emailInput">البريد الإلكتروني</label>
+          <div class="email-field-wrap">
+            <input type="email" id="emailInput" name="email" placeholder="example@gmail.com"
+                   autocomplete="username email" dir="ltr" required>
+            <button type="button" id="emailDropdownToggle" class="email-drop-toggle" aria-label="عرض الحسابات المحفوظة">
+              <i data-lucide="chevron-down"></i>
+            </button>
+            <div id="emailDropdown" class="email-dropdown" style="display:none;"></div>
+          </div>
+        </div>
 
-      <div class="login-divider"><span>أو</span></div>
-      <a href="/auth/google?from=admin" class="btn-google">
-        <svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true">
-          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-        </svg>
-        الدخول بحساب جوجل
-      </a>
-    </form>
+        <div>
+          <label class="login-field-label" for="passwordInput">كلمة السر</label>
+          <input type="password" id="passwordInput" name="password"
+                 placeholder="••••••••" autocomplete="current-password" required>
+        </div>
+
+        <button id="loginBtn" class="btn-primary" type="submit">
+          <i data-lucide="log-in"></i> دخول
+        </button>
+        <p id="loginError" class="error"></p>
+
+        <div class="login-divider"><span>أو</span></div>
+        <a href="/auth/google?from=admin" class="btn-google">
+          <svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          </svg>
+          الدخول بحساب جوجل
+        </a>
+      </form>
+    </div>
+
   </div>
 </div>
 
-<!-- لوحة التحكم -->
+<!-- ═══════════ لوحة التحكم ═══════════ -->
 <div id="adminPanel" class="container section" style="display:none;">
 
-  <!-- 👥 إدارة الأساتذة -->
+  <div class="dash-head">
+    <div>
+      <span class="eyebrow">الإدارة</span>
+      <h2>لوحة التحكم</h2>
+      <p>كل ما تحتاجه لإدارة محتوى المنصة في مكان واحد</p>
+    </div>
+    <div class="dash-stats">
+      <span class="dash-stat"><i data-lucide="library-big"></i> مكتبة الدروس</span>
+      <span class="dash-stat"><i data-lucide="inbox"></i> مراجعة المساهمات</span>
+      <span class="dash-stat"><i data-lucide="users"></i> هيئة التدريس</span>
+    </div>
+  </div>
+
+  <!-- إدارة الأساتذة -->
   <div id="teachersCard" class="teachers-card" style="display:none;">
     <div class="teachers-header">
-      <h3><i data-lucide="users" class="admin-icon"></i> إدارة الأساتذة</h3>
+      <h3><i data-lucide="users"></i> إدارة الأساتذة</h3>
       <button id="addTeacherBtn" class="btn-add-teacher" type="button">
-        <i data-lucide="user-plus" class="admin-icon"></i> إضافة أستاذ
+        <i data-lucide="user-plus"></i> إضافة أستاذ
       </button>
     </div>
     <div id="teachersList">
@@ -506,93 +130,107 @@
   </div>
 
   <!-- قسم المراجعة -->
-<div class="review-card collapsible-card">
-  <div class="collapsible-chip chip-gold" id="reviewChip" role="button" tabindex="0" aria-expanded="false">
-    <i data-lucide="inbox" class="chip-icon"></i>
-    <div class="chip-text">
-      <h3>الدروس بانتظار المراجعة</h3>
-      <p class="chip-subtitle"><span id="pendingCount">0</span> درس</p>
+  <div class="review-card collapsible-card">
+    <div class="collapsible-chip chip-gold" id="reviewChip" role="button" tabindex="0" aria-expanded="false">
+      <i data-lucide="inbox" class="chip-icon"></i>
+      <div class="chip-text">
+        <h3>الدروس بانتظار المراجعة</h3>
+        <p class="chip-subtitle"><span id="pendingCount">0</span> درس</p>
+      </div>
+      <span class="chip-chevron"><i data-lucide="chevron-down"></i></span>
     </div>
-    <span class="chip-chevron"><i data-lucide="chevron-down"></i></span>
-  </div>
 
-  <div class="collapsible-body" id="reviewBody" style="display:none;">
+    <div class="collapsible-body" id="reviewBody" style="display:none;">
+      <div id="reviewLoginScreen" class="review-login">
+        <div class="review-login-box">
+          <i data-lucide="lock-keyhole"></i>
+          <h4>الدخول إلى قسم المراجعة</h4>
+          <p>أدخل كلمة سر المراجعة</p>
+          <input type="password" id="reviewPasswordInput" placeholder="كلمة سر المراجعة" autocomplete="current-password">
+          <button id="reviewLoginBtn" class="btn-primary" type="button">
+            <i data-lucide="log-in"></i> دخول
+          </button>
+          <p id="reviewLoginError" class="error"></p>
+        </div>
+      </div>
 
-    <div id="reviewLoginScreen" class="review-login">
-      <div class="review-login-box">
-        <i data-lucide="lock-keyhole" class="admin-icon"></i>
-        <h4>الدخول إلى قسم المراجعة</h4>
-        <p>أدخل كلمة سر المراجعة</p>
-        <input type="password" id="reviewPasswordInput" placeholder="كلمة سر المراجعة" autocomplete="current-password">
-        <button id="reviewLoginBtn" class="btn-primary" type="button">
-          <i data-lucide="log-in" class="admin-icon"></i> دخول
+      <div id="pendingList" class="pending-list" style="display:none;"></div>
+
+      <div style="padding: 4px 0 20px; text-align: left;">
+        <button id="refreshPendingBtn" class="btn-refresh" type="button">
+          <i data-lucide="refresh-cw"></i> تحديث
         </button>
-        <p id="reviewLoginError" class="error"></p>
       </div>
     </div>
-
-    <div id="pendingList" class="pending-list" style="display:none;"></div>
-
-    <div style="padding: 0 26px 20px; text-align: left;">
-      <button id="refreshPendingBtn" class="btn-refresh" type="button">
-        <i data-lucide="refresh-cw" class="admin-icon"></i> تحديث
-      </button>
-    </div>
   </div>
-</div>
 
   <!-- رفع درس جديد -->
-<div class="upload-card collapsible-card">
-  <div class="collapsible-chip chip-emerald" id="uploadChip" role="button" tabindex="0" aria-expanded="false">
-    <i data-lucide="cloud-upload" class="chip-icon"></i>
-    <div class="chip-text">
-      <h3>رفع درس جديد</h3>
-      <p class="chip-subtitle">أضف ملفاً جديداً إلى المنصة</p>
+  <div class="upload-card collapsible-card">
+    <div class="collapsible-chip chip-emerald" id="uploadChip" role="button" tabindex="0" aria-expanded="false">
+      <i data-lucide="cloud-upload" class="chip-icon"></i>
+      <div class="chip-text">
+        <h3>رفع درس جديد</h3>
+        <p class="chip-subtitle">أضف ملفاً جديداً إلى المنصة</p>
+      </div>
+      <span class="chip-chevron"><i data-lucide="chevron-down"></i></span>
     </div>
-    <span class="chip-chevron"><i data-lucide="chevron-down"></i></span>
+
+    <div class="collapsible-body" id="uploadBody" style="display:none;">
+      <form id="uploadForm">
+        <div class="field-capsule">
+          <div class="form-group">
+            <label for="yearSelect"><i data-lucide="calendar"></i> السنة الدراسية</label>
+            <select name="year" id="yearSelect" required><option value="">اختر السنة</option></select>
+          </div>
+          <div class="form-group">
+            <label for="specializationSelect"><i data-lucide="graduation-cap"></i> التخصص</label>
+            <select name="specialization" id="specializationSelect" required><option value="">اختر السنة أولاً</option></select>
+          </div>
+          <div class="form-group">
+            <label for="subjectSelect"><i data-lucide="library"></i> المادة</label>
+            <select name="subject" id="subjectSelect" required><option value="">اختر التخصص أولاً</option></select>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top:16px;">
+          <label for="lessonTitle"><i data-lucide="type"></i> عنوان الدرس</label>
+          <input id="lessonTitle" type="text" name="title" required placeholder="مثال: المدخل إلى الحضارة الإسلامية">
+        </div>
+
+        <div class="form-group" style="margin-top:14px;">
+          <label for="lessonDescription"><i data-lucide="align-right"></i> وصف مختصر (اختياري)</label>
+          <textarea id="lessonDescription" name="description" rows="3" placeholder="وصف موجز عن الدرس"></textarea>
+        </div>
+
+        <div class="form-group" style="margin-top:14px;">
+          <label for="lessonFile"><i data-lucide="paperclip"></i> الملف (PDF أو Word)</label>
+          <input id="lessonFile" type="file" name="file" accept=".pdf,.doc,.docx" required>
+        </div>
+
+        <button type="submit" class="btn-primary" style="margin-top:20px;">
+          <i data-lucide="upload"></i> رفع الدرس
+        </button>
+        <p id="uploadStatus" class="status" aria-live="polite"></p>
+      </form>
+    </div>
   </div>
 
-  <div class="collapsible-body" id="uploadBody" style="display:none;">
-    <form id="uploadForm">
-      <label for="yearSelect">السنة الدراسية</label>
-      <select name="year" id="yearSelect" required><option value="">اختر السنة</option></select>
-
-      <label for="specializationSelect">التخصص</label>
-      <select name="specialization" id="specializationSelect" required><option value="">اختر السنة أولاً</option></select>
-
-      <label for="subjectSelect">المادة</label>
-      <select name="subject" id="subjectSelect" required><option value="">اختر التخصص أولاً</option></select>
-
-      <label for="lessonTitle">عنوان الدرس</label>
-      <input id="lessonTitle" type="text" name="title" required placeholder="مثال: المدخل إلى الحضارة الإسلامية">
-
-      <label for="lessonDescription">وصف مختصر (اختياري)</label>
-      <textarea id="lessonDescription" name="description" rows="3" placeholder="وصف موجز عن الدرس"></textarea>
-
-      <label for="lessonFile">الملف (PDF أو Word)</label>
-      <input id="lessonFile" type="file" name="file" accept=".pdf,.doc,.docx" required>
-
-      <button type="submit" class="btn-primary">
-        <i data-lucide="upload" class="admin-icon"></i> رفع الدرس
-      </button>
-      <p id="uploadStatus" class="status" aria-live="polite"></p>
-    </form>
-  </div>
-</div>
   <!-- إدارة الدروس -->
-<div class="manage-card collapsible-card">
-  <div class="collapsible-chip chip-emerald" id="manageChip" role="button" tabindex="0" aria-expanded="false">
-    <i data-lucide="library-big" class="chip-icon"></i>
-    <div class="chip-text">
-      <h3>إدارة الدروس المرفوعة</h3>
-      <p class="chip-subtitle" id="manageCount">جميع دروس المنصة</p>
+  <div class="manage-card collapsible-card">
+    <div class="collapsible-chip chip-emerald" id="manageChip" role="button" tabindex="0" aria-expanded="false">
+      <i data-lucide="library-big" class="chip-icon"></i>
+      <div class="chip-text">
+        <h3>إدارة الدروس المرفوعة</h3>
+        <p class="chip-subtitle" id="manageCount">جميع دروس المنصة</p>
+      </div>
+      <span class="chip-chevron"><i data-lucide="chevron-down"></i></span>
     </div>
-    <span class="chip-chevron"><i data-lucide="chevron-down"></i></span>
+
+    <div class="collapsible-body" id="manageBody" style="display:none;">
+      <div id="adminLessons"></div>
+    </div>
   </div>
 
-  <div class="collapsible-body" id="manageBody" style="display:none;">
-    <div id="adminLessons"></div>
-  </div>
 </div>
 
 <footer>
@@ -602,12 +240,12 @@
   </div>
 </footer>
 
-<!-- جذر النوافذ المنبثقة -->
 <div id="modalRoot"></div>
 
 <script src="data.js"></script>
-<script src="https://unpkg.com/lucide@latest"></script>
+<script src="lucide.min.js"></script>
 <script src="admin.js"></script>
+<script src="modern-ui.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     if (window.lucide) window.lucide.createIcons();

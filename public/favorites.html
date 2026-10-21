@@ -4,32 +4,45 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>مفضلتي - كلية العلوم الإسلامية</title>
+<meta name="description" content="تخصصاتك المفضلة ودروسك المعجبة في مكان واحد">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0e5742">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
-<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
 
 <header class="navbar">
   <div class="container nav-wrap">
-    <div class="logo" onclick="window.location.href='index.html'">
-      <img src="lion.png" alt="جامعة وهران 1" class="logo-img">
-      <div>
-        <h1>كلية العلوم الإسلامية</h1>
-        <p>جامعة وهران 1 أحمد بن بلة</p>
-      </div>
-    </div>
-    <nav>
-      <a href="index.html"><i data-lucide="house"></i> الرئيسية</a>
-      <button id="themeToggle" class="theme-btn" aria-label="تبديل الوضع"></button>
+    <a class="logo" href="index.html" title="العودة للرئيسية">
+      <span class="logo-mark"><img src="lion.png" alt="شعار كلية العلوم الإسلامية" class="logo-img"></span>
+      <span class="logo-text">
+        <strong>كلية العلوم الإسلامية</strong>
+        <small>جامعة وهران 1 أحمد بن بلة</small>
+      </span>
+    </a>
+    <nav class="nav-menu" aria-label="التنقل الرئيسي">
+      <a href="index.html" class="nav-link">الرئيسية</a>
+      <a href="teachers.html" class="nav-link">هيئة التدريس</a>
+      <a href="favorites.html" class="nav-link">مفضلتي</a>
+      <a href="contact.html" class="nav-link">تواصل</a>
+      <button id="themeToggle" class="theme-btn" type="button" aria-label="تبديل الوضع"></button>
     </nav>
   </div>
 </header>
 
-<section class="contact-hero">
+<section class="page-hero">
   <div class="container">
-    <span class="contact-hero-icon"><i data-lucide="star"></i></span>
-    <h1>مفضلتي</h1>
-    <p>تخصصاتك المفضلة ودروسك المُعجَبة في مكان واحد</p>
+    <div class="page-hero-card">
+      <div class="page-hero-content">
+        <span class="page-hero-icon"><i data-lucide="star"></i></span>
+        <h1>مفضلتي</h1>
+        <p>تخصصاتك المفضلة ودروسك المُعجَبة في مكان واحد</p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -64,29 +77,21 @@
   </div>
 </footer>
 
-<!-- ✏️ جديد: مكتبة الأيقونات (يجب أن تكون قبل app.js) -->
 <script src="lucide.min.js"></script>
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
 // ═══════════════════════════════════════════════
-// ⭐ صفحة المفضلة - بدون إعادة تعريف أي متغير
+// ⭐ صفحة المفضلة
 // ═══════════════════════════════════════════════
-// ملاحظة مهمة:
-// - themeToggle و savedTheme معرّفتان في app.js
-// - دالة icon() أيضاً معرّفة في app.js
-// - لا نعيد تعريفها هنا
-
-(function() {
+(function () {
   'use strict';
 
-  // متغيرات خاصة بجلب الدروس
   let serverLessons = [];
   let lessonsLoaded = false;
   let loadFailed = false;
   let loadAttempts = 0;
 
-  // جلب الدروس وتنظيف المفضلة من الدروس المحذوفة
   async function loadLessons() {
     loadAttempts++;
     try {
@@ -99,7 +104,6 @@
       lessonsLoaded = true;
       loadFailed = false;
 
-      // حذف الدروس المفضلة التي لم تعد موجودة على السيرفر
       const favs = getFavorites();
       const existingIds = serverLessons.map(l => l.id);
       const cleaned = favs.lessons.filter(id => existingIds.includes(id));
@@ -109,36 +113,20 @@
       }
     } catch (err) {
       console.error('تعذر جلب الدروس:', err);
-      // لا نحذف أي شيء من المفضلة عند فشل الاتصال، ونعيد المحاولة
-      if (loadAttempts < 5) {
-        setTimeout(loadLessons, 3000);
-      } else {
-        loadFailed = true; // بعد 5 محاولات نعرض رسالة بدل الانتظار الأبدي
-      }
+      if (loadAttempts < 5) setTimeout(loadLessons, 3000);
+      else loadFailed = true;
     }
     renderFavorites();
   }
-  
-  // ═══════════════════════════════════════════════
-  // عرض المفضلة
-  // ═══════════════════════════════════════════════
+
   function renderFavorites() {
-    // التحقق من وجود الدوال المطلوبة
-    if (typeof getFavorites !== 'function') {
-      console.error('getFavorites غير معرّفة');
-      return;
-    }
-    
+    if (typeof getFavorites !== 'function') return;
     const favs = getFavorites();
-    
-    // ==================== التخصصات ====================
+
     const specsList = document.getElementById('favSpecsList');
     const specCountEl = document.getElementById('specCount');
-    
-    if (specCountEl) {
-      specCountEl.textContent = `(${favs.specializations.length})`;
-    }
-    
+    if (specCountEl) specCountEl.textContent = `(${favs.specializations.length})`;
+
     if (specsList) {
       if (!favs.specializations.length) {
         specsList.innerHTML = `
@@ -146,14 +134,12 @@
             <span>${icon('inbox')}</span>
             <p>لا توجد تخصصات في المفضلة بعد</p>
             <a href="index.html">تصفح التخصصات وأضف</a>
-          </div>
-        `;
+          </div>`;
       } else {
         specsList.innerHTML = favs.specializations.map(fav => {
           const yearObj = (typeof YEARS !== 'undefined') ? YEARS.find(y => y.id === fav.year) : null;
           const yearName = yearObj ? yearObj.name : fav.year;
           const specEscaped = fav.spec.replace(/'/g, "\\'");
-          
           return `
             <div class="fav-card">
               <div class="fav-card-content">
@@ -164,29 +150,22 @@
                 </div>
               </div>
               <div class="fav-card-actions">
-                <button onclick="window.goToSpecialization('${fav.year}', '${specEscaped}')" 
-                        class="fav-go-btn">
+                <button onclick="window.goToSpecialization('${fav.year}', '${specEscaped}')" class="fav-go-btn">
                   ${icon('arrow-left')} اذهب
                 </button>
-                <button onclick="window.removeSpecFavorite('${fav.year}', '${specEscaped}')" 
-                        class="fav-remove-btn" aria-label="إزالة من المفضلة">
+                <button onclick="window.removeSpecFavorite('${fav.year}', '${specEscaped}')" class="fav-remove-btn" aria-label="إزالة من المفضلة">
                   ${icon('x')}
                 </button>
               </div>
-            </div>
-          `;
+            </div>`;
         }).join('');
       }
     }
-    
-    // ==================== الدروس ====================
+
     const lessonsList = document.getElementById('favLessonsList');
     const lessonsCountEl = document.getElementById('lessonsCount');
-    
-    if (lessonsCountEl) {
-      lessonsCountEl.textContent = `(${favs.lessons.length})`;
-    }
-    
+    if (lessonsCountEl) lessonsCountEl.textContent = `(${favs.lessons.length})`;
+
     if (lessonsList) {
       if (!favs.lessons.length) {
         lessonsList.innerHTML = `
@@ -194,44 +173,26 @@
             <span>${icon('inbox')}</span>
             <p>لا توجد دروس مُعجَبة بعد</p>
             <a href="index.html">تصفح الدروس وأضف إعجاب</a>
-          </div>
-        `;
+          </div>`;
       } else {
-        const allLessonsData = serverLessons;
-        
-        // نفرّق بين "لم يُحمَّل بعد" و"محمَّل وفارغ"
         if (!lessonsLoaded) {
           lessonsList.innerHTML = loadFailed
-            ? `
-              <div class="fav-empty">
-                <span>${icon('triangle-alert')}</span>
-                <p>تعذر تحميل الدروس الآن. أعد تحميل الصفحة بعد قليل.</p>
-              </div>
-            `
-            : `
-              <div class="fav-empty">
-                <span>${icon('hourglass')}</span>
-                <p>جارٍ تحميل الدروس...</p>
-              </div>
-            `;
-          // (تُعرض القائمة بعد انتهاء الجلب)
+            ? `<div class="fav-empty"><span>${icon('triangle-alert')}</span><p>تعذر تحميل الدروس الآن. أعد تحميل الصفحة بعد قليل.</p></div>`
+            : `<div class="fav-empty"><span>${icon('hourglass')}</span><p>جارٍ تحميل الدروس...</p></div>`;
           return;
         }
-        
-        const favLessons = allLessonsData.filter(l => favs.lessons.includes(l.id));
-        
+
+        const favLessons = serverLessons.filter(l => favs.lessons.includes(l.id));
         if (!favLessons.length) {
           lessonsList.innerHTML = `
             <div class="fav-empty">
               <span>${icon('inbox')}</span>
               <p>الدروس المُعجَبة لم تعد متاحة</p>
-            </div>
-          `;
+            </div>`;
         } else {
           lessonsList.innerHTML = favLessons.map(l => {
             const title = (typeof escapeHtml === 'function') ? escapeHtml(l.title) : l.title;
             const subject = (typeof escapeHtml === 'function') ? escapeHtml(l.subject) : l.subject;
-            
             return `
               <div class="fav-card">
                 <div class="fav-card-content">
@@ -247,52 +208,38 @@
                     ${icon('x')}
                   </button>
                 </div>
-              </div>
-            `;
+              </div>`;
           }).join('');
         }
       }
     }
   }
-  
-  // ═══════════════════════════════════════════════
-  // الدوال العامة (window)
-  // ═══════════════════════════════════════════════
-  
-  window.goToSpecialization = function(yearId, spec) {
+
+  window.goToSpecialization = function (yearId, spec) {
     sessionStorage.setItem('goto_year', yearId);
     sessionStorage.setItem('goto_spec', spec);
     window.location.href = 'index.html';
   };
-  
-  window.removeSpecFavorite = function(yearId, spec) {
-    if (typeof toggleFavoriteSpecialization === 'function') {
-      toggleFavoriteSpecialization(yearId, spec);
-    }
+
+  window.removeSpecFavorite = function (yearId, spec) {
+    if (typeof toggleFavoriteSpecialization === 'function') toggleFavoriteSpecialization(yearId, spec);
     renderFavorites();
   };
-  
-  window.removeLessonFavorite = function(lessonId) {
-    if (typeof toggleFavoriteLesson === 'function') {
-      toggleFavoriteLesson(lessonId);
-    }
+
+  window.removeLessonFavorite = function (lessonId) {
+    if (typeof toggleFavoriteLesson === 'function') toggleFavoriteLesson(lessonId);
     renderFavorites();
   };
-  
-  // ═══════════════════════════════════════════════
-  // تشغيل عند التحميل
-  // ═══════════════════════════════════════════════
+
   function init() {
     loadLessons();
     renderFavorites();
   }
-  
-  if (document.readyState === 'complete') {
-    init();
-  } else {
-    window.addEventListener('load', init);
-  }
+
+  if (document.readyState === 'complete') init();
+  else window.addEventListener('load', init);
 })();
 </script>
+<script src="modern-ui.js"></script>
 </body>
 </html>

@@ -9,7 +9,7 @@
 <!-- 📱 PWA - تطبيق ويب تقدمي                       -->
 <!-- ═══════════════════════════════════════════════ -->
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0d5f4a">
+<meta name="theme-color" content="#0e5742">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -19,10 +19,11 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 
 <!-- ═══════════════════════════════════════════════ -->
-<!-- 🔤 الخطوط                                       -->
+<!-- 🔤 الخطوط + الأنماط                             -->
 <!-- ═══════════════════════════════════════════════ -->
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
-<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
 
 <!-- ═══════════════════════════════════════════════ -->
 <!-- 🔍 SEO - تحسين محركات البحث                    -->
@@ -47,10 +48,8 @@
 <meta name="twitter:title" content="منصة الدروس الجامعية - كلية العلوم الإسلامية">
 <meta name="twitter:description" content="دروس PDF و Word لكل التخصصات - جامعة وهران 1">
 
-<!-- Canonical URL -->
 <link rel="canonical" href="https://islamic-lessons.onrender.com/">
 
-<!-- Schema.org -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -60,41 +59,39 @@
   "url": "https://islamic-lessons.onrender.com",
   "description": "منصة تعليمية تجمع دروس كلية العلوم الإسلامية - جامعة وهران 1 أحمد بن بلة",
   "inLanguage": "ar",
-  "address": {
-    "@type": "PostalAddress",
-    "addressCountry": "DZ",
-    "addressLocality": "وهران"
-  },
-  "parentOrganization": {
-    "@type": "CollegeOrUniversity",
-    "name": "جامعة وهران 1 أحمد بن بلة"
-  },
-  "founder": {
-    "@type": "Person",
-    "name": "جدة عبد الرحمن"
-  }
+  "address": { "@type": "PostalAddress", "addressCountry": "DZ", "addressLocality": "وهران" },
+  "parentOrganization": { "@type": "CollegeOrUniversity", "name": "جامعة وهران 1 أحمد بن بلة" },
+  "founder": { "@type": "Person", "name": "جدة عبد الرحمن" }
 }
 </script>
 </head>
 <body>
 
+<!-- ═══════════ الشريط العلوي ═══════════ -->
 <header class="navbar">
   <div class="container nav-wrap">
-    <div class="logo" id="secretLogo" title="كلية العلوم الإسلامية">
-      <img src="lion.png" alt="جامعة وهران 1" class="logo-img">
-      <div>
-        <h1>كلية العلوم الإسلامية</h1>
-        <p>جامعة وهران 1 أحمد بن بلة</p>
-      </div>
-    </div>
-    <nav>
-      <a href="#" id="homeBtn"><i data-lucide="house"></i> الرئيسية</a>
-      <a href="admin.html" class="btn-admin admin-hidden" id="adminBtn"><i data-lucide="shield-check"></i> لوحة التحكم</a>
-      <button id="openLoginBtn" class="login-nav-btn" type="button" title="دخول">
-        <i data-lucide="log-in"></i> دخول
+    <a class="logo" id="secretLogo" href="index.html" title="كلية العلوم الإسلامية">
+      <span class="logo-mark"><img src="lion.png" alt="شعار كلية العلوم الإسلامية" class="logo-img"></span>
+      <span class="logo-text">
+        <strong>كلية العلوم الإسلامية</strong>
+        <small>جامعة وهران 1 أحمد بن بلة</small>
+      </span>
+    </a>
+
+    <nav class="nav-menu" aria-label="التنقل الرئيسي">
+      <a href="index.html" id="homeBtn" class="nav-link">الرئيسية</a>
+      <a href="teachers.html" class="nav-link">هيئة التدريس</a>
+      <a href="favorites.html" class="nav-link">مفضلتي</a>
+      <a href="contact.html" class="nav-link">تواصل</a>
+      <a href="admin.html" class="nav-link btn-admin admin-hidden" id="adminBtn">لوحة التحكم</a>
+
+      <button id="themeToggle" class="theme-btn" type="button" aria-label="تبديل الوضع"></button>
+      <button id="menuToggle" class="icon-btn menu-toggle" type="button" aria-label="القائمة" aria-expanded="false">
+        <i data-lucide="menu"></i>
       </button>
-      <button id="themeToggle" class="theme-btn" aria-label="تبديل الوضع"></button>
-      <button id="menuToggle" class="theme-btn menu-toggle" aria-label="القائمة"><i data-lucide="menu"></i></button>
+      <button id="openLoginBtn" class="nav-cta" type="button" title="دخول">
+        دخول <i data-lucide="arrow-left"></i>
+      </button>
 
       <!-- القائمة المنسدلة -->
       <div id="menuDropdown" class="menu-dropdown">
@@ -120,10 +117,8 @@
           <span class="menu-icon"><i data-lucide="phone"></i></span>
           <span>تواصل مع الإدارة</span>
         </a>
-
-        <!-- زر تثبيت التطبيق -->
         <div class="menu-divider"></div>
-        <button id="installAppBtn" class="menu-item install-btn" style="display:none;">
+        <button id="installAppBtn" class="menu-item install-btn" type="button" style="display:none;">
           <span class="menu-icon"><i data-lucide="smartphone"></i></span>
           <span>تثبيت التطبيق</span>
         </button>
@@ -132,15 +127,68 @@
   </div>
 </header>
 
+<!-- ═══════════ الواجهة الرئيسية ═══════════ -->
 <section class="hero">
   <div class="container">
-    <h2>﷽</h2>
-    <h1>منصة الدروس الجامعية</h1>
-    <p>اختر السنة → التخصص → المادة → تصفّح الدروس</p>
-    <div class="search-hero">
-      <input type="text" id="searchInput" placeholder="ابحث عن درس، مادة، أو ملف...">
-      <i data-lucide="search" class="search-ico"></i>
+
+    <div class="hero-card">
+      <div class="hero-media" aria-hidden="true"></div>
+      <div class="hero-glow" aria-hidden="true"></div>
+      <span class="hero-basmala" aria-hidden="true">﷽</span>
+
+      <div class="hero-content">
+        <span class="hero-eyebrow">
+          <i data-lucide="sparkles"></i>
+          كلية العلوم الإسلامية · جامعة وهران 1
+        </span>
+        <h1 class="hero-title">منصة الدروس <em>الجامعية</em></h1>
+        <p class="hero-sub">
+          كل محاضراتك وملفاتك في مكان واحد. اختر السنة، ثم التخصص، ثم المادة —
+          وابدأ المراجعة في ثوانٍ.
+        </p>
+      </div>
     </div>
+
+    <!-- الحفظة العائمة -->
+    <div class="hero-capsule">
+      <form class="search-capsule" role="search" onsubmit="return false">
+        <div class="capsule-seg">
+          <i data-lucide="calendar"></i>
+          <select id="quickYearFilter" aria-label="السنة الدراسية">
+            <option value="">كل السنوات</option>
+          </select>
+        </div>
+        <span class="capsule-sep" aria-hidden="true"></span>
+
+        <div class="capsule-seg">
+          <i data-lucide="graduation-cap"></i>
+          <select id="quickSpecFilter" aria-label="التخصص" disabled>
+            <option value="">كل التخصصات</option>
+          </select>
+        </div>
+        <span class="capsule-sep" aria-hidden="true"></span>
+
+        <div class="capsule-seg">
+          <i data-lucide="search"></i>
+          <input type="text" id="searchInput" placeholder="ابحث عن درس أو مادة أو ملف..." autocomplete="off" aria-label="بحث">
+        </div>
+
+        <button class="capsule-btn" id="searchActionBtn" type="button" aria-label="بحث">
+          <i data-lucide="arrow-left"></i>
+        </button>
+      </form>
+    </div>
+
+    <div class="trust">
+      <p class="trust-label">موثوق به من طرف طلبة وأساتذة الكلية</p>
+      <div class="trust-stats">
+        <div class="trust-stat"><b data-count="5" data-stat="years">5</b><span>سنوات دراسية</span></div>
+        <div class="trust-stat"><b data-count="40" data-stat="specs">40</b><span>تخصصاً جامعياً</span></div>
+        <div class="trust-stat"><b data-count="400" data-stat="subjects">400</b><span>مادة علمية</span></div>
+        <div class="trust-stat"><b>PDF</b><span>ملفات Word</span></div>
+      </div>
+    </div>
+
   </div>
 </section>
 
@@ -148,26 +196,54 @@
   <div id="breadcrumb" class="breadcrumb"></div>
 </div>
 
+<!-- ═══════════ الأقسام ═══════════ -->
 <section id="yearsSection" class="container section">
-  <h2 class="section-title">اختر السنة الدراسية</h2>
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">ابدأ من هنا</span>
+      <h2 class="section-title">اختر السنة الدراسية</h2>
+    </div>
+    <p class="section-hint">ليسانس · ماستر</p>
+  </div>
   <div id="yearsGrid" class="years-grid"></div>
 </section>
 
 <section id="specializationsSection" class="container section" style="display:none;">
-  <button class="back-btn" onclick="goHome()">← رجوع إلى السنوات</button>
-  <h2 class="section-title" id="specTitle">اختر التخصص</h2>
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">الخطوة الثانية</span>
+      <h2 class="section-title" id="specTitle">اختر التخصص</h2>
+    </div>
+    <button class="back-btn" type="button" onclick="goHome()">
+      <i data-lucide="arrow-right"></i> رجوع إلى السنوات
+    </button>
+  </div>
   <div id="specializationsGrid" class="specializations-grid"></div>
 </section>
 
 <section id="subjectsSection" class="container section" style="display:none;">
-  <button class="back-btn" onclick="backToSpecializations()">← رجوع إلى التخصصات</button>
-  <h2 class="section-title" id="subjectTitle">اختر المادة</h2>
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">الخطوة الثالثة</span>
+      <h2 class="section-title" id="subjectTitle">اختر المادة</h2>
+    </div>
+    <button class="back-btn" type="button" onclick="backToSpecializations()">
+      <i data-lucide="arrow-right"></i> رجوع إلى التخصصات
+    </button>
+  </div>
   <div id="subjectsGrid" class="subjects-grid"></div>
 </section>
 
 <section id="lessonsSection" class="container section" style="display:none;">
-  <button class="back-btn" onclick="backToSubjects()">← رجوع إلى المواد</button>
-  <h2 class="section-title" id="lessonsTitle">الدروس</h2>
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">المحتوى</span>
+      <h2 class="section-title" id="lessonsTitle">الدروس</h2>
+    </div>
+    <button class="back-btn" type="button" onclick="backToSubjects()">
+      <i data-lucide="arrow-right"></i> رجوع إلى المواد
+    </button>
+  </div>
   <div id="lessonsGrid" class="lessons-grid"></div>
   <div id="emptyMsg" class="empty" style="display:none;">
     <i data-lucide="book-open" class="empty-ico"></i>
@@ -176,8 +252,15 @@
 </section>
 
 <section id="searchResultsSection" class="container section" style="display:none;">
-  <button class="back-btn" onclick="goHome()">← رجوع</button>
-  <h2 class="section-title">نتائج البحث</h2>
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">البحث</span>
+      <h2 class="section-title">نتائج البحث</h2>
+    </div>
+    <button class="back-btn" type="button" onclick="goHome()">
+      <i data-lucide="arrow-right"></i> رجوع
+    </button>
+  </div>
   <div id="searchResultsGrid" class="lessons-grid"></div>
   <div id="searchEmptyMsg" class="empty" style="display:none;">
     <i data-lucide="search-x" class="empty-ico"></i>
@@ -192,11 +275,9 @@
   </div>
 </footer>
 
-<!-- ═══════════════════════════════════════════════ -->
-<!-- 🌟 نافذة الترحيب                                -->
-<!-- ═══════════════════════════════════════════════ -->
+<!-- ═══════════ نافذة الترحيب ═══════════ -->
 <div id="welcomeModal" class="welcome-backdrop" style="display:none;">
-  <div class="welcome-card" onclick="event.stopPropagation()">
+  <div class="welcome-card" onclick="event.stopPropagation()" role="dialog" aria-modal="true" aria-label="تسجيل الدخول">
     <button type="button" id="welcomeCloseBtn" class="welcome-close" aria-label="إغلاق">
       <i data-lucide="x"></i>
     </button>
@@ -206,7 +287,7 @@
     </div>
 
     <h2 class="welcome-title">مرحباً بك في المنصة</h2>
-    
+
     <form id="welcomeForm" autocomplete="on">
       <div class="welcome-field">
         <label for="welcomeEmail">البريد الإلكتروني</label>
@@ -247,34 +328,27 @@
     </a>
 
     <p class="welcome-guest-hint">
-  للتصفح كزائر: أغلق النافذة بالضغط على زر الإغلاق ✕
-</p>
+      للتصفح كزائر: أغلق النافذة بالضغط على زر الإغلاق ✕
+    </p>
 
-<!-- 👤 شارة المستخدم المسجّل -->
-<div id="loggedInChip" class="logged-chip" style="display:none;">
-  <span class="logged-chip-icon"><i data-lucide="user-round"></i></span>
-  <span id="loggedChipLabel" class="logged-chip-label"></span>
-  <a id="loggedChipLink" href="#" class="logged-chip-action">صفحتي</a>
-  <button type="button" id="loggedChipLogout" class="logged-chip-logout" title="خروج">
-    <i data-lucide="log-out"></i>
-  </button>
+    <div id="loggedInChip" class="logged-chip" style="display:none;">
+      <span class="logged-chip-icon"><i data-lucide="user-round"></i></span>
+      <span id="loggedChipLabel" class="logged-chip-label"></span>
+      <a id="loggedChipLink" href="#" class="logged-chip-action">صفحتي</a>
+      <button type="button" id="loggedChipLogout" class="logged-chip-logout" title="خروج">
+        <i data-lucide="log-out"></i>
+      </button>
+    </div>
+  </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════ -->
-<!-- 🚀 PWA Service Worker + زر التثبيت            -->
-<!-- ═══════════════════════════════════════════════ -->
 <script>
-// تسجيل Service Worker
+// PWA: تسجيل Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/service-worker.js')
-      .then((registration) => {
-        console.log('✅ PWA: Service Worker مسجّل');
-        console.log('📍 النطاق:', registration.scope);
-      })
-      .catch((err) => {
-        console.error('❌ PWA: فشل التسجيل:', err);
-      });
+      .then((registration) => console.log('✅ PWA: Service Worker مسجّل —', registration.scope))
+      .catch((err) => console.error('❌ PWA: فشل التسجيل:', err));
   });
 }
 
@@ -285,11 +359,7 @@ const installBtn = document.getElementById('installAppBtn');
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
-  console.log('📱 التطبيق قابل للتثبيت!');
-
-  if (installBtn) {
-    installBtn.style.display = 'flex';
-  }
+  if (installBtn) installBtn.style.display = 'flex';
 });
 
 if (installBtn) {
@@ -298,33 +368,21 @@ if (installBtn) {
       alert('✅ التطبيق مثبّت بالفعل على جهازك!');
       return;
     }
-
     deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-
-    if (outcome === 'accepted') {
-      console.log('✅ تم قبول التثبيت');
-    } else {
-      console.log('❌ تم رفض التثبيت');
-    }
-
+    await deferredPrompt.userChoice;
     deferredPrompt = null;
   });
 }
 
 window.addEventListener('appinstalled', () => {
-  console.log('🎉 تم تثبيت التطبيق!');
   deferredPrompt = null;
-  if (installBtn) {
-    installBtn.style.display = 'none';
-  }
+  if (installBtn) installBtn.style.display = 'none';
 });
 </script>
 
-<!-- ✏️ جديد: مكتبة الأيقونات (يجب أن تكون قبل app.js) -->
 <script src="lucide.min.js"></script>
 <script src="data.js"></script>
 <script src="app.js"></script>
-<script src="adhkar.js"></script>
+<script src="modern-ui.js"></script>
 </body>
 </html>
