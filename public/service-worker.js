@@ -5,7 +5,7 @@
 // ⚠️ مهم: عند أي تعديل، زيّد رقم الإصدار!
 // ═══════════════════════════════════════════════
 
-const VERSION = 'v1.0.32';
+const VERSION = 'v1.0.40';
 const CACHE_NAME = `islamic-lessons-${VERSION}`;
 const STATIC_CACHE = `islamic-lessons-static-${VERSION}`;
 const DYNAMIC_CACHE = `islamic-lessons-dynamic-${VERSION}`;
@@ -29,6 +29,7 @@ const STATIC_FILES = [
   '/modern-ui.js',
   '/lucide.min.js',
   '/lion.png',
+  '/hero-dome-1600.jpg',
   '/manifest.json'
 ];
 

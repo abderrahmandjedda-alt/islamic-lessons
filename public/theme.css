@@ -3730,7 +3730,6 @@ html[data-theme="dark"] .student-upload-card .form-section-title { color: var(--
 
 .cselect.open .cselect-trigger {
   border-color: var(--pine);
-  background: var(--card);
   box-shadow: 0 0 0 4px rgba(14, 87, 66, 0.1);
 }
 
@@ -4052,6 +4051,114 @@ html[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
 .chip-icon svg,
 .upload-card-icon svg {
   color: inherit !important;
+}
+
+/* ═══════════════ 22 · HERO BACKGROUND (home) ═══════════════ */
+.hero-media {
+  background-color: #06281e;
+  background-image:
+    linear-gradient(to left, rgba(4, 16, 12, 0.86) 0%, rgba(4, 16, 12, 0.5) 38%, rgba(4, 16, 12, 0.06) 72%),
+    linear-gradient(to top, rgba(4, 16, 12, 0.88) 0%, rgba(4, 16, 12, 0.28) 48%, rgba(4, 16, 12, 0.04) 100%),
+    url("hero-dome-1600.jpg");
+  background-size: cover, cover, cover;
+  background-position: center, center, center 46%;
+  background-repeat: no-repeat;
+}
+
+.hero-media::before { display: none; }
+
+.hero-media::after {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  opacity: 0.22;
+  mix-blend-mode: overlay;
+}
+
+.hero-glow {
+  background: radial-gradient(circle, rgba(233, 192, 138, 0.3), transparent 62%);
+}
+
+.hero-title { color: #fdf8ec; }
+.hero-title em { color: #e9c08a; }
+.hero-sub { color: rgba(250, 244, 231, 0.86); }
+
+@media (max-width: 760px) {
+  .hero-media {
+    background-image:
+      linear-gradient(to top, rgba(4, 16, 12, 0.92) 0%, rgba(4, 16, 12, 0.58) 58%, rgba(4, 16, 12, 0.34) 100%),
+      url("hero-dome-1600.jpg");
+    background-size: cover, cover;
+    background-position: center, center 42%;
+  }
+}
+
+/* ═══════════════ 24 · ENTRY DHIKR ═══════════════ */
+.entry-dhikr {
+  position: fixed;
+  top: 92px;
+  left: 50%;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: calc(100% - 32px);
+  max-width: 620px;
+  padding: 14px 18px;
+  border-radius: 18px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  transform: translateX(-50%) translateY(-14px);
+  transition: opacity 0.35s ease, transform 0.45s var(--ease);
+  pointer-events: none;
+}
+
+.entry-dhikr.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.entry-dhikr.hide { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+
+.entry-dhikr-icon {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: rgba(14, 87, 66, 0.09);
+  color: var(--pine);
+  border: 1px solid rgba(14, 87, 66, 0.1);
+}
+
+.entry-dhikr-icon svg { width: 20px; height: 20px; stroke-width: 1.7; }
+
+.entry-dhikr-body { min-width: 0; }
+
+.entry-dhikr-text {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--ink);
+}
+
+.entry-dhikr-source {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+html[data-theme="dark"] .entry-dhikr-icon {
+  background: rgba(63, 184, 148, 0.12);
+  border-color: rgba(63, 184, 148, 0.18);
+}
+
+@media (max-width: 560px) {
+  .entry-dhikr { top: 76px; padding: 12px 14px; gap: 11px; border-radius: 16px; }
+  .entry-dhikr-icon { width: 38px; height: 38px; border-radius: 12px; }
+  .entry-dhikr-text { font-size: 0.9rem; line-height: 1.65; }
+  .entry-dhikr-source { font-size: 0.65rem; }
 }
 
 /* احترام تقليل الحركة */

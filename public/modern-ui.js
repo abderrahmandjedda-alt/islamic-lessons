@@ -605,11 +605,62 @@
   }
 
   /* ─────────────────────────────
+     🕌 ذكر/آية/حديث عند دخول الموقع (3 ثوانٍ)
+  ───────────────────────────── */
+  function initEntryDhikr() {
+    try {
+      if (sessionStorage.getItem('entryDhikrShown') === '1') return;
+    } catch (err) {}
+
+    if (/(^|\/)(admin|teacher|student)(\.html)?$/i.test(location.pathname)) return;
+
+    const items = [
+      { icon: 'book-open', text: 'أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ', source: 'سورة الرعد — الآية 28' },
+      { icon: 'graduation-cap', text: 'وَقُل رَّبِّ زِدْنِي عِلْمًا', source: 'سورة طه — الآية 114' },
+      { icon: 'scroll-text', text: 'خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ', source: 'رواه البخاري' },
+      { icon: 'sparkles', text: 'مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ بِهِ طَرِيقًا إِلَى الْجَنَّةِ', source: 'رواه مسلم' },
+      { icon: 'star', text: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ', source: 'ذكر — متفق عليه' },
+      { icon: 'heart', text: 'إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ', source: 'رواه البخاري' },
+      { icon: 'book-open', text: 'مَنْ يُرِدِ اللَّهُ بِهِ خَيْرًا يُفَقِّهْهُ فِي الدِّينِ', source: 'متفق عليه' }
+    ];
+
+    const item = items[Math.floor(Math.random() * items.length)];
+
+    const box = document.createElement('div');
+    box.className = 'entry-dhikr';
+    box.setAttribute('role', 'status');
+    box.setAttribute('aria-live', 'polite');
+    box.innerHTML =
+      '<span class="entry-dhikr-icon"><i data-lucide="' + item.icon + '"></i></span>' +
+      '<div class="entry-dhikr-body">' +
+        '<p class="entry-dhikr-text"></p>' +
+        '<span class="entry-dhikr-source"></span>' +
+      '</div>';
+
+    box.querySelector('.entry-dhikr-text').textContent = item.text;
+    box.querySelector('.entry-dhikr-source').textContent = item.source;
+    document.body.appendChild(box);
+
+    if (window.lucide) window.lucide.createIcons();
+
+    requestAnimationFrame(function () { box.classList.add('show'); });
+
+    try { sessionStorage.setItem('entryDhikrShown', '1'); } catch (err) {}
+
+    setTimeout(function () {
+      box.classList.remove('show');
+      box.classList.add('hide');
+      setTimeout(function () { box.remove(); }, 500);
+    }, 3000);
+  }
+
+  /* ─────────────────────────────
      🏁 التشغيل
   ───────────────────────────── */
   function init() {
     markActiveNav();
     initMobileNav();
+    initEntryDhikr();
     initCardWave();
     fillRealStats();
     tagReveals(document);
