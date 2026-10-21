@@ -1178,28 +1178,32 @@ html[data-theme="dark"] .fav-card::after {
   min-height: 212px;
 }
 
-/* البطاقات تنبثق عند دخولها الشاشة أثناء التمرير */
-.wave-armed > .year-card,
-.wave-armed > .specialization-card,
-.wave-armed > .subject-card,
-.wave-armed > .lesson-card,
-.wave-armed > .teacher-card { opacity: 0; }
-
-.wave-armed > .wave-in {
-  animation: yearWave 1.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+/* ظهور البطاقات: انبثاق عند دخول كل بطاقة إلى الشاشة */
+.year-card,
+.specialization-card,
+.subject-card,
+.lesson-card,
+.teacher-card {
+  animation: none;
 }
 
-.years-grid > .year-card:nth-child(1) { animation-delay: 0.04s; }
-.years-grid > .year-card:nth-child(2) { animation-delay: 0.16s; }
-.years-grid > .year-card:nth-child(3) { animation-delay: 0.28s; }
-.years-grid > .year-card:nth-child(4) { animation-delay: 0.4s; }
-.years-grid > .year-card:nth-child(5) { animation-delay: 0.52s; }
-.years-grid > .year-card:nth-child(n+6) { animation-delay: 0.64s; }
+.wave-play {
+  animation: yearWave 1.15s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+:is(.years-grid, .specializations-grid, .subjects-grid, .lessons-grid, .teachers-grid) > :nth-child(1) { animation-delay: 0.04s; }
+:is(.years-grid, .specializations-grid, .subjects-grid, .lessons-grid, .teachers-grid) > :nth-child(2) { animation-delay: 0.12s; }
+:is(.years-grid, .specializations-grid, .subjects-grid, .lessons-grid, .teachers-grid) > :nth-child(3) { animation-delay: 0.2s; }
+:is(.years-grid, .specializations-grid, .subjects-grid, .lessons-grid, .teachers-grid) > :nth-child(4) { animation-delay: 0.28s; }
+:is(.years-grid, .specializations-grid, .subjects-grid, .lessons-grid, .teachers-grid) > :nth-child(5) { animation-delay: 0.36s; }
+:is(.years-grid, .specializations-grid, .subjects-grid, .lessons-grid, .teachers-grid) > :nth-child(6) { animation-delay: 0.44s; }
+:is(.years-grid, .specializations-grid, .subjects-grid, .lessons-grid, .teachers-grid) > :nth-child(7) { animation-delay: 0.52s; }
+:is(.years-grid, .specializations-grid, .subjects-grid, .lessons-grid, .teachers-grid) > :nth-child(8) { animation-delay: 0.6s; }
+:is(.years-grid, .specializations-grid, .subjects-grid, .lessons-grid, .teachers-grid) > :nth-child(n+9) { animation-delay: 0.68s; }
 
 @keyframes yearWave {
-  0% { opacity: 0; transform: translateY(90px) scale(0.82); filter: blur(16px); }
-  55% { opacity: 1; transform: translateY(-14px) scale(1.04); filter: blur(0); }
-  78% { opacity: 1; transform: translateY(5px) scale(0.995); filter: blur(0); }
+  0% { opacity: 0; transform: translateY(80px) scale(0.87); filter: blur(12px); }
+  60% { opacity: 1; transform: translateY(-10px) scale(1.02); filter: blur(0); }
   100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
 }
 
@@ -1212,7 +1216,7 @@ html[data-theme="dark"] .fav-card::after {
   color: var(--pine);
   background: linear-gradient(150deg, rgba(14, 87, 66, 0.12), rgba(192, 138, 78, 0.14));
   border: 1px solid rgba(14, 87, 66, 0.09);
-  transition: transform 0.55s var(--ease), background 0.4s, color 0.4s;
+  transition: transform 0.55s var(--ease), background 0.4s;
 }
 
 .year-card .year-icon svg { width: 25px; height: 25px; stroke-width: 1.7; }
@@ -1267,7 +1271,7 @@ html[data-theme="dark"] .year-card .count {
 }
 
 /* بطاقة التخصص */
-.specialization-card { display: flex; flex-direction: column; padding: 22px; gap: 16px; }
+.specialization-card { display: flex; flex-direction: column; padding: 22px; gap: 16px; cursor: pointer; }
 
 .spec-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
 
@@ -1283,7 +1287,7 @@ html[data-theme="dark"] .year-card .count {
   color: var(--pine);
   background: rgba(14, 87, 66, 0.08);
   border: 1px solid rgba(14, 87, 66, 0.1);
-  transition: background 0.4s, color 0.4s, transform 0.5s var(--ease);
+  transition: background 0.4s, transform 0.5s var(--ease);
 }
 
 .spec-icon svg { width: 21px; height: 21px; stroke-width: 1.7; }
@@ -1365,7 +1369,7 @@ html[data-theme="dark"] .year-card .count {
   color: var(--brass-2);
   background: rgba(192, 138, 78, 0.12);
   border: 1px solid rgba(192, 138, 78, 0.16);
-  transition: background 0.4s, color 0.4s, transform 0.5s var(--ease);
+  transition: background 0.4s, transform 0.5s var(--ease);
 }
 
 .subject-card .icon svg { width: 20px; height: 20px; stroke-width: 1.7; }
@@ -4034,6 +4038,21 @@ html[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
 }
 
 .cselect-menu::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+/* أيقونات الخانات ترث لون الخانة (كي تظهر بيضاء عند المرور) */
+.year-icon svg,
+.spec-icon svg,
+.subject-card .icon svg,
+.fav-card-icon svg,
+.contact-card-icon svg,
+.menu-icon svg,
+.notice-icon svg,
+.my-lessons-icon svg,
+.results-icon svg,
+.chip-icon svg,
+.upload-card-icon svg {
+  color: inherit !important;
+}
 
 /* احترام تقليل الحركة */
 @media (prefers-reduced-motion: reduce) {

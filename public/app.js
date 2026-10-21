@@ -337,8 +337,8 @@ function renderSpecializations(yearId) {
     const specJson = JSON.stringify(spec);
 
     return `
-      <div class="specialization-card ripple-surface">
-        <div class="spec-header" onclick='selectSpecialization(${specJson})' style="cursor: pointer;">
+      <div class="specialization-card ripple-surface" onclick='selectSpecialization(${specJson})'>
+        <div class="spec-header">
           <div style="display:flex;align-items:center;gap:12px;">
             <span class="spec-icon">${icon(getSpecializationIcon(spec))}</span>
             <h4>${escapeHtml(spec)}</h4>

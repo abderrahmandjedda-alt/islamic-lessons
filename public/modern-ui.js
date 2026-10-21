@@ -549,75 +549,59 @@
   }
 
   /* ─────────────────────────────
-     🌊 انبثاق البطاقات عند التمرير (السنوات، التخصصات، المواد، الدروس، الأساتذة)
+     🌊 انبثاق البطاقات عند دخولها الشاشة
   ───────────────────────────── */
   function initCardWave() {
     const CARD = '.year-card, .specialization-card, .subject-card, .lesson-card, .teacher-card';
-    const grids = $$('.years-grid, .specializations-grid, .subjects-grid, .lessons-grid, .teachers-grid');
-    if (!grids.length) return;
+    const all = function () { return $$(CARD); };
 
-    grids.forEach(function (grid) { grid.classList.add('wave-armed'); });
-
-    function eachCard(fn) {
-      grids.forEach(function (grid) {
-        Array.prototype.forEach.call(grid.children, function (child) {
-          if (child.matches && child.matches(CARD)) fn(child);
-        });
-      });
+    if (!('IntersectionObserver' in window)) {
+      all().forEach(function (card) { card.classList.add('wave-play'); });
+      return;
     }
 
-    function reveal(card) {
-      if (!card || card.classList.contains('wave-in')) return;
+    function play(card) {
+      if (card.dataset.wavePlayed === '1') return;
+      card.dataset.wavePlayed = '1';
       const parent = card.parentElement;
       const index = parent ? Array.prototype.indexOf.call(parent.children, card) : 0;
-      card.style.animationDelay = ((index % 5) * 90) + 'ms';
-      card.classList.add('wave-in');
+      card.style.animationDelay = ((index % 5) * 80) + 'ms';
+      card.classList.add('wave-play');
     }
 
-    let io = null;
-    if ('IntersectionObserver' in window) {
-      io = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting) {
-            reveal(entry.target);
-            io.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.3, rootMargin: '0px 0px -15% 0px' });
-    }
+    const io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        play(entry.target);
+        io.unobserve(entry.target);
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
 
-    function observeCards() {
-      eachCard(function (card) {
-        if (card.classList.contains('wave-in')) return;
-        if (!io) { reveal(card); return; }
-        if (card.dataset.waveObs === '1') return;
+    function observeAll() {
+      all().forEach(function (card) {
+        if (card.dataset.waveObs === '1' || card.dataset.wavePlayed === '1') return;
         card.dataset.waveObs = '1';
         io.observe(card);
       });
     }
 
-    observeCards();
+    observeAll();
 
-    if ('MutationObserver' in window) {
-      let scheduled = false;
-      new MutationObserver(function () {
-        if (scheduled) return;
-        scheduled = true;
-        requestAnimationFrame(function () {
-          scheduled = false;
-          observeCards();
-        });
-      }).observe(document.body, { childList: true, subtree: true });
+    function checkVisible() {
+      all().forEach(function (card) {
+        if (card.dataset.wavePlayed === '1') return;
+        const rect = card.getBoundingClientRect();
+        if (rect.bottom > 0 && rect.top < window.innerHeight * 0.92) play(card);
+      });
     }
 
-    // شبكة أمان: أي بطاقة ظاهرة ولم تُكشف بعد
-    setInterval(function () {
-      eachCard(function (card) {
-        if (card.classList.contains('wave-in')) return;
-        const rect = card.getBoundingClientRect();
-        if (rect.top < window.innerHeight * 0.85 && rect.bottom > 0) reveal(card);
-      });
-    }, 600);
+    window.addEventListener('scroll', checkVisible, { passive: true });
+    window.addEventListener('resize', checkVisible, { passive: true });
+    setInterval(checkVisible, 400);
+
+    if ('MutationObserver' in window) {
+      new MutationObserver(observeAll).observe(document.body, { childList: true, subtree: true });
+    }
   }
 
   /* ─────────────────────────────

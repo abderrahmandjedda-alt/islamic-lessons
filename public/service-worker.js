@@ -5,7 +5,7 @@
 // ⚠️ مهم: عند أي تعديل، زيّد رقم الإصدار!
 // ═══════════════════════════════════════════════
 
-const VERSION = 'v1.0.28';
+const VERSION = 'v1.0.32';
 const CACHE_NAME = `islamic-lessons-${VERSION}`;
 const STATIC_CACHE = `islamic-lessons-static-${VERSION}`;
 const DYNAMIC_CACHE = `islamic-lessons-dynamic-${VERSION}`;
